@@ -3,7 +3,8 @@
 Spring 7 will base on JDK 25(lts) and align with Jakarta EE 11, and update the components to the newest version.
 *  Hibernate ORM 7
 *  Hibernate Validator 9
-*  Tomcat 11 
+*  Tomcat 11
+*  Kotlin 2 Refinement
 
 
 ## Resources
