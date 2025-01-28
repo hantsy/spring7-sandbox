@@ -1,0 +1,43 @@
+# see https://docs.docker.com/compose/compose-file/compose-versioning/
+# version: "3.5" # specify docker compose version, v3.5 is compatible with docker 17.12.0+
+
+# Define the services/containers to be run
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blogdb
+      POSTGRES_USER: user
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql
+      - ./pg-initdb.d:/docker-entrypoint-initdb.d
+
+  mongodb:
+    image: mongo
+    volumes:
+      - ./data/mongo:/data/db
+    ports:
+      - "27017:27017"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ./data/es:/usr/share/elasticsearch/data     
+  artemis:
+    image: qoricode/activemq-artemis
+    environment:
+      ARTEMIS_USERNAME: user
+      ARTEMIS_PASSWORD: password
+    volumes:
+      - ./data/artemis:/var/lib/artemis/data
+    ports:
+      - "6161:61616"    
