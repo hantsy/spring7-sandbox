@@ -10,10 +10,10 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: blogdb
+      POSTGRES_DB: testdb
       POSTGRES_USER: user
     volumes:
-      - ./data/postgresql:/var/lib/postgresql
+      - ./data/postgresql:/var/lib/postgres
       - ./pg-initdb.d:/docker-entrypoint-initdb.d
 
   mongodb:
