@@ -26,7 +26,7 @@
 
         <!-- API and frameworks -->
         <jakartaee-api.version>11.0.0-M4</jakartaee-api.version>
-        <spring-framework.version>7.0.0-M1</spring-framework.version>
+        <spring-framework.version>7.0.0-M2</spring-framework.version>
         <spring-data.version>2025.1.0-M1</spring-data.version>
         <spring-security.version>6.5.0-M1</spring-security.version>
         <freemarker.version>2.3.34</freemarker.version>
