@@ -1,6 +1,6 @@
 # Spring 7 Sandbox
 
-Spring 7 will be based on JDK 25(LTS), align with Jakarta EE 11, and update the components to the newest version.
+Spring 7 retains JDK 17 but embraces the new features from JDK 25(LTS), aligns with Jakarta EE 11, and updates the components to the latest version.
 *  Hibernate ORM 7
 *  Hibernate Validator 9
 *  Tomcat 11
