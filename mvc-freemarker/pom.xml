@@ -25,7 +25,7 @@
         <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
 
         <!-- API and frameworks -->
-        <jakartaee-api.version>11.0.0-M5</jakartaee-api.version>
+        <jakartaee-api.version>11.0.0-RC1</jakartaee-api.version>
         <spring-framework.version>7.0.0-M2</spring-framework.version>
         <spring-data.version>2025.1.0-M1</spring-data.version>
         <spring-security.version>6.5.0-M1</spring-security.version>
