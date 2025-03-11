@@ -3,18 +3,16 @@ package com.example.demo;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
 import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 import java.util.function.BiFunction;
 
-@Repository
 public class H2PostRepository implements PostRepository {
 
     private final DatabaseClient databaseClient;
-    private final BiFunction<Row, RowMetadata, Post> postMapper = (row, metadata) -> new Post(
+    private static final BiFunction<Row, RowMetadata, Post> POST_MAPPER = (row, metadata) -> new Post(
         row.get("id", UUID.class),
         row.get("title", String.class),
         row.get("content", String.class)
@@ -27,11 +25,12 @@ public class H2PostRepository implements PostRepository {
     @Override
     public Mono<Post> findById(UUID id) {
         String sql = """
-                SELECT * FROM posts WHERE id = :id
+                SELECT * FROM posts
+                WHERE id = :id
                 """;
         return databaseClient.sql(sql)
                 .bind("id", id)
-                .map(postMapper)
+                .map(POST_MAPPER)
                 .one();
     }
 
@@ -41,7 +40,7 @@ public class H2PostRepository implements PostRepository {
                 SELECT * FROM posts
                 """;
         return databaseClient.sql(sql)
-                .map(postMapper)
+                .map(POST_MAPPER)
                 .all();
     }
 
@@ -57,14 +56,14 @@ public class H2PostRepository implements PostRepository {
                 .bind("content", post.content())
                 .fetch()
                 .first()
-                .map(stringObjectMap ->(UUID) stringObjectMap.get("id"));
+                .map(row ->(UUID) row.get("id"));
     }
 
     @Override
     public Mono<Long> update(UUID id, Post post) {
         String sql = """
                 UPDATE posts
-                SET title = :title, content = :content 
+                SET title = :title, content = :content
                 WHERE id = :id
                 """;
         return databaseClient.sql(sql)

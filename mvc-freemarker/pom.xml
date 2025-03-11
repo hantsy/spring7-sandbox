@@ -17,42 +17,42 @@
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
         <!-- maven plugins -->
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
-        <cargo-maven3-plugin.version>1.10.16</cargo-maven3-plugin.version>
+        <cargo-maven3-plugin.version>1.10.18</cargo-maven3-plugin.version>
         <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
 
         <!-- API and frameworks -->
-        <jakartaee-api.version>11.0.0-M4</jakartaee-api.version>
-        <spring-framework.version>7.0.0-M1</spring-framework.version>
+        <jakartaee-api.version>11.0.0-RC1</jakartaee-api.version>
+        <spring-framework.version>7.0.0-M2</spring-framework.version>
         <spring-data.version>2025.1.0-M1</spring-data.version>
         <spring-security.version>6.5.0-M1</spring-security.version>
         <freemarker.version>2.3.34</freemarker.version>
         <hibernate-validator.version>9.0.0.CR1</hibernate-validator.version>
         <postgresql.version>42.7.5</postgresql.version>
-        <reactor.version>2024.0.2</reactor.version>
-        <logback.version>1.5.16</logback.version>
-        <slf4j.version>2.0.16</slf4j.version>
+        <reactor.version>2024.0.3</reactor.version>
+        <logback.version>1.5.17</logback.version>
+        <slf4j.version>2.0.17</slf4j.version>
         <lombok.version>1.18.36</lombok.version>
-        <testcontainers.version>1.20.4</testcontainers.version>
-        <jackson.version>2.18.2</jackson.version>
-        <junit.version>5.11.4</junit.version>
-        <mockito.version>5.15.2</mockito.version>
+        <testcontainers.version>1.20.6</testcontainers.version>
+        <jackson.version>2.18.3</jackson.version>
+        <junit.version>5.12.0</junit.version>
+        <mockito.version>5.16.0</mockito.version>
         <assertj-core.version>3.27.3</assertj-core.version>
         <json-path.version>2.9.0</json-path.version>
         <hamcrest.version>3.0</hamcrest.version>
 
         <!-- Apache Tomcat -->
-        <tomcat.version>11.0.2</tomcat.version>
+        <tomcat.version>11.0.5</tomcat.version>
 
         <!-- Eclipse Jetty  -->
         <jetty.version>12.1.0.alpha1</jetty.version>
 
         <!-- WildFly for Jakarta EE 10 -->
         <wildfly.version>35.0.0.Final</wildfly.version>
-        <wildfly-maven-plugin.version>5.1.1.Final</wildfly-maven-plugin.version>
+        <wildfly-maven-plugin.version>5.1.2.Final</wildfly-maven-plugin.version>
         <wildfly.artifactId>wildfly-dist</wildfly.artifactId>
 
         <!-- Skip tests by default -->
@@ -245,7 +245,7 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <!-- <dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
@@ -254,7 +254,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
