@@ -37,10 +37,9 @@
         <appender-ref ref="RollingFile"/>
         <appender-ref ref="Console"/>
     </root>
-    <logger name="org.springframework.security" level="TRACE"/>
-    <logger name="org.springframework.web" level="DEBUG"/>
-    <logger name="org.springframework.jdbc" level="DEBUG"/>
-    <logger name="org.springframework.data" level="DEBUG"/>
+    <logger name="org.springframework.beans" level="TRACE"/>
+    <logger name="org.springframework.context" level="DEBUG"/>
+    <logger name="org.springframework.r2dbc" level="DEBUG"/>
     <logger name="reactor.util" level="INFO">
     </logger>
     <logger name="com.example" level="debug" additivity="false">

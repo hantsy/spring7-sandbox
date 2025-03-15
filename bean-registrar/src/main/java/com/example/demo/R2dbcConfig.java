@@ -23,7 +23,8 @@ public class R2dbcConfig {
     public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
         return DatabaseClient.builder()
                 .connectionFactory(connectionFactory)
-                .bindMarkers(BindMarkersFactory.indexed(":", 1))
+                //.bindMarkers(BindMarkersFactory.indexed(":", 1))
+                .namedParameters(true)
                 .build();
     }
 

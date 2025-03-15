@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>spring6-sample-bean-registar</name>
+    <name>spring6-sample-bean-registrar</name>
     <description>Spring 7 Bean Registrar(without Spring Boot)</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,7 +21,7 @@
 
         <!-- API and frameworks -->
         <jakartaee-api.version>11.0.0-RC1</jakartaee-api.version>
-        <spring-framework.version>7.0.0-M2</spring-framework.version>
+        <spring-framework.version>7.0.0-M3</spring-framework.version>
         <reactor.version>2024.0.4</reactor.version>
         <logback.version>1.5.17</logback.version>
         <slf4j.version>2.0.17</slf4j.version>
@@ -110,6 +110,11 @@
             <groupId>io.r2dbc</groupId>
             <artifactId>r2dbc-h2</artifactId>
             <version>1.0.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
         </dependency>
         <!-- Jakarta EE 9 API, @Inject support -->
         <dependency>

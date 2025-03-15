@@ -2,6 +2,8 @@ package com.example.demo;
 
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -10,6 +12,7 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 
 public class H2PostRepository implements PostRepository {
+    private static final Logger LOG = LoggerFactory.getLogger(H2PostRepository.class);
 
     private final DatabaseClient databaseClient;
     private static final BiFunction<Row, RowMetadata, Post> POST_MAPPER = (row, metadata) -> new Post(
@@ -47,16 +50,20 @@ public class H2PostRepository implements PostRepository {
     @Override
     public Mono<UUID> save(Post post) {
         String sql = """
-                INSERT INTO posts (title, content)
-                VALUES (:title, :content)
-                RETURNING id
+                SELECT id FROM FINAL TABLE(
+                    INSERT INTO posts(title, content)
+                    VALUES (:title, :content)
+                )
                 """;
         return databaseClient.sql(sql)
                 .bind("title", post.title())
                 .bind("content", post.content())
                 .fetch()
                 .first()
-                .map(row ->(UUID) row.get("id"));
+                .map(row ->{
+                    LOG.debug("Inserted post: {}", post);
+                    return (UUID) row.get("id");
+                });
     }
 
     @Override
