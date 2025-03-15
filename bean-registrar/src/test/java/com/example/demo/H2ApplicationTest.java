@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.UUID;
 
@@ -30,7 +31,12 @@ class H2ApplicationTest {
         Mono<UUID> savedPostId = this.postRepository.save(post);
 
         savedPostId.flatMap(id -> this.postRepository.findById(id))
-                .subscribe(System.out::println);
+                .as(StepVerifier::create)
+                .consumeNextWith(p -> {
+                    assertThat(p.title()).isEqualTo("Test Title");
+                    assertThat(p.content()).isEqualTo("Test Content");
+                })
+                .verifyComplete();
 
         savedPostId.flatMap(id ->
                         this.postRepository.update(id, new Post(null, "Updated Title", "Updated Content"))
@@ -41,7 +47,7 @@ class H2ApplicationTest {
 
         savedPostId.flatMap(id -> this.postRepository.deleteById(id))
                 .subscribe(System.out::println);
-        
+
         this.postRepository.findAll().subscribe(System.out::println);
     }
 }
