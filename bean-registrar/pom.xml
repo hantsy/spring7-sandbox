@@ -20,7 +20,7 @@
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 
         <!-- API and frameworks -->
-        <jakartaee-api.version>11.0.0-RC1</jakartaee-api.version>
+        <jakartaee-api.version>11.0.0</jakartaee-api.version>
         <spring-framework.version>7.0.0-M3</spring-framework.version>
         <reactor.version>2024.0.4</reactor.version>
         <logback.version>1.5.18</logback.version>
