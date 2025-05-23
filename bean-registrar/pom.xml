@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>spring6-sample-bean-registrar</name>
+    <name>spring7-examples-bean-registrar</name>
     <description>Spring 7 Bean Registrar(without Spring Boot)</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
