@@ -29,7 +29,7 @@
         <h2.version>2.3.232</h2.version>
         <jackson.version>2.18.3</jackson.version>
 		<kotlin.version>2.1.10</kotlin.version>
-		<kotlinx-coroutines.version>1.10.1</kotlinx-coroutines.version>
+		<kotlinx-coroutines.version>1.10.2</kotlinx-coroutines.version>
 
 		<!-- test libs  -->
         <junit.version>5.12.1</junit.version>
