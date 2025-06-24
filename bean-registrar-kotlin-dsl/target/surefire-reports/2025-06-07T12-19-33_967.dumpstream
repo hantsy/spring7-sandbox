@@ -1,5 +1,0 @@
-# Created at 2025-06-07T12:19:34.501
-Boot Manifest-JAR contains absolute paths in classpath 'D:\hantsylabs\spring7-sandbox\bean-registrar-kotlin-dsl\target\test-classes'
-Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-'other' has different root
-
