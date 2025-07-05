@@ -45,7 +45,7 @@
         <hamcrest.version>3.0</hamcrest.version>
 
         <!-- Apache Tomcat -->
-        <tomcat.version>11.0.8</tomcat.version>
+        <tomcat.version>11.0.9</tomcat.version>
 
         <!-- Eclipse Jetty  -->
         <jetty.version>12.1.0.beta1</jetty.version>
