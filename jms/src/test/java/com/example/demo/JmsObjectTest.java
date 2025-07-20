@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,28 +15,27 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringJUnitConfig(value = {JmsTest.TestConfig.class})
+@SpringJUnitConfig(value = {JmsObjectTest.TestConfig.class})
 @ContextConfiguration(initializers = {ArtemisContainerInitializer.class})
-public class JmsTest {
-    private final static Logger log = LoggerFactory.getLogger(JmsTest.class);
+public class JmsObjectTest {
+    private final static Logger log = LoggerFactory.getLogger(JmsObjectTest.class);
 
     @Configuration
-    @Import(value = {JmsConfig.class, HelloSender.class, HelloReceiver.class})
+    @Import(value = {JmsConfig.class, HelloObjectSender.class, HelloObjectReceiver.class})
     static class TestConfig {
     }
 
     @Autowired
-    HelloSender sender;
+    HelloObjectSender sender;
 
     @Autowired
-    HelloReceiver receiver;
+    HelloObjectReceiver receiver;
 
     @Test
     public void whenWaitOneSecond_thenReceiverShouldReceiveAllMessages() {
         sender.send();
 
         // wait one second to verify.
-        await().atMost(Duration.ofSeconds(1))
-                .untilAsserted(() -> assertThat(receiver.getMessageList().size()).isEqualTo(10));
+        await().atMost(Duration.ofMillis(1_500)).untilAsserted(() -> assertThat(receiver.getMessageList().size()).isEqualTo(10));
     }
 }

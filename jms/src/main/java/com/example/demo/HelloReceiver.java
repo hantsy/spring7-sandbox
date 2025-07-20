@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class Receiver {
+public class HelloReceiver {
     private final Logger log = LoggerFactory.getLogger(JmsConfig.class);
 
     private List<String> messageList = new ArrayList<>();

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jms.core.JmsClient;
@@ -23,7 +22,6 @@ public class JmsClientTest {
     private final static Logger log = LoggerFactory.getLogger(JmsClientTest.class);
 
     @Configuration
-    @ComponentScan(basePackageClasses = Sender.class)
     @Import(value = {JmsConfig.class})
     static class TestConfig {
     }
@@ -41,7 +39,7 @@ public class JmsClientTest {
         await().atMost(Duration.ofMillis(1_500))
                 .untilAsserted(() -> {
                     var receivedMessage = jmsClient.destination("test")
-                            .withTimeToLive(1000)
+                            .withReceiveTimeout(1000)
                             .receive(Greeting.class);
                     assertThat(receivedMessage).isPresent();
                     log.info("Greeting messages received: {}", receivedMessage.get());

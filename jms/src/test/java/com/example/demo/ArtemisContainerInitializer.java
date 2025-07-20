@@ -25,8 +25,11 @@ class ArtemisContainerInitializer implements ApplicationContextInitializer<@NotN
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
         container.start();
-        ApplicationListener<?> stopContainerListener = (ContextClosedEvent event) -> container.stop();
-        applicationContext.addApplicationListener(stopContainerListener);
+        applicationContext.addApplicationListener(event -> {
+            if(event instanceof  ContextClosedEvent e) {
+                container.stop();
+            }
+        });
 
         var brokerUrlFormat = "tcp://%s:%d";
         var brokerUrl = brokerUrlFormat.formatted(container.getHost(), container.getFirstMappedPort());

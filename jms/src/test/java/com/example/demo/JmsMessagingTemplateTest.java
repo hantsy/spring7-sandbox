@@ -23,7 +23,6 @@ public class JmsMessagingTemplateTest {
     private final static Logger log = LoggerFactory.getLogger(JmsMessagingTemplateTest.class);
 
     @Configuration
-    @ComponentScan(basePackageClasses = Sender.class)
     @Import(value = {JmsConfig.class})
     static class TestConfig {
     }

@@ -6,17 +6,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.annotation.EnableJms;
+import org.springframework.jms.annotation.JmsListenerConfigurer;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.config.JmsListenerEndpointRegistrar;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsClient;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.converter.JacksonJsonMessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 
 @Configuration
 @EnableJms
-public class JmsConfig {
+public class JmsConfig implements JmsListenerConfigurer{
 
     @Autowired
     Environment environment;
@@ -29,36 +32,58 @@ public class JmsConfig {
     }
 
     @Bean
+    public org.springframework.jms.support.converter.MessageConverter messageConverter() {
+        org.springframework.jms.support.converter.JacksonJsonMessageConverter messageConverter = new org.springframework.jms.support.converter.JacksonJsonMessageConverter();
+        messageConverter.setTypeIdPropertyName("_type");
+        return messageConverter;
+    }
+
+    @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory());
         //factory.setDestinationResolver(destinationResolver());
-        factory.setSessionTransacted(true);
-        factory.setConcurrency("5");
+        factory.setMessageConverter(messageConverter());
+//        factory.setSessionTransacted(true);
+//        factory.setConcurrency("5");
         return factory;
     }
 
 
     @Bean
     public JmsTemplate jmsTemplate() {
-        return new JmsTemplate(connectionFactory());
+        JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory());
+        jmsTemplate.setMessageConverter(messageConverter());
+        return jmsTemplate;
     }
 
     @Bean
-    public MessageConverter jsonMessageConverter() {
+    public MessageConverter messagingMessageConverter() {
         return new JacksonJsonMessageConverter();
     }
 
     @Bean
     public JmsMessagingTemplate jmsMessagingTemplate() {
         JmsMessagingTemplate jmsMessagingTemplate = new JmsMessagingTemplate(connectionFactory());
-        jmsMessagingTemplate.setMessageConverter(jsonMessageConverter());
+        jmsMessagingTemplate.setMessageConverter(messagingMessageConverter());
         return jmsMessagingTemplate;
     }
 
     @Bean
-    public JmsClient  jmsClient() {
-        return JmsClient.create(connectionFactory(), jsonMessageConverter());
+    public JmsClient jmsClient() {
+        return JmsClient.create(connectionFactory(), messagingMessageConverter());
     }
 
+    @Override
+    public void configureJmsListeners(JmsListenerEndpointRegistrar registrar) {
+        registrar.setMessageHandlerMethodFactory(messageHandlerMethodFactory());
+        registrar.setContainerFactory(jmsListenerContainerFactory());
+    }
+
+    @Bean
+    public  DefaultMessageHandlerMethodFactory messageHandlerMethodFactory(){
+        DefaultMessageHandlerMethodFactory messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
+        messageHandlerMethodFactory.setMessageConverter(messagingMessageConverter());
+        return messageHandlerMethodFactory;
+    }
 }
