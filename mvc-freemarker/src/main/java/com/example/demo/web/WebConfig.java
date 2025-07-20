@@ -1,20 +1,18 @@
 package com.example.demo.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-
-import java.util.List;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebMvc
@@ -38,9 +36,9 @@ public class WebConfig implements WebMvcConfigurer {
     ObjectMapper objectMapper;
 
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        var jackson2MessageConverter = new MappingJackson2HttpMessageConverter(objectMapper);
-        converters.add(jackson2MessageConverter);
+    public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
+        var httpMessageConverter = new JacksonJsonHttpMessageConverter(objectMapper);
+        builder.jsonMessageConverter(httpMessageConverter);
     }
 
     @Override

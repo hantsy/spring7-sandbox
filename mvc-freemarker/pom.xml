@@ -37,7 +37,7 @@
         <slf4j.version>2.0.17</slf4j.version>
         <lombok.version>1.18.38</lombok.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <jackson.version>2.19.1</jackson.version>
+        <jackson.version>3.0.0-rc6</jackson.version>
         <junit.version>5.13.3</junit.version>
         <mockito.version>5.18.0</mockito.version>
         <assertj-core.version>3.27.3</assertj-core.version>
@@ -117,7 +117,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
+                <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
                 <type>pom</type>
@@ -210,17 +210,10 @@
         </dependency>
 
         <!-- Jackson -->
+        <!-- jdk8 and jsr310 are merged in the core databind module in 3.0.0-->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk8</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
         <!-- Jakarta EE 9 compatible Servlet container, eg. Tomcat 10, Eclipse Jetty 11 -->
