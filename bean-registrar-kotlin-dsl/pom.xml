@@ -27,7 +27,7 @@
         <slf4j.version>2.0.17</slf4j.version>
         <r2dbc-h2.version>1.0.0.RELEASE</r2dbc-h2.version>
         <h2.version>2.3.232</h2.version>
-        <jackson.version>2.19.1</jackson.version>
+        <jackson.version>3.0.0-rc6</jackson.version>
 		<kotlin.version>2.2.0</kotlin.version>
 		<kotlinx-coroutines.version>1.10.2</kotlinx-coroutines.version>
 
@@ -97,7 +97,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
+                <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
                 <type>pom</type>
@@ -143,12 +143,8 @@
             <artifactId>jakarta.inject-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk8</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 		
 		<!-- kotlin -->
