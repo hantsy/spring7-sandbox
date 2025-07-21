@@ -6,6 +6,7 @@ import com.example.demo.web.WebConfig;
 import jakarta.servlet.Filter;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletRegistration;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
@@ -21,7 +22,7 @@ public class DemoApplicationInitializer extends AbstractAnnotationConfigDispatch
     protected Class<?>[] getServletConfigClasses() {
         return new Class[]{
                 AppConfig.class,
-                Jackson2ObjectMapperConfig.class,
+                JacksonObjectMapperConfig.class,
                 DataSourceConfig.class,
                 DataJdbcConfig.class,
                 JdbcConfig.class,

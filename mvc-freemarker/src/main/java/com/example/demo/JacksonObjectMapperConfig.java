@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.DeserializationFeature;
@@ -8,19 +9,20 @@ import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
-public class Jackson2ObjectMapperConfig {
+public class JacksonObjectMapperConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
 
         var builder = JsonMapper.builder();
 
-        builder.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+        builder.changeDefaultPropertyInclusion(include -> include.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                         DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
                 .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
                 .findAndAddModules();
-// Jackson2ObjectMapperBuilder is removed, due to the Jackson 3 JsonMapperBuilder.
+// Spring Jackson2ObjectMapperBuilder is deprecated, due to the Jackson 3 JsonMapper.Builder.
 //        var builder = Jackson2ObjectMapperBuilder.json();
 //        builder.serializationInclusion(JsonInclude.Include.NON_EMPTY);
 //        builder.featuresToDisable(
