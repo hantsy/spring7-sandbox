@@ -55,7 +55,6 @@ public class DemoApplicationInitializer extends AbstractAnnotationConfigDispatch
 
         // Enable logging request details
         registration.setInitParameter("enableLoggingRequestDetails", "true");
-
     }
 
 }

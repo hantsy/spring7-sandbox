@@ -43,9 +43,7 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        http
-                // antMatchers -> securityMatcher
-                .securityMatcher("/api/**")
+        http.securityMatcher("/api/**")
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().hasRole("ADMIN")
                 )
@@ -57,8 +55,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(authorize -> authorize
+        http.authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
