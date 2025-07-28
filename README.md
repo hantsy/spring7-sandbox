@@ -1,6 +1,7 @@
 # Spring 7 Sandbox
 
-Spring 7 retains JDK 17 as a baseline but embraces the new features from JDK 25(LTS). It aligns with Jakarta EE 11 and updates the components to the latest version.
+Spring 7 retains JDK 17 as a baseline but incorporates the new features from JDK 25 (LTS). It aligns with Jakarta EE 11 and updates the components to the latest version.
+
 *  Hibernate ORM 7
 *  Hibernate Validator 9
 *  Tomcat 11
@@ -9,6 +10,7 @@ Spring 7 retains JDK 17 as a baseline but embraces the new features from JDK 25(
 
 ## Resources
 
+* [Spring Boot 4.0.0-M1 available now](https://spring.io/blog/2025/07/24/spring-boot-4-0-0-M1-available-now)
 * [Spring AMQP 4.0 Milestone 3 Available](https://spring.io/blog/2025/07/21/spring-amqp-4-0-0-m3-available)
 * [Spring for Apache Kafka 4.0.0-M3 is Available Now](https://spring.io/blog/2025/07/21/spring-kafka-4)
 * [Spring REST Docs 4.0.0-M1](https://spring.io/blog/2025/07/21/spring-rest-docs-4)
