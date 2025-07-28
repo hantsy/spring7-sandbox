@@ -3,7 +3,7 @@ package com.example.demo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.server.test.LocalServerPort;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.ApiVersionInserter;
 import org.springframework.web.client.RestClient;
@@ -16,7 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class DemoApplicationTests {
-
+    // This is a 4.0 break change.
+    // The `LocalServerPort` is moved from package `org.springframework.boot.test.web.server`
+    // to `org.springframework.boot.web.server.test`.
     @LocalServerPort
     int port;
 
