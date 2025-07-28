@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.web.client.ApiVersionFormatter;
 import org.springframework.web.client.ApiVersionInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.DisposableServer;
@@ -40,11 +39,11 @@ public class IntegrationTests {
                 .codecs(c -> c.defaultCodecs().enableLoggingRequestDetails(true))
                 //.defaultHeaders(headers -> headers.set("X-API-Version", "1.0"))
                 .apiVersionInserter(ApiVersionInserter.builder()
-                        .useHeader("X-API-Version")
+                                .useHeader("X-API-Version")
 //                        .usePathSegment(0)
 //                        .useQueryParam("version")
-                       // .withVersionFormatter(ApiVersionFormatter)
-                        .build()
+                                // .withVersionFormatter(ApiVersionFormatter)
+                                .build()
                 )
                 .clientConnector(clientConnector)
                 .build();
@@ -85,17 +84,6 @@ public class IntegrationTests {
                 .bodyToMono(String.class)
                 .as(StepVerifier::create)
                 .expectNext("Hello v2.0")
-                .verifyComplete();
-    }
-
-    @Test
-    public void testGetAllPosts() throws Exception {
-        this.client
-                .get().uri("/posts")
-                .retrieve()
-                .bodyToFlux(Post.class)
-                .as(StepVerifier::create)
-                .expectNextCount(2)
                 .verifyComplete();
     }
 

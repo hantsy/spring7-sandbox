@@ -21,7 +21,7 @@ public class GreetingControllerTest {
 
     @Test
     void testHello() {
-        this.webTestClient.get().uri("/hello")
+        this.webTestClient.get().uri( "/hello")
                 .apiVersion(1.0)
                 .exchange()
                 .expectBody(String.class).isEqualTo("Hello v1.0(Default)");
