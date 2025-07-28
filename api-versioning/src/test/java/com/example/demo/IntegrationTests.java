@@ -15,6 +15,8 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.server.HttpServer;
 import reactor.test.StepVerifier;
 
+import java.time.Duration;
+
 @SpringJUnitConfig(classes = Application.class)
 public class IntegrationTests {
 
@@ -33,7 +35,7 @@ public class IntegrationTests {
         var reactorHttpClient = HttpClient.create().option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30_000);
         var clientConnector = new ReactorClientHttpConnector(reactorHttpClient);
 
-        this.disposableServer = this.httpServer.bindNow();
+        this.disposableServer = this.httpServer.bindNow(Duration.ofMillis(5_000));
         this.client = WebClient.builder()
                 .baseUrl("http://localhost:" + this.port)
                 .codecs(c -> c.defaultCodecs().enableLoggingRequestDetails(true))
@@ -79,7 +81,7 @@ public class IntegrationTests {
     @Test
     public void testHello2_0() {
         this.client.get().uri("/hello")
-                .apiVersion("2_0")
+                .apiVersion("2.0")
                 .retrieve()
                 .bodyToMono(String.class)
                 .as(StepVerifier::create)
