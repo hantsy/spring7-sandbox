@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class DemoApplication {
 
-    public static final String DESTENATION_HELLO = "hello";
+    public static final String DESTINATION_HELLO = "hello";
 
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);

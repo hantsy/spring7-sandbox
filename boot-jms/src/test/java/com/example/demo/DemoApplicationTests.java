@@ -32,7 +32,7 @@ class DemoApplicationTests {
 
     @Test
     public void testSendMessage() {
-        jmsClient.destination(DemoApplication.DESTENATION_HELLO).send(Greeting.of("Hello World"));
+        jmsClient.destination(DemoApplication.DESTINATION_HELLO).send(Greeting.of("Hello World"));
         waitAtMost(Duration.ofMillis(5_000))
                 .untilAsserted(() -> assertThat(this.listener.latestMessage).isEqualTo("Hello World"));
     }
@@ -62,7 +62,7 @@ class DemoApplicationTests {
     @Test
     void testSendAndReceive2_withJsmTemplate_Greeting() {
         var testMsg = Greeting.of("Hello World");
-        jmsTemplate.convertAndSend(DemoApplication.DESTENATION_HELLO, testMsg);
+        jmsTemplate.convertAndSend(DemoApplication.DESTINATION_HELLO, testMsg);
 
         waitAtMost(Duration.ofMillis(5_000))
                 .untilAsserted(() -> assertThat(this.listener.latestMessage).isEqualTo("Hello World"));

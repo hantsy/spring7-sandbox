@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class GreetingListener {
     public String latestMessage;
 
-    @JmsListener(destination = DemoApplication.DESTENATION_HELLO)
+    @JmsListener(destination = DemoApplication.DESTINATION_HELLO)
     public void onGreeting(Greeting greeting) {
         log.debug("received greeting: {}", greeting);
         this.latestMessage = greeting.message();
