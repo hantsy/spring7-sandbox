@@ -1,52 +1,29 @@
 package com.example.demo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.core.JmsClient;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class DemoApplication {
+
+    public static final String DESTENATION_HELLO = "hello";
 
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
     }
 
-}
-
-
-@Component
-class Sender {
-    private final static Logger log = LoggerFactory.getLogger(Receiver.class);
-    final JmsClient jmsClient;
-
-    public Sender(JmsClient jmsClient) {
-        this.jmsClient = jmsClient;
+    @Bean
+    org.springframework.jms.support.converter.JacksonJsonMessageConverter jacksonMessageConverter() {
+        org.springframework.jms.support.converter.JacksonJsonMessageConverter messageConverter = new org.springframework.jms.support.converter.JacksonJsonMessageConverter();
+        messageConverter.setTypeIdPropertyName("_type");
+        return messageConverter;
     }
 
-    public void sendMessage(String message) {
-        log.debug("sending message:{}", message);
-        this.jmsClient.destination("hello")
-                .send(message);
-    }
-}
 
-@Component
-class Receiver {
-    private final static Logger log = LoggerFactory.getLogger(Receiver.class);
+//    @Bean
+//    JacksonJsonMessageConverter jacksonJsonMessageConverter() {
+//        return new JacksonJsonMessageConverter();
+//    }
 
-    private String lastReceivedMessage;
-
-    @JmsListener(destination = "hello")
-    public void receiveMessage(String message) {
-        log.debug("received message: {0} " + message);
-        this.lastReceivedMessage = message;
-    }
-
-    public String latestMessage() {
-        return lastReceivedMessage;
-    }
 }
