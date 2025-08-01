@@ -24,7 +24,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 //@Import(TestcontainersConfiguration.class)
+    @Testcontainers
 class DemoApplicationTests {
+
+    @Container
+    static  RabbitMQContainer rabbitMQContainer = new RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"))
+            .withExposedPorts(5672, 15672, 5552)
+            .withEnv("RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS", "-rabbitmq_stream advertised_host localhost")
+            .withCopyFileToContainer(MountableFile.forHostPath(Paths.get("rabbitmq/enable_plugins")), "/etc/rabbitmq/enable_plugins");
+
+    @DynamicPropertySource
+    static void dynamicPropertySource(final DynamicPropertyRegistry registry) {
+        registry.add("spring.rabbitmq.host", rabbitMQContainer::getHost);
+        registry.add("spring.rabbitmq.port", () ->rabbitMQContainer.getMappedPort(5672));
+        registry.add("spring.rabbitmq.stream.host", rabbitMQContainer::getHost);
+        registry.add("spring.rabbitmq.stream.port", () ->rabbitMQContainer.getMappedPort(5552));
+//        registry.add("spring.rabbitmq.stream.username", rabbitMQContainer::getAdminUsername);
+//        registry.add("spring.rabbitmq.stream.password", rabbitMQContainer::getAdminPassword);
+    }
+
     @Autowired
     RabbitStreamTemplate rabbitStreamTemplate;
 
