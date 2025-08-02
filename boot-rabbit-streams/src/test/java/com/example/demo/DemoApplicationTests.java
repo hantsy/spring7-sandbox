@@ -15,9 +15,9 @@ import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 import tools.jackson.databind.ObjectMapper;
 
-import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +32,7 @@ class DemoApplicationTests {
             .withExposedPorts(5672, 15672, 5552)
             .withEnv("RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS", "-rabbitmq_stream advertised_host localhost")
             .withCopyFileToContainer(MountableFile.forHostPath("./rabbitmq/enabled_plugins"), "/etc/rabbitmq/enabled_plugins")
-            .withLogConsumer(outputFrame -> log.info("[Docker]>>>{}",  outputFrame.getUtf8String()));
+            .withLogConsumer(outputFrame -> log.info("[Docker]>>>{}", outputFrame.getUtf8String()));
 
     @DynamicPropertySource
     static void dynamicPropertySource(final DynamicPropertyRegistry registry) {
@@ -48,15 +48,22 @@ class DemoApplicationTests {
     RabbitStreamTemplate rabbitStreamTemplate;
 
     @Autowired
+    RabbitStreamTemplate offsetTrackRabbitStreamTemplate;
+
+    @Autowired
     GreetingListener listener;
+
+    @Autowired
+    OffsetTrackListener offsetTrackListener;
 
     // @Autowired
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void testSendRabbitStream() {
-        List.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
-                .forEach(word -> rabbitStreamTemplate.convertAndSend(Greeting.of(word)));
+        var streamsResult = Stream.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
+                .map(word -> rabbitStreamTemplate.convertAndSend(Greeting.of(word)))
+                .toArray(CompletableFuture[]::new);
 //                .forEach(word -> rabbitStreamTemplate.convertAndSend(objectMapper.writeValueAsString(Greeting.of(word)), (Message m) -> {
 //                            m.getMessageProperties().setType(Greeting.class.getTypeName());
 //                            m.getMessageProperties().setContentType("application/json");
@@ -64,9 +71,25 @@ class DemoApplicationTests {
 //                        })
 //                );
 
+        CompletableFuture.allOf(streamsResult).join();
+
         Awaitility.await().atMost(Duration.ofMillis(5_000))
                 .untilAsserted(() -> {
                     assertThat(listener.getWordCount("the")).isEqualTo(2);
+                });
+    }
+
+    @Test
+    void testSendRabbitStream_offsetTrack() {
+        var streamsResult = Stream.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
+                .map(word -> offsetTrackRabbitStreamTemplate.convertAndSend(Greeting.of(word)))
+                .toArray(CompletableFuture[]::new);
+
+        CompletableFuture.allOf(streamsResult).join();
+
+        Awaitility.await().atMost(Duration.ofMillis(5_000))
+                .untilAsserted(() -> {
+                    assertThat(offsetTrackListener.getWordCount("the")).isEqualTo(2);
                 });
     }
 
