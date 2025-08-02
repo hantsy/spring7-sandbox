@@ -25,12 +25,14 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
     }
 
-
     @Bean
     StreamAdmin streamAdmin(Environment env) {
         return new StreamAdmin(env, sc -> {
             sc.stream(QUEUE_NAME).maxAge(Duration.ofHours(2)).create();
-            sc.stream(OFFSET_TRACK_STREAM).maxLengthBytes(ByteCapacity.GB(1)).create();
+            sc.stream(OFFSET_TRACK_STREAM)
+                    .maxLengthBytes(ByteCapacity.GB(1))
+                    .maxAge(Duration.ofHours(2))
+                    .create();
         });
     }
 
