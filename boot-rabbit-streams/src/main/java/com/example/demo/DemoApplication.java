@@ -2,22 +2,27 @@ package com.example.demo;
 
 import com.rabbitmq.stream.Environment;
 import com.rabbitmq.stream.OffsetSpecification;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.QueueBuilder;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import com.rabbitmq.stream.ProducerBuilder;
+import com.rabbitmq.stream.codec.SimpleCodec;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.amqp.autoconfigure.RabbitStreamTemplateConfigurer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.rabbit.stream.config.StreamRabbitListenerContainerFactory;
 import org.springframework.rabbit.stream.listener.StreamListenerContainer;
+import org.springframework.rabbit.stream.producer.ProducerCustomizer;
 import org.springframework.rabbit.stream.support.StreamAdmin;
+import org.springframework.rabbit.stream.support.StreamMessageProperties;
 import org.springframework.rabbit.stream.support.converter.DefaultStreamMessageConverter;
 import org.springframework.rabbit.stream.support.converter.StreamMessageConverter;
 
 import java.time.Duration;
+import java.util.Random;
 
 @SpringBootApplication
 public class DemoApplication {
@@ -37,15 +42,20 @@ public class DemoApplication {
         });
     }
 
-    @Bean
-    RabbitListenerContainerFactory<StreamListenerContainer> rabbitListenerContainerFactory(Environment env) {
-        return new StreamRabbitListenerContainerFactory(env);
-    }
+//    @Bean
+//    RabbitListenerContainerFactory<StreamListenerContainer> rabbitListenerContainerFactory(Environment env) {
+//        StreamRabbitListenerContainerFactory factory = new StreamRabbitListenerContainerFactory(env);
+//        factory.setContainerCustomizer(container ->
+//                container.setStreamConverter(streamMessageConverter()));
+//
+//        return factory;
+//    }
 
     @Bean
     RabbitListenerContainerFactory<StreamListenerContainer> nativeFactory(Environment env) {
         StreamRabbitListenerContainerFactory factory = new StreamRabbitListenerContainerFactory(env);
         factory.setNativeListener(true);
+        //factory.setContainerCustomizer(container -> container.setStreamConverter(streamMessageConverter()));
         factory.setConsumerCustomizer((id, builder) -> {
             builder.name("myConsumer")
                     .offset(OffsetSpecification.first())
@@ -59,9 +69,26 @@ public class DemoApplication {
         return new JacksonJsonMessageConverter();
     }
 
-    @Bean
-    StreamMessageConverter streamMessageConverter() {
-        return new DefaultStreamMessageConverter();
-    }
+//    @Bean
+//    StreamMessageConverter streamMessageConverter() {
+//        return new DefaultStreamMessageConverter();
+//    }
+
+//    @Bean
+//    ProducerCustomizer producerCustomizer() {
+//        return (name, builder) -> builder.name("producer-"+ new Random().nextLong())
+//                .stream(QUEUE_NAME)
+//                .enqueueTimeout(Duration.ofMillis(5_000))
+//                .confirmTimeout(Duration.ofMillis(5_000));
+//    }
+//
+//    @Bean
+//    RabbitStreamTemplateConfigurer rabbitStreamTemplateConfigurer() {
+//         var configurer = new RabbitStreamTemplateConfigurer();
+//         configurer.setProducerCustomizer(producerCustomizer());
+//         configurer.setMessageConverter(jsonMessageConverter());
+//         //configurer.setStreamMessageConverter(streamMessageConverter());
+//         return configurer;
+//    }
 }
 

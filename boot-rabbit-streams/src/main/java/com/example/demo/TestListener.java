@@ -2,6 +2,7 @@ package com.example.demo;
 
 import com.rabbitmq.stream.Message;
 import com.rabbitmq.stream.MessageHandler;
+import com.rabbitmq.stream.MessageHandler.Context;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class TestListener {
     }
 
     @RabbitListener(id = "test", queues = "test.stream.queue2", containerFactory = "nativeFactory")
-    void nativeMsg(Message in, MessageHandler.Context context) {
+    void nativeMsg(Message in, Context context) {
         log.debug("receiving message from test.stream.queue2: {}", in);
         context.storeOffset();
     }
