@@ -71,7 +71,7 @@ public class JmsConfig implements JmsListenerConfigurer{
 
     @Bean
     public JmsClient jmsClient() {
-        return JmsClient.create(connectionFactory(), messagingMessageConverter());
+        return JmsClient.create(jmsTemplate());
     }
 
     @Override
