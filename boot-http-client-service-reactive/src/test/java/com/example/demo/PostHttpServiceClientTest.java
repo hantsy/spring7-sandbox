@@ -1,21 +1,18 @@
 package com.example.demo;
 
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.common.Json;
 import com.github.tomakehurst.wiremock.http.Body;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.web.client.RestClient;
 import reactor.test.StepVerifier;
+import wiremock.com.fasterxml.jackson.annotation.JsonInclude;
+import wiremock.com.fasterxml.jackson.databind.DeserializationFeature;
+import wiremock.com.fasterxml.jackson.databind.ObjectMapper;
+import wiremock.com.fasterxml.jackson.databind.SerializationFeature;
+import wiremock.com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,14 +22,21 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
-@WireMockTest(httpPort = 8080)
-public class PostClientTest {
+@WireMockTest(httpPort = 9090)
+public class PostHttpServiceClientTest {
+    static {
+        ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
+        wireMockObjectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS);
+        wireMockObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
+
+        JavaTimeModule module = new JavaTimeModule();
+        wireMockObjectMapper.registerModule(module);
+    }
 
     @Autowired
-    RestClient client;
-
-    @Autowired
-    ObjectMapper objectMapper;
+    PostHttpServiceClient client;
 
     @BeforeEach
     public void setup() {
@@ -61,7 +65,6 @@ public class PostClientTest {
                 .withHeader("Accept", equalTo("application/json")));
     }
 
-    @SneakyThrows
     @Test
     public void testGetPostById() {
         var id = UUID.randomUUID();
@@ -93,7 +96,6 @@ public class PostClientTest {
         );
     }
 
-    @SneakyThrows
     @Test
     public void testCreatePost() {
         var id = UUID.randomUUID();
@@ -123,7 +125,6 @@ public class PostClientTest {
         );
     }
 
-    @SneakyThrows
     @Test
     public void testUpdatePost() {
         var id = UUID.randomUUID();
@@ -151,7 +152,6 @@ public class PostClientTest {
         );
     }
 
-    @SneakyThrows
     @Test
     public void testDeletePostById() {
         var id = UUID.randomUUID();
