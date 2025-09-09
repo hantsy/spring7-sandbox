@@ -9,6 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import wiremock.com.fasterxml.jackson.annotation.JsonInclude;
+import wiremock.com.fasterxml.jackson.databind.DeserializationFeature;
+import wiremock.com.fasterxml.jackson.databind.SerializationFeature;
+import wiremock.com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,12 +24,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 @WireMockTest(httpPort = 9090)
 public class PostHttpServiceClientTest {
+    static {
+        wiremock.com.fasterxml.jackson.databind.ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
+        wireMockObjectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        wireMockObjectMapper.disable(wiremock.com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS);
+        wireMockObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
+
+        wiremock.com.fasterxml.jackson.datatype.jsr310.JavaTimeModule module = new JavaTimeModule();
+        wireMockObjectMapper.registerModule(module);
+    }
 
     @Autowired
     PostHttpServiceClient client;
 
-    @Autowired
-    ObjectMapper objectMapper;
 
     @BeforeEach
     public void setup() {
