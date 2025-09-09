@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -25,7 +25,13 @@ public class PostClient {
 
     public Mono<Post> getById(UUID id) {
         return client.get().uri("/posts/{id}", id)
-                .exchangeToMono(response -> response.bodyToMono(Post.class));
+                .retrieve()
+                .onStatus(code -> code == HttpStatus.NOT_FOUND,
+                        clientResponse -> {
+                            throw new PostNotFoundException(id);
+                        }
+                )
+                .bodyToMono(Post.class);
     }
 
     public Mono<URI> save(Post post) {
