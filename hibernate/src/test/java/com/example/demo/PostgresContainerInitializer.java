@@ -19,7 +19,8 @@ class PostgresContainerInitializer implements ApplicationContextInitializer<Conf
     public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
         final var container = new PostgreSQLContainer("postgres:16");
         container.start();
-        log.info(" container.getFirstMappedPort():: {}", container.getFirstMappedPort());
+        log.info("container.getJdbcUrl():: {}", container.getJdbcUrl());
+        log.info("container.getFirstMappedPort():: {}", container.getFirstMappedPort());
 
         configurableApplicationContext
                 .addApplicationListener((ApplicationListener<ContextClosedEvent>) event -> container.stop());

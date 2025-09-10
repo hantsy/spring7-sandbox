@@ -24,11 +24,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author hantsy
  */
-@SpringJUnitConfig(classes = {JpaConfig.class, PostRepositoryTest.TestConfig.class})
+@SpringJUnitConfig(classes = { PostRepositoryTest.TestConfig.class, JpaConfig.class})
 public class PostRepositoryTest {
     private final static Logger log = LoggerFactory.getLogger(PostRepositoryTest.class);
 
-    //@Inject
     @Autowired
     PostRepository posts;
 

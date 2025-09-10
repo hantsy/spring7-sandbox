@@ -6,7 +6,6 @@ import com.example.demo.model.Status;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -21,8 +20,11 @@ import java.util.stream.Stream;
 @Transactional
 public class JpaPostRepository implements PostRepository {
 
-    @Autowired
-    EntityManager entityManager;
+    private final EntityManager entityManager;
+
+    public JpaPostRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public List<Post> findAll() {

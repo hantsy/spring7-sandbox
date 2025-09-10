@@ -20,12 +20,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author hantsy
  */
-@SpringJUnitConfig(classes = {DataSourceConfig.class, JpaConfig.class, PostRepositoryTestWithTestcontainers.TestConfig.class})
+@SpringJUnitConfig(classes = {
+        DataSourceConfig.class,
+        JpaConfig.class,
+        PostRepositoryTestWithTestcontainers.TestConfig.class
+})
 @ContextConfiguration(initializers = PostgresContainerInitializer.class)
 public class PostRepositoryTestWithTestcontainers {
     private final static Logger log = LoggerFactory.getLogger(PostRepositoryTestWithTestcontainers.class);
 
-    //@Inject
     @Autowired
     PostRepository posts;
 
