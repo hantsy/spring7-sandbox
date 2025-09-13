@@ -22,7 +22,7 @@
 
         <!-- runtime deps -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version>
-        <spring-framework.version>7.0.0-M8</spring-framework.version>
+        <spring-framework.version>7.0.0-M9</spring-framework.version>
         <postgresql.version>42.7.7</postgresql.version>
         <hibernate.version>7.1.0.Final</hibernate.version>
         <lombok.version>1.18.38</lombok.version>
