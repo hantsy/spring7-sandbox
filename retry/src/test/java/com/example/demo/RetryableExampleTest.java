@@ -8,7 +8,6 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringJUnitConfig(classes = {RetryableExample.class, ResilientConfig.class})
 public class RetryableExampleTest {
