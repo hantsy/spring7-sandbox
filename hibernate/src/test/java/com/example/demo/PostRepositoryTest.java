@@ -61,7 +61,7 @@ public class PostRepositoryTest {
 
     @Configuration
     @ComponentScan(basePackageClasses = PostRepository.class)
-    @Import({JpaConfig.class, JpaTxConfig.class})
+    @Import({JpaConfig.class})
     static class TestConfig {
 
         @Bean

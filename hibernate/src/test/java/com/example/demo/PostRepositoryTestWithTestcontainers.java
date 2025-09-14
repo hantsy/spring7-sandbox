@@ -65,7 +65,7 @@ public class PostRepositoryTestWithTestcontainers {
 
     @Configuration
     @ComponentScan(basePackageClasses = PostRepository.class)
-    @Import({DataSourceConfig.class, JpaConfig.class, JpaTxConfig.class})
+    @Import({DataSourceConfig.class, JpaConfig.class})
     static class TestConfig {
     }
 

@@ -5,8 +5,7 @@ import com.example.demo.model.Post;
 import com.example.demo.model.Status;
 import jakarta.data.Limit;
 import jakarta.data.repository.*;
-import jakarta.transaction.Transactional;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;

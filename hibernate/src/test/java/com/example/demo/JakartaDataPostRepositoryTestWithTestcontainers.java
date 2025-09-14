@@ -66,7 +66,7 @@ public class JakartaDataPostRepositoryTestWithTestcontainers {
 
     @Configuration
     @ComponentScan(basePackageClasses = JakartaDataPostRepository.class)
-    @Import({DataSourceConfig.class, JpaConfig.class, JakartaDataConfig.class})
+    @Import({DataSourceConfig.class, JakartaDataConfig.class})
     static class TestConfig {
     }
 
