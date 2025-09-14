@@ -23,7 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 @WireMockTest(httpPort = 9090)
-public class PostHttpServiceClientTest {
+public class PostHttpServiceTest {
     static {
         ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
         wireMockObjectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -36,7 +36,7 @@ public class PostHttpServiceClientTest {
     }
 
     @Autowired
-    PostHttpServiceClient client;
+    PostHttpService client;
 
     @BeforeEach
     public void setup() {

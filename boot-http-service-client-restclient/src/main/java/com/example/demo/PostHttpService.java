@@ -4,14 +4,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.*;
-import org.springframework.web.service.registry.HttpServiceClient;
 
 import java.util.List;
 import java.util.UUID;
 
 @HttpExchange(url = "/posts", accept = "application/json", contentType = "application/json")
-@HttpServiceClient("post")
-public interface PostHttpServiceClient {
+public interface PostHttpService {
     @GetExchange("")
     List<Post> allPosts();
 

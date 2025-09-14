@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.retry.RetryListener;
-import org.springframework.core.retry.RetryPolicy;
-import org.springframework.core.retry.RetryTemplate;
-import org.springframework.core.retry.Retryable;
+import org.springframework.core.retry.*;
 
 import java.time.Duration;
 
@@ -43,8 +40,13 @@ public class RetryConfig {
             }
 
             @Override
-            public void onRetryPolicyExhaustion(RetryPolicy retryPolicy, Retryable<?> retryable, Throwable throwable) {
-                log.debug("onRetryPolicyExhaustion: retryPolicy={}, retryable={}, throwable={}", retryPolicy.getClass().getSimpleName(), retryable.getClass().getSimpleName(), throwable.getMessage());
+            public void onRetryPolicyExhaustion(RetryPolicy retryPolicy, Retryable<?> retryable, RetryException exception) {
+                log.debug("onRetryPolicyExhaustion: retryPolicy={}, retryable={}, throwable={}", retryPolicy.getClass().getSimpleName(), retryable.getClass().getSimpleName(), exception.getMessage());
+            }
+
+            @Override
+            public void onRetryPolicyInterruption(RetryPolicy retryPolicy, Retryable<?> retryable, RetryException exception) {
+                log.debug("onRetryPolicyInterruption: retryPolicy={}, retryable={}, throwable={}", retryPolicy.getClass().getSimpleName(), retryable.getClass().getSimpleName(), exception.getMessage());
             }
         });
 

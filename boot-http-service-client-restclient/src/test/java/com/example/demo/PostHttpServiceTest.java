@@ -1,7 +1,6 @@
 package com.example.demo;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.Json;
 import com.github.tomakehurst.wiremock.http.Body;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
@@ -23,7 +22,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 @WireMockTest(httpPort = 9090)
-public class PostHttpServiceClientTest {
+public class PostHttpServiceTest {
     static {
         wiremock.com.fasterxml.jackson.databind.ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
         wireMockObjectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -36,7 +35,7 @@ public class PostHttpServiceClientTest {
     }
 
     @Autowired
-    PostHttpServiceClient client;
+    PostHttpService client;
 
 
     @BeforeEach
