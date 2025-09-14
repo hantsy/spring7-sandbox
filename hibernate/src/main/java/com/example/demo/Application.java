@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.repository.jpa.PostRepository;
+import com.example.demo.repository.PostRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

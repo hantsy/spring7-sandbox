@@ -6,7 +6,7 @@
     <groupId>com.example</groupId>
     <artifactId>spring7-sandbox-hibernate-example</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>spring7-sandbox-hibernate-example</name>
     <description>Spring 7 Hibernate Example(without Spring Boot)</description>
