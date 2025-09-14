@@ -1,4 +1,4 @@
-package com.example.demo.repository.jpa;
+package com.example.demo.repository;
 
 import com.example.demo.model.Post;
 import com.example.demo.model.Status;

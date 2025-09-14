@@ -1,4 +1,4 @@
-package com.example.demo.repository.jpa;
+package com.example.demo.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
