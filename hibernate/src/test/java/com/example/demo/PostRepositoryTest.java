@@ -8,10 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -24,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author hantsy
  */
-@SpringJUnitConfig(classes = { PostRepositoryTest.TestConfig.class, JpaConfig.class})
+@SpringJUnitConfig(classes = {PostRepositoryTest.TestConfig.class})
 public class PostRepositoryTest {
     private final static Logger log = LoggerFactory.getLogger(PostRepositoryTest.class);
 
@@ -64,6 +61,7 @@ public class PostRepositoryTest {
 
     @Configuration
     @ComponentScan(basePackageClasses = PostRepository.class)
+    @Import({JpaConfig.class, JpaTxConfig.class})
     static class TestConfig {
 
         @Bean

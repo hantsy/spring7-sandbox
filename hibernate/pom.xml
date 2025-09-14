@@ -96,6 +96,11 @@
             <artifactId>spring-orm</artifactId>
         </dependency>
 
+        <!-- Jakarta Data -->
+        <dependency>
+            <groupId>jakarta.data</groupId>
+            <artifactId>jakarta.data-api</artifactId>
+        </dependency>
 
         <!-- Jdbc and Postgres drivers -->
         <dependency>
@@ -126,7 +131,6 @@
             <artifactId>expressly</artifactId>
             <version>6.0.0</version>
         </dependency>
-
 
         <!-- logging with logback -->
         <dependency>

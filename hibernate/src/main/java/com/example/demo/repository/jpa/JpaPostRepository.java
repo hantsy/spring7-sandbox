@@ -26,6 +26,7 @@ public class JpaPostRepository implements PostRepository {
         this.entityManager = entityManager;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Post> findAll() {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -37,6 +38,7 @@ public class JpaPostRepository implements PostRepository {
         return this.entityManager.createQuery(query).getResultList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Stream<Post> stream() {
         CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -48,6 +50,7 @@ public class JpaPostRepository implements PostRepository {
         return this.entityManager.createQuery(query).getResultStream();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Post> findByKeyword(String q, Status status, int offset, int limit) {
 
@@ -81,6 +84,7 @@ public class JpaPostRepository implements PostRepository {
                 .getResultList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Post> findById(UUID id) {
         Post Post = null;

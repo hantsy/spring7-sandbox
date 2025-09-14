@@ -4,6 +4,7 @@ import com.example.demo.model.Post;
 import com.example.demo.model.Status;
 import com.example.demo.repository.data.JakartaDataPostRepository;
 import com.example.demo.repository.jpa.PostRepository;
+import jakarta.data.Limit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -23,14 +24,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author hantsy
  */
 @SpringJUnitConfig(classes = {
-        PostRepositoryTestWithTestcontainers.TestConfig.class
+        JakartaDataPostRepositoryTestWithTestcontainers.TestConfig.class
 })
 @ContextConfiguration(initializers = PostgresContainerInitializer.class)
-public class PostRepositoryTestWithTestcontainers {
-    private final static Logger log = LoggerFactory.getLogger(PostRepositoryTestWithTestcontainers.class);
+public class JakartaDataPostRepositoryTestWithTestcontainers {
+    private final static Logger log = LoggerFactory.getLogger(JakartaDataPostRepositoryTestWithTestcontainers.class);
 
     @Autowired
-    PostRepository posts;
+    JakartaDataPostRepository posts;
 
     @BeforeEach
     public void setup() {
@@ -49,7 +50,7 @@ public class PostRepositoryTestWithTestcontainers {
         var results = posts.findAll();
         assertThat(results.size()).isEqualTo(2);
 
-        var resultsByKeyword = posts.findByKeyword("", Status.PENDING_MODERATION, 0, 10);
+        var resultsByKeyword = posts.findByKeyword("", Status.PENDING_MODERATION, new Limit(10, 0));
         assertThat(resultsByKeyword.size()).isEqualTo(1);
     }
 
@@ -64,8 +65,8 @@ public class PostRepositoryTestWithTestcontainers {
     }
 
     @Configuration
-    @ComponentScan(basePackageClasses = PostRepository.class)
-    @Import({DataSourceConfig.class, JpaConfig.class, JpaTxConfig.class})
+    @ComponentScan(basePackageClasses = JakartaDataPostRepository.class)
+    @Import({DataSourceConfig.class, JpaConfig.class, JakartaDataConfig.class})
     static class TestConfig {
     }
 

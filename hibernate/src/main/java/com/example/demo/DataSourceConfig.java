@@ -18,6 +18,7 @@ public class DataSourceConfig {
     private static final String ENV_DATASOURCE_PASSWORD = "datasource.password";
     private static final String ENV_DATASOURCE_USERNAME = "datasource.username";
     private static final String ENV_DATASOURCE_URL = "datasource.url";
+    private static final String ENV_DATASOURCE_DRIVER_CLASS_NAME ="datasource.driverClassName";
     private static final Logger log = LoggerFactory.getLogger(DataSourceConfig.class);
     //private static final String ENV_DATASOURCE_JNDINAME = "datasource.jndi-name";
 
@@ -30,7 +31,13 @@ public class DataSourceConfig {
         dataSource.setUrl(env.getProperty(ENV_DATASOURCE_URL));
         dataSource.setUsername(env.getProperty(ENV_DATASOURCE_USERNAME));
         dataSource.setPassword(env.getProperty(ENV_DATASOURCE_PASSWORD));
-        log.debug("defaultDataSource():: url={}, username={}, password={}", dataSource.getUrl(),  dataSource.getUsername(), dataSource.getPassword());
+
+        if(env.getProperty(ENV_DATASOURCE_DRIVER_CLASS_NAME) != null){
+            log.debug("DataSource Driver class name:{}", env.getProperty(ENV_DATASOURCE_DRIVER_CLASS_NAME));
+            dataSource.setDriverClassName(env.getProperty(ENV_DATASOURCE_DRIVER_CLASS_NAME));
+        }
+
+        log.debug("Default DataSource:: url={}, username={}, password={}", dataSource.getUrl(),  dataSource.getUsername(), dataSource.getPassword());
         return dataSource;
     }
 

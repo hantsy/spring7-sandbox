@@ -28,11 +28,13 @@ class PostgresContainerInitializer implements ApplicationContextInitializer<Conf
         configurableApplicationContext
                 .getEnvironment()
                 .getPropertySources()
-                .addFirst(
+                .addLast(
                         new MapPropertySource("tc",
                                 Map.of("datasource.url", container.getJdbcUrl(),
                                         "datasource.username", container.getUsername(),
-                                        "datasource.password", container.getPassword()
+                                        "datasource.password", container.getPassword(),
+                                        "datasource.driverClassName", "org.postgresql.Driver",
+                                        "hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect"
                                 )
                         )
                 );
