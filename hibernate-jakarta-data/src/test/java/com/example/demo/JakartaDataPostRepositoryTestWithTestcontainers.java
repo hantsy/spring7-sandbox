@@ -2,8 +2,7 @@ package com.example.demo;
 
 import com.example.demo.model.Post;
 import com.example.demo.model.Status;
-import com.example.demo.repository.data.JakartaDataPostRepository;
-import com.example.demo.repository.jpa.PostRepository;
+import com.example.demo.repository.JakartaDataPostRepository;
 import jakarta.data.Limit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

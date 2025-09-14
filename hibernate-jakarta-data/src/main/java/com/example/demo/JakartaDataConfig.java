@@ -1,7 +1,6 @@
 package com.example.demo;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@PropertySource(value = "classpath:/jpa.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "classpath:/hibernate.properties", ignoreResourceNotFound = true)
 public class JakartaDataConfig {
 
     public static final Logger log = LoggerFactory.getLogger(JakartaDataConfig.class);

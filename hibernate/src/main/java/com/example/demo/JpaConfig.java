@@ -19,7 +19,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@PropertySource(value = "classpath:/jpa.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "classpath:/hibernate.properties", ignoreResourceNotFound = true)
 public class JpaConfig {
     public static final Logger log = LoggerFactory.getLogger(JpaConfig.class);
 
