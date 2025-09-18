@@ -28,7 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
-		<lombok.version>1.18.40</lombok.version>
+		<lombok.version>1.18.42</lombok.version>
 		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 	</properties>
 	<dependencies>
