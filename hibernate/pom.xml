@@ -30,7 +30,7 @@
         <logback.version>1.5.18</logback.version>
         <testcontainers.version>1.21.3</testcontainers.version>
         <junit.version>5.13.4</junit.version>
-        <mockito.version>5.19.0</mockito.version>
+        <mockito.version>5.20.0</mockito.version>
     </properties>
 
     <dependencyManagement>
