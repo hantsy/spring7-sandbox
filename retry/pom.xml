@@ -23,7 +23,7 @@
         <jakartaee-api.version>11.0.0</jakartaee-api.version>
         <spring-framework.version>7.0.0-M9</spring-framework.version>
         <reactor.version>2025.0.0-M7</reactor.version>
-        <logback.version>1.5.18</logback.version>
+        <logback.version>1.5.19</logback.version>
         <slf4j.version>2.0.17</slf4j.version>
 
         <junit.version>5.13.4</junit.version>
