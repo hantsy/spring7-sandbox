@@ -18,6 +18,7 @@ Spring 7 retains JDK 17 as a baseline but incorporates the new features from JDK
 * [Spring Authorization Server moving to Spring Security 7.0](https://spring.io/blog/2025/09/11/spring-authorization-server-moving-to-spring-security-7-0)
 * [Spring Security 7.0.0-M1 available now](https://spring.io/blog/2025/07/21/spring-security-7-0-0-M1-available-now)
 * [The Road to GA - Introduction](https://spring.io/blog/2025/09/02/road_to_ga_introduction)
+* [Introducing Jackson 3 support in Spring](https://spring.io/blog/2025/10/07/introducing-jackson-3-support-in-spring)
 * [Core Spring Resilience Features: @ConcurrencyLimit, @Retryable, and RetryTemplate](https://spring.io/blog/2025/09/09/core-spring-resilience-features)
 * [Spring Framework 7.0.0-M9 available now](https://spring.io/blog/2025/09/11/spring-framework-7-0-0-M9-available-now)
 * [Spring Framework 7.0.0-M8 available now](https://spring.io/blog/2025/08/14/spring-framework-7-0-0-M8-available-now)
