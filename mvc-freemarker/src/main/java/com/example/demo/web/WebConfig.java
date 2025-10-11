@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 @EnableWebMvc
@@ -33,11 +33,11 @@ import tools.jackson.databind.ObjectMapper;
 public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
-    ObjectMapper objectMapper;
+    JsonMapper jsonMapper;
 
     @Override
     public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
-        var httpMessageConverter = new JacksonJsonHttpMessageConverter(objectMapper);
+        var httpMessageConverter = new JacksonJsonHttpMessageConverter(jsonMapper);
         builder.jsonMessageConverter(httpMessageConverter);
     }
 

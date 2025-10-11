@@ -1,6 +1,6 @@
 package com.example.demo.web;
 
-import com.example.demo.JacksonObjectMapperConfig;
+import com.example.demo.JacksonJsonMapperConfig;
 import com.example.demo.domain.model.PostSummary;
 import com.example.demo.domain.repository.PostRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-@SpringJUnitWebConfig(classes = {WebConfig.class, JacksonObjectMapperConfig.class, TestDataConfig.class})
+@SpringJUnitWebConfig(classes = {WebConfig.class, JacksonJsonMapperConfig.class, TestDataConfig.class})
 public class PostControllerTest {
 
     @Autowired

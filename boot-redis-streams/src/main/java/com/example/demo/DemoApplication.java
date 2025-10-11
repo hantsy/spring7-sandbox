@@ -11,6 +11,7 @@ import org.springframework.data.redis.hash.Jackson3HashMapper;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer.StreamMessageListenerContainerOptions;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Duration;
 
@@ -25,7 +26,7 @@ public class DemoApplication {
 
     @Bean
     HashMapper hashMapper() {
-        return new Jackson3HashMapper(new ObjectMapper(), true);
+        return new Jackson3HashMapper(new JsonMapper(), true);
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")

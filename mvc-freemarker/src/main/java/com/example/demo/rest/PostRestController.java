@@ -1,8 +1,9 @@
-package com.example.demo.web;
+package com.example.demo.rest;
 
 import com.example.demo.domain.model.Post;
 import com.example.demo.domain.model.PostSummary;
 import com.example.demo.domain.repository.PostRepository;
+import com.example.demo.web.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;

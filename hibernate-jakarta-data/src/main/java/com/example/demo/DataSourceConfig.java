@@ -14,13 +14,13 @@ import javax.sql.DataSource;
 @Configuration
 @PropertySource(value = "classpath:/datasource.properties", ignoreResourceNotFound = true)
 public class DataSourceConfig {
+    private static final Logger log = LoggerFactory.getLogger(DataSourceConfig.class);
 
     private static final String ENV_DATASOURCE_PASSWORD = "datasource.password";
     private static final String ENV_DATASOURCE_USERNAME = "datasource.username";
     private static final String ENV_DATASOURCE_URL = "datasource.url";
     private static final String ENV_DATASOURCE_DRIVER_CLASS_NAME ="datasource.driverClassName";
-    private static final Logger log = LoggerFactory.getLogger(DataSourceConfig.class);
-    //private static final String ENV_DATASOURCE_JNDINAME = "datasource.jndi-name";
+
 
     @Autowired
     private Environment env;

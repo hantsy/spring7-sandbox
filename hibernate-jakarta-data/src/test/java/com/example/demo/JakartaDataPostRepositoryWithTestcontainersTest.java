@@ -2,18 +2,19 @@ package com.example.demo;
 
 import com.example.demo.model.Post;
 import com.example.demo.model.Status;
-import com.example.demo.repository.PostRepository;
+import com.example.demo.repository.JakartaDataPostRepository;
+import jakarta.data.Limit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.*;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,12 +22,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author hantsy
  */
-@SpringJUnitConfig(classes = {PostRepositoryTest.TestConfig.class})
-public class PostRepositoryTest {
-    private final static Logger log = LoggerFactory.getLogger(PostRepositoryTest.class);
+@SpringJUnitConfig(classes = {
+        JakartaDataPostRepositoryWithTestcontainersTest.TestConfig.class
+})
+@ContextConfiguration(initializers = PostgresContainerInitializer.class)
+public class JakartaDataPostRepositoryWithTestcontainersTest {
+    private final static Logger log = LoggerFactory.getLogger(JakartaDataPostRepositoryWithTestcontainersTest.class);
 
     @Autowired
-    PostRepository posts;
+    JakartaDataPostRepository posts;
 
     @BeforeEach
     public void setup() {
@@ -45,7 +49,7 @@ public class PostRepositoryTest {
         var results = posts.findAll();
         assertThat(results.size()).isEqualTo(2);
 
-        var resultsByKeyword = posts.findByKeyword("", Status.PENDING_MODERATION, 0, 10);
+        var resultsByKeyword = posts.findByKeyword("", Status.PENDING_MODERATION, new Limit(10, 0));
         assertThat(resultsByKeyword.size()).isEqualTo(1);
     }
 
@@ -60,17 +64,9 @@ public class PostRepositoryTest {
     }
 
     @Configuration
-    @ComponentScan(basePackageClasses = PostRepository.class)
-    @Import({JpaConfig.class})
+    @ComponentScan(basePackageClasses = JakartaDataPostRepository.class)
+    @Import({DataSourceConfig.class, JakartaDataConfig.class})
     static class TestConfig {
-
-        @Bean
-        @Primary
-        public DataSource embeddedDataSource() {
-            return new EmbeddedDatabaseBuilder()
-                    .setType(EmbeddedDatabaseType.H2)
-                    .build();
-        }
     }
 
 }

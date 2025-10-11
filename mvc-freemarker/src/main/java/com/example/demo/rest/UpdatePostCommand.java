@@ -1,4 +1,4 @@
-package com.example.demo.web;
+package com.example.demo.rest;
 
 import com.example.demo.domain.model.Status;
 

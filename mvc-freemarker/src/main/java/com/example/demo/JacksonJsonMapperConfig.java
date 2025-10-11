@@ -4,15 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
-public class JacksonObjectMapperConfig {
+public class JacksonJsonMapperConfig {
 
     @Bean
-    public ObjectMapper objectMapper() {
+    public JsonMapper jsonMapper() {
 
         var builder = JsonMapper.builder();
 

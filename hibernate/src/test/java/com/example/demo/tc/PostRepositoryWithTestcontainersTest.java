@@ -1,9 +1,10 @@
-package com.example.demo;
+package com.example.demo.tc;
 
+import com.example.demo.DataSourceConfig;
+import com.example.demo.JpaConfig;
 import com.example.demo.model.Post;
 import com.example.demo.model.Status;
-import com.example.demo.repository.JakartaDataPostRepository;
-import jakarta.data.Limit;
+import com.example.demo.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -23,14 +24,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author hantsy
  */
 @SpringJUnitConfig(classes = {
-        JakartaDataPostRepositoryTestWithTestcontainers.TestConfig.class
+        PostRepositoryWithTestcontainersTest.TestConfig.class
 })
 @ContextConfiguration(initializers = PostgresContainerInitializer.class)
-public class JakartaDataPostRepositoryTestWithTestcontainers {
-    private final static Logger log = LoggerFactory.getLogger(JakartaDataPostRepositoryTestWithTestcontainers.class);
+public class PostRepositoryWithTestcontainersTest {
+    private final static Logger log = LoggerFactory.getLogger(PostRepositoryWithTestcontainersTest.class);
 
     @Autowired
-    JakartaDataPostRepository posts;
+    PostRepository posts;
 
     @BeforeEach
     public void setup() {
@@ -49,7 +50,7 @@ public class JakartaDataPostRepositoryTestWithTestcontainers {
         var results = posts.findAll();
         assertThat(results.size()).isEqualTo(2);
 
-        var resultsByKeyword = posts.findByKeyword("", Status.PENDING_MODERATION, new Limit(10, 0));
+        var resultsByKeyword = posts.findByKeyword("", Status.PENDING_MODERATION, 0, 10);
         assertThat(resultsByKeyword.size()).isEqualTo(1);
     }
 
@@ -64,8 +65,8 @@ public class JakartaDataPostRepositoryTestWithTestcontainers {
     }
 
     @Configuration
-    @ComponentScan(basePackageClasses = JakartaDataPostRepository.class)
-    @Import({DataSourceConfig.class, JakartaDataConfig.class})
+    @ComponentScan(basePackageClasses = PostRepository.class)
+    @Import({DataSourceConfig.class, JpaConfig.class})
     static class TestConfig {
     }
 

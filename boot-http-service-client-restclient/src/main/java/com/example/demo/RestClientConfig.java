@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 
@@ -15,12 +15,12 @@ import java.util.List;
 public class RestClientConfig {
 
     @Bean
-    RestClientCustomizer restClientCustomizer(ObjectMapper objectMapper) {
+    RestClientCustomizer restClientCustomizer(JsonMapper mapper) {
         return builder -> builder//.baseUrl("http://localhost:9090")
 //                .configureMessageConverters(c -> c.registerDefaults()
-//                        .jsonMessageConverter(new JacksonJsonHttpMessageConverter(objectMapper))
+//                        .jsonMessageConverter(new JacksonJsonHttpMessageConverter(mapper))
 //                )
-                .messageConverters(List.of(new JacksonJsonHttpMessageConverter(objectMapper)))
+                .messageConverters(List.of(new JacksonJsonHttpMessageConverter(mapper)))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
     }

@@ -1,5 +1,6 @@
-package com.example.demo;
+package com.example.demo.h2;
 
+import com.example.demo.JpaConfig;
 import com.example.demo.model.Post;
 import com.example.demo.model.Status;
 import com.example.demo.repository.PostRepository;
@@ -8,12 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.*;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,12 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author hantsy
  */
-@SpringJUnitConfig(classes = {
-        PostRepositoryTestWithTestcontainers.TestConfig.class
-})
-@ContextConfiguration(initializers = PostgresContainerInitializer.class)
-public class PostRepositoryTestWithTestcontainers {
-    private final static Logger log = LoggerFactory.getLogger(PostRepositoryTestWithTestcontainers.class);
+@SpringJUnitConfig(classes = {PostRepositoryTest.TestConfig.class})
+public class PostRepositoryTest {
+    private final static Logger log = LoggerFactory.getLogger(PostRepositoryTest.class);
 
     @Autowired
     PostRepository posts;
@@ -64,8 +62,16 @@ public class PostRepositoryTestWithTestcontainers {
 
     @Configuration
     @ComponentScan(basePackageClasses = PostRepository.class)
-    @Import({DataSourceConfig.class, JpaConfig.class})
+    @Import({JpaConfig.class})
     static class TestConfig {
+
+        @Bean
+        @Primary
+        public DataSource embeddedDataSource() {
+            return new EmbeddedDatabaseBuilder()
+                    .setType(EmbeddedDatabaseType.H2)
+                    .build();
+        }
     }
 
 }

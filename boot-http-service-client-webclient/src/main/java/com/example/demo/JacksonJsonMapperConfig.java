@@ -10,10 +10,10 @@ import tools.jackson.databind.json.JsonMapper;
 
 // jackson 2 related configuration is deprecated in Spring 7.
 @Configuration(proxyBeanMethods = false)
-class JacksonObjectMapperConfig {
+class JacksonJsonMapperConfig {
 
     @Bean
-    ObjectMapper jackson3ObjectMapper() {
+    JsonMapper jacksonJsonMapper() {
         var builder = JsonMapper.builder();
 
         builder.changeDefaultPropertyInclusion(include -> include.withValueInclusion(JsonInclude.Include.NON_NULL))

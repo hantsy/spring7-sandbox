@@ -8,12 +8,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.json.JacksonJsonEncoder;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration(proxyBeanMethods = false)
 public class WebClientConfig {
 
     @Bean
-    WebClientCustomizer webClientCustomizer(ObjectMapper mapper) {
+    WebClientCustomizer webClientCustomizer(JsonMapper mapper) {
         return builder -> {
             builder.baseUrl("http://localhost:9090")
                     .codecs(c -> c.defaultCodecs().jacksonJsonEncoder(new JacksonJsonEncoder(mapper)))
