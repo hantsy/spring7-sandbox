@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -44,8 +45,8 @@ public class Post implements Serializable {
         this.slug = Slug.deriveFromTitle(this.title);
     }
 
-    public static Post of (String title, String content, Status status){
-        return new Post(UUID.randomUUID(), title, content, status, LocalDateTime.now());
+    public static Post of(String title, String content, Status status) {
+        return new Post(null, title, content, status, LocalDateTime.now());
     }
 
     @PrePersist // prepersist callback
