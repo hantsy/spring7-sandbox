@@ -49,7 +49,7 @@ public class JakartaDataPostRepositoryWithTestcontainersTest {
         var results = posts.findAll();
         assertThat(results.size()).isEqualTo(2);
 
-        var resultsByKeyword = posts.findByKeyword("", Status.PENDING_MODERATION, new Limit(10, 0));
+        var resultsByKeyword = posts.findByKeyword("%", Status.PENDING_MODERATION, new Limit(10, 1));
         assertThat(resultsByKeyword.size()).isEqualTo(1);
     }
 

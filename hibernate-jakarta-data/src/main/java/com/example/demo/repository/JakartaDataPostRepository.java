@@ -12,22 +12,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 @jakarta.data.repository.Repository
+@Transactional
 public interface JakartaDataPostRepository {
 
-    @Transactional
     @Delete
     int deleteAll();
 
-    @Transactional
     @Save
     Post save(Post post);
 
+    @Transactional(readOnly = true)
     @Find
     List<Post> findAll();
 
+    @Transactional(readOnly = true)
     @Query("from Post p where p.title like :s and p.status=:status")
     List<Post> findByKeyword(@Param("s") String s, @Param("status") Status status, Limit limit);
 
+    @Transactional(readOnly = true)
     @Find
     Optional<Post> findById(UUID id);
 }
