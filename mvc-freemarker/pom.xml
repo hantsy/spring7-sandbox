@@ -471,7 +471,7 @@
                             </container>
                             <configuration>
                                 <properties>
-                                    <cargo.jetty.deployer.ee.version>11</cargo.jetty.deployer.ee.version>
+                                    <cargo.jetty.deployer.ee.version>ee11</cargo.jetty.deployer.ee.version>
                                     <cargo.servlet.port>8080</cargo.servlet.port>
                                     <cargo.logging>low</cargo.logging>
                                 </properties>
@@ -553,7 +553,7 @@
                             <configuration>
                                 <type>standalone</type>
                                 <properties>
-                                    <cargo.jetty.deployer.ee.version>11</cargo.jetty.deployer.ee.version>
+                                    <cargo.jetty.deployer.ee.version>ee11</cargo.jetty.deployer.ee.version>
                                     <cargo.servlet.port>8080</cargo.servlet.port>
                                     <cargo.logging>low</cargo.logging>
                                 </properties>
