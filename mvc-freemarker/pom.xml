@@ -472,6 +472,7 @@
                             <configuration>
                                 <properties>
                                     <cargo.jetty.deployer.ee.version>ee11</cargo.jetty.deployer.ee.version>
+                                    <cargo.jetty.modules>server,ext,http,ee11-annotations,ee11-plus,ee11-jsp,ee11-deploy</cargo.jetty.modules>
                                     <cargo.servlet.port>8080</cargo.servlet.port>
                                     <cargo.logging>low</cargo.logging>
                                 </properties>
@@ -554,6 +555,7 @@
                                 <type>standalone</type>
                                 <properties>
                                     <cargo.jetty.deployer.ee.version>ee11</cargo.jetty.deployer.ee.version>
+                                    <cargo.jetty.modules>server,ext,http,ee11-annotations,ee11-plus,ee11-jsp,ee11-deploy</cargo.jetty.modules>
                                     <cargo.servlet.port>8080</cargo.servlet.port>
                                     <cargo.logging>low</cargo.logging>
                                 </properties>
