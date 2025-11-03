@@ -15,7 +15,9 @@ public class WebClientConfig {
     @Bean
     WebClientCustomizer webClientCustomizer(JsonMapper mapper) {
         return builder -> {
-            builder.baseUrl("http://localhost:9090")
+            builder
+                    // configure baseUrl in application.properties
+                    //.baseUrl("http://localhost:9090")
                     .codecs(c -> c.defaultCodecs().jacksonJsonEncoder(new JacksonJsonEncoder(mapper)))
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
