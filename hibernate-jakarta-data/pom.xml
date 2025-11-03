@@ -22,14 +22,14 @@
 
         <!-- runtime deps -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version>
-        <spring-framework.version>7.0.0-RC2</spring-framework.version>
+        <spring-framework.version>7.0.0-RC3</spring-framework.version>
         <postgresql.version>42.7.8</postgresql.version>
-        <hibernate.version>7.1.4.Final</hibernate.version>
+        <hibernate.version>7.1.6.Final</hibernate.version>
         <lombok.version>1.18.38</lombok.version>
         <slf4j.version>2.0.17</slf4j.version>
         <logback.version>1.5.20</logback.version>
         <testcontainers.version>2.0.1</testcontainers.version>
-        <junit.version>6.0.0</junit.version>
+        <junit.version>6.0.1</junit.version>
         <mockito.version>5.20.0</mockito.version>
         <h2.version>2.3.232</h2.version>
     </properties>
@@ -173,7 +173,7 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <version>2.9.0</version>
+            <version>2.10.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

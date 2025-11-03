@@ -21,12 +21,12 @@
 
         <!-- API and frameworks -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version>
-        <spring-framework.version>7.0.0-RC2</spring-framework.version>
+        <spring-framework.version>7.0.0-RC3</spring-framework.version>
         <reactor.version>2025.0.0-RC1</reactor.version>
         <logback.version>1.5.20</logback.version>
         <slf4j.version>2.0.17</slf4j.version>
 
-        <junit.version>6.0.0</junit.version>
+        <junit.version>6.0.1</junit.version>
         <mockito.version>5.20.0</mockito.version>
         <assertj-core.version>3.27.6</assertj-core.version>
         <json-path.version>2.9.0</json-path.version>
