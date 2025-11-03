@@ -30,6 +30,8 @@ class DemoApplicationTests {
 
     @BeforeEach
     void setup() {
+        orderRepository.deleteAllInBatch();
+        customerRepository.deleteAllInBatch();
         productRepository.deleteAllInBatch();
     }
 
