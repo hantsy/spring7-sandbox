@@ -16,11 +16,11 @@ public class RestClientConfig {
 
     @Bean
     RestClientCustomizer restClientCustomizer(JsonMapper mapper) {
-        return builder -> builder//.baseUrl("http://localhost:9090")
-//                .configureMessageConverters(c -> c.registerDefaults()
-//                        .jsonMessageConverter(new JacksonJsonHttpMessageConverter(mapper))
-//                )
-                .messageConverters(List.of(new JacksonJsonHttpMessageConverter(mapper)))
+        return builder -> builder
+                .baseUrl("http://localhost:9090")
+                .configureMessageConverters(c -> c.registerDefaults()
+                        .jsonMessageConverter(new JacksonJsonHttpMessageConverter(mapper))
+                )
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
     }
