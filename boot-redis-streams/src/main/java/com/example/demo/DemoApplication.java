@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.hash.HashMapper;
-import org.springframework.data.redis.hash.Jackson3HashMapper;
+import org.springframework.data.redis.hash.JacksonHashMapper;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer.StreamMessageListenerContainerOptions;
 import tools.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ public class DemoApplication {
 
     @Bean
     HashMapper hashMapper() {
-        return new Jackson3HashMapper(new JsonMapper(), true);
+        return new JacksonHashMapper(new JsonMapper(), true);
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
