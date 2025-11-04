@@ -28,11 +28,11 @@ class DemoApplicationTests {
         this.client = WebClient.builder()
                 .baseUrl("http://localhost:" + this.port)
                 .codecs(c -> c.defaultCodecs().enableLoggingRequestDetails(true))
-                //.defaultHeaders(headers -> headers.set("X-API-Version", "1.0"))
+                .defaultHeaders(headers -> headers.set("X-API-Version", "1.0"))
                 .apiVersionInserter(ApiVersionInserter.builder()
                                 .useHeader("X-API-Version")
-//                        .usePathSegment(0)
-//                        .useQueryParam("version")
+                                // .usePathSegment(0)
+                                // .useQueryParam("version")
                                 // .withVersionFormatter(ApiVersionFormatter)
                                 .build()
                 )
@@ -43,7 +43,8 @@ class DemoApplicationTests {
     @Test
     void testHello() {
         this.client.get().uri("/hello")
-                .apiVersion(1.0)
+               // will apply the default version in webclient
+               // .apiVersion(1.0)
                 .retrieve()
                 .bodyToMono(String.class)
                 .as(StepVerifier::create)

@@ -53,7 +53,7 @@ class WebConfig implements WebFluxConfigurer {
                 // default is SemanticApiVersionParser
                 //.setVersionParser(new SemanticApiVersionParser())
 
-                // When a defaultVersion is also set, this is automatically set to false.
+                // When a defaultVersion is also set, `setVersionRequired` is automatically set to false.
                 // .setVersionRequired(true)
                 .setDefaultVersion("1.0");
     }
