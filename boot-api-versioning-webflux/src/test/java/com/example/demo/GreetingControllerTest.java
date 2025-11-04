@@ -2,7 +2,8 @@ package com.example.demo;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+//import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.client.ApiVersionInserter;
 
@@ -16,7 +17,9 @@ public class GreetingControllerTest {
         this.webTestClient = WebTestClient
                 .bindToController(new GreetingController())
                 .apiVersioning(apiVersionConfigurer ->
-                        apiVersionConfigurer.useRequestHeader("X-API-Version").setDefaultVersion("1.0"))
+                        apiVersionConfigurer.useRequestHeader("X-API-Version")
+                                .setDefaultVersion("1.0")
+                )
                 .configureClient()
                 .apiVersionInserter(ApiVersionInserter.builder()
                         .useHeader("X-API-Version")
@@ -27,7 +30,7 @@ public class GreetingControllerTest {
     @Test
     void testHello() {
         this.webTestClient.get().uri( "/hello")
-                //.apiVersion(1.0)
+                .apiVersion("1.0")
                 .exchange()
                 .expectBody(String.class).isEqualTo("Hello v1.0(Default)");
     }
@@ -35,7 +38,7 @@ public class GreetingControllerTest {
     @Test
     void testHello1_1() {
         this.webTestClient.get().uri("/hello")
-                .apiVersion(1.1)
+                .apiVersion("1.1")
                 .exchange()
                 .expectBody(String.class).isEqualTo("Hello v1.1");
     }
@@ -43,7 +46,7 @@ public class GreetingControllerTest {
     @Test
     void testHello2_0() {
         this.webTestClient.get().uri("/hello")
-                .apiVersion(2.0)
+                .apiVersion("2.0")
                 .exchange()
                 .expectBody(String.class).isEqualTo("Hello v2.0");
     }

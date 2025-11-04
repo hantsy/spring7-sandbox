@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

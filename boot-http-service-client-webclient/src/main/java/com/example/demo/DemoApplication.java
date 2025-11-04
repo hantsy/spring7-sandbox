@@ -6,7 +6,11 @@ import org.springframework.web.service.registry.HttpServiceGroup;
 import org.springframework.web.service.registry.ImportHttpServices;
 
 @SpringBootApplication
-@ImportHttpServices(value = PostHttpService.class, clientType = HttpServiceGroup.ClientType.WEB_CLIENT)
+@ImportHttpServices(
+        value = PostHttpService.class,
+        group = "post",
+        clientType = HttpServiceGroup.ClientType.WEB_CLIENT
+)
 public class DemoApplication {
 
     public static void main(String[] args) {
