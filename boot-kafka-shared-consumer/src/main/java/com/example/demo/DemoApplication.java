@@ -17,6 +17,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.ShareKafkaMessageListenerContainer;
+import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
@@ -48,7 +49,7 @@ class ShareConsumerConfig {
         Map<String, Object> props = Map.of(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServers().getFirst(),
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonJsonSerializer.class
         );
 
         DefaultKafkaProducerFactory<String, Object> producerFactory = new DefaultKafkaProducerFactory<>(props);
