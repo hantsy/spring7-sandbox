@@ -51,7 +51,7 @@ class DemoApplicationTests {
     @Test
     void testHello() {
         var hello = this.client.get().uri("/hello")
-                .apiVersion(1.0)
+                //.apiVersion(1.0)
                 .retrieve()
                 .body(String.class);
 
