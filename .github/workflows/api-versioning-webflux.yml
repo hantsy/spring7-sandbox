@@ -1,0 +1,32 @@
+name: api-versioning-webflux
+
+on:
+  push:
+    paths:
+      - "api-versioning-webflux/**"
+    branches:
+      - master
+  pull_request:
+    paths:
+      - "api-versioning-webflux/**"
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: 21
+          cache: "maven"
+
+      - name: Build with Maven
+        run: mvn -B -q clean package --file api-versioning-webflux/pom.xml
+        
+
