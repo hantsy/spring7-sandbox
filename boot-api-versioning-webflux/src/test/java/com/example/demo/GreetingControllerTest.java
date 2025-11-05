@@ -14,7 +14,7 @@ public class GreetingControllerTest {
 
     @TestConfiguration
     static class TestConfig {
-
+      
         @Bean
         WebTestClientBuilderCustomizer testClientBuilderCustomizer() {
             return builder -> builder.defaultApiVersion("1.0")
