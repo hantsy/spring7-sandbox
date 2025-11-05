@@ -29,7 +29,7 @@
         <spring-framework.version>7.0.0-RC3</spring-framework.version>
         <reactor.version>2025.0.0-RC1</reactor.version>
         <spring-data.version>2025.1.0-RC2</spring-data.version>
-        <spring-security.version>7.0.0-RC1</spring-security.version>
+        <spring-security.version>7.0.0-RC2</spring-security.version>
         <freemarker.version>2.3.34</freemarker.version>
         <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
         <postgresql.version>42.7.8</postgresql.version>
