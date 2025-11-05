@@ -13,6 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven.compiler.release>21</maven.compiler.release>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
@@ -22,15 +23,24 @@
 
         <!-- runtime deps -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version>
-        <spring-framework.version>7.0.0-RC1</spring-framework.version>
+        <spring-framework.version>7.0.0-RC3</spring-framework.version>
         <postgresql.version>42.7.8</postgresql.version>
-        <hibernate.version>7.1.4.Final</hibernate.version>
+        <hibernate.version>7.1.6.Final</hibernate.version>
+        <expressly.version>6.0.0</expressly.version>
+        <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
+
         <lombok.version>1.18.38</lombok.version>
+
         <slf4j.version>2.0.17</slf4j.version>
         <logback.version>1.5.20</logback.version>
-        <testcontainers.version>1.21.3</testcontainers.version>
-        <junit.version>6.0.0</junit.version>
+
+        <testcontainers.version>2.0.1</testcontainers.version>
+        <junit.version>6.0.1</junit.version>
         <mockito.version>5.20.0</mockito.version>
+        <h2.version>2.3.232</h2.version>
+        <hamcrest.version>3.0</hamcrest.version>
+        <json-path.version>2.10.0</json-path.version>
+        <assertj.version>3.27.6</assertj.version>
     </properties>
 
     <dependencyManagement>
@@ -120,7 +130,7 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>9.0.1.Final</version>
+            <version>${hibernate-validator.version}</version>
         </dependency>
         <dependency>
             <groupId>jakarta.el</groupId>
@@ -129,7 +139,7 @@
         <dependency>
             <groupId>org.glassfish.expressly</groupId>
             <artifactId>expressly</artifactId>
-            <version>6.0.0</version>
+            <version>${expressly.version}</version>
         </dependency>
 
         <!-- logging with logback -->
@@ -167,18 +177,18 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.27.6</version>
+            <version>${assertj.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <version>2.9.0</version>
+            <version>${json-path.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
-            <version>3.0</version>
+            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -189,17 +199,17 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>2.3.232</version>
+            <version>${h2.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -210,7 +220,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <annotationProcessorPath>

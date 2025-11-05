@@ -18,7 +18,7 @@
 
         <!-- maven plugins -->
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-        <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
+        <maven-war-plugin.version>3.5.0</maven-war-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <cargo-maven3-plugin.version>1.10.24</cargo-maven3-plugin.version>
@@ -26,9 +26,9 @@
 
         <!-- API and frameworks -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version>
-        <spring-framework.version>7.0.0-RC1</spring-framework.version>
+        <spring-framework.version>7.0.0-RC3</spring-framework.version>
         <reactor.version>2025.0.0-RC1</reactor.version>
-        <spring-data.version>2025.1.0-RC1</spring-data.version>
+        <spring-data.version>2025.1.0-RC2</spring-data.version>
         <spring-security.version>7.0.0-RC1</spring-security.version>
         <freemarker.version>2.3.34</freemarker.version>
         <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
@@ -36,12 +36,12 @@
         <logback.version>1.5.20</logback.version>
         <slf4j.version>2.0.17</slf4j.version>
         <lombok.version>1.18.42</lombok.version>
-        <testcontainers.version>1.21.3</testcontainers.version>
+        <testcontainers.version>2.0.1</testcontainers.version>
         <jackson.version>3.0.1</jackson.version>
-        <junit.version>6.0.0</junit.version>
+        <junit.version>6.0.1</junit.version>
         <mockito.version>5.20.0</mockito.version>
         <assertj-core.version>3.27.6</assertj-core.version>
-        <json-path.version>2.9.0</json-path.version>
+        <json-path.version>2.10.0</json-path.version>
         <hamcrest.version>3.0</hamcrest.version>
 
         <!-- Apache Tomcat -->
@@ -52,7 +52,7 @@
 
         <!-- WildFly for Jakarta EE 10 -->
         <wildfly.version>35.0.0.Final</wildfly.version>
-        <wildfly-maven-plugin.version>5.1.4.Final</wildfly-maven-plugin.version>
+        <wildfly-maven-plugin.version>5.1.5.Final</wildfly-maven-plugin.version>
         <wildfly.artifactId>wildfly-dist</wildfly.artifactId>
 
         <!-- Skip tests by default -->
@@ -284,12 +284,12 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

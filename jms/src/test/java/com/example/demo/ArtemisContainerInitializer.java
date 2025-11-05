@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.core.env.MapPropertySource;
@@ -25,11 +24,7 @@ class ArtemisContainerInitializer implements ApplicationContextInitializer<@NotN
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
         container.start();
-        applicationContext.addApplicationListener(event -> {
-            if(event instanceof  ContextClosedEvent e) {
-                container.stop();
-            }
-        });
+        applicationContext.addApplicationListener((ContextClosedEvent e) -> container.stop());
 
         var brokerUrlFormat = "tcp://%s:%d";
         var brokerUrl = brokerUrlFormat.formatted(container.getHost(), container.getFirstMappedPort());
