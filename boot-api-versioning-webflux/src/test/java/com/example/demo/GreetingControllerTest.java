@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 //import org.springframework.boot.webtestclient.WebTestClientBuilderCustomizer;
+//4.0-rc2 changed the package
 import org.springframework.boot.webtestclient.autoconfigure.WebTestClientBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.web.reactive.server.WebTestClient;
