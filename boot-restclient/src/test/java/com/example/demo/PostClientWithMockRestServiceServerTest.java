@@ -27,8 +27,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RestClientTest
-public class PostClientWithRestClientTest {
-    private final static Logger log = LoggerFactory.getLogger(PostClientWithRestClientTest.class);
+public class PostClientWithMockRestServiceServerTest {
+    private final static Logger log = LoggerFactory.getLogger(PostClientWithMockRestServiceServerTest.class);
 
     @TestConfiguration
     @Import(PostClient.class)
