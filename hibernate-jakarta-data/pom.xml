@@ -27,7 +27,7 @@
         <postgresql.version>42.7.8</postgresql.version>
         <hibernate.version>7.1.7.Final</hibernate.version>
         <expressly.version>6.0.0</expressly.version>
-        <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
 
         <lombok.version>1.18.38</lombok.version>
 
