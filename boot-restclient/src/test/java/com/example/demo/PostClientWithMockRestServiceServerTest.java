@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -32,7 +33,8 @@ public class PostClientWithMockRestServiceServerTest {
 
     @TestConfiguration
     @Import(PostClient.class)
-    static class TestConfig{}
+    static class TestConfig {
+    }
 
     @Autowired
     MockRestServiceServer server;
@@ -82,6 +84,18 @@ public class PostClientWithMockRestServiceServerTest {
         assertThat(post.content()).isEqualTo(data.content());
         assertThat(post.status()).isEqualTo(data.status());
         assertThat(post.createdAt()).isEqualTo(data.createdAt());
+
+        server.verify();
+    }
+
+    @Test
+    public void testGetPostById_NotFound() {
+        var id = UUID.randomUUID();
+        server.expect(ExpectedCount.once(), requestTo("/posts/" + id))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.NOT_FOUND));
+
+        assertThatThrownBy(() -> client.getById(id)).isInstanceOf(PostNotFoundException.class);
 
         server.verify();
     }
