@@ -22,11 +22,13 @@ import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest
 @WireMockTest(httpPort = 9090)
 public class PostClientTest {
     private final static Logger log = LoggerFactory.getLogger(PostClientTest.class);
+
     static {
         ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
         wireMockObjectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -85,6 +87,21 @@ public class PostClientTest {
         assertThat(post.content()).isEqualTo(data.content());
         assertThat(post.status()).isEqualTo(data.status());
         assertThat(post.createdAt()).isEqualTo(data.createdAt());
+
+        verify(getRequestedFor(urlEqualTo("/posts/" + id))
+                .withHeader("Accept", equalTo("application/json"))
+        );
+    }
+
+    @Test
+    public void testGetPostById_NotFound() {
+        var id = UUID.randomUUID();
+
+        stubFor(get("/posts/" + id)
+                .willReturn(aResponse().withStatus(404))
+        );
+
+        assertThatThrownBy(() -> client.getById(id)).isInstanceOf(PostNotFoundException.class);
 
         verify(getRequestedFor(urlEqualTo("/posts/" + id))
                 .withHeader("Accept", equalTo("application/json"))
