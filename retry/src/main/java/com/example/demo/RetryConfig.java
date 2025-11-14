@@ -17,7 +17,7 @@ public class RetryConfig {
     public RetryTemplate retryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate(
                 RetryPolicy.builder()
-                        .maxAttempts(5)
+                        .maxRetries(5)
                         .delay(Duration.ofMillis(1500))
                         .jitter(Duration.ofMillis(50))
                         .includes(ExampleException.class)

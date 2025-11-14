@@ -16,7 +16,7 @@ public class RetryableExample {
     private int retryCount = 0;
 
     @Retryable(value = {ExampleException.class},
-            maxAttempts = 5,
+            maxRetries = 5,
             delay = 1500,
             jitter = 50,
             timeUnit = TimeUnit.MILLISECONDS
