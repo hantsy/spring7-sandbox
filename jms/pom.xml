@@ -23,10 +23,10 @@
 
         <!-- API and frameworks -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version>
-        <spring-framework.version>7.0.0-RC3</spring-framework.version>
+        <spring-framework.version>7.0.0</spring-framework.version>
         <reactor.version>2025.0.0-M5</reactor.version>
         <jackson.version>3.0.2</jackson.version>
-        <logback.version>1.5.20</logback.version>
+        <logback.version>1.5.21</logback.version>
         <slf4j.version>2.0.17</slf4j.version>
 
         <junit.version>6.0.1</junit.version>
@@ -35,7 +35,7 @@
         <json-path.version>2.10.0</json-path.version>
         <hamcrest.version>3.0</hamcrest.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <testcontainers.version>2.0.1</testcontainers.version>
+        <testcontainers.version>2.0.2</testcontainers.version>
     </properties>
 
     <dependencyManagement>
