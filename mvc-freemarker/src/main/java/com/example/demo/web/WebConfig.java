@@ -38,7 +38,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
         var httpMessageConverter = new JacksonJsonHttpMessageConverter(jsonMapper);
-        builder.jsonMessageConverter(httpMessageConverter);
+        builder.addCustomConverter(httpMessageConverter);
     }
 
     @Override
