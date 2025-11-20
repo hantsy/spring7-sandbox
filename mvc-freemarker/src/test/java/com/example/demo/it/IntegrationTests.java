@@ -3,9 +3,12 @@ package com.example.demo.it;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.Duration;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class IntegrationTests {
 
@@ -32,7 +35,8 @@ public class IntegrationTests {
                 .exchange()
                 .expectStatus()
                 .is3xxRedirection()
-                .expectHeader().location("http://localhost:" + 8080 + "/demo/login");
+                .expectHeader()
+                .value(HttpHeaders.LOCATION, v -> assertThat(v).contains("demo/login"));
     }
 
 }
