@@ -8,11 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.rabbit.stream.producer.RabbitStreamTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -47,19 +48,48 @@ class DemoApplicationTests {
     RabbitStreamTemplate rabbitStreamTemplate;
 
     @Autowired
+    RabbitStreamTemplate offsetTrackRabbitStreamTemplate;
+
+    @Autowired
     GreetingListener listener;
+
+    @Autowired
+    OffsetTrackListener offsetTrackListener;
+
+    // @Autowired
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void testSendRabbitStream() {
         var streamsResult = Stream.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
                 .map(word -> rabbitStreamTemplate.convertAndSend(Greeting.of(word)))
                 .toArray(CompletableFuture[]::new);
+//                .forEach(word -> rabbitStreamTemplate.convertAndSend(objectMapper.writeValueAsString(Greeting.of(word)), (Message m) -> {
+//                            m.getMessageProperties().setType(Greeting.class.getTypeName());
+//                            m.getMessageProperties().setContentType("application/json");
+//                            return m;
+//                        })
+//                );
 
         CompletableFuture.allOf(streamsResult).join();
 
         Awaitility.await().atMost(Duration.ofMillis(5_000))
                 .untilAsserted(() -> {
                     assertThat(listener.getWordCount("the")).isEqualTo(2);
+                });
+    }
+
+    @Test
+    void testSendRabbitStream_offsetTrack() {
+        var streamsResult = Stream.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
+                .map(word -> offsetTrackRabbitStreamTemplate.convertAndSend(Greeting.of(word)))
+                .toArray(CompletableFuture[]::new);
+
+        CompletableFuture.allOf(streamsResult).join();
+
+        Awaitility.await().atMost(Duration.ofMillis(5_000))
+                .untilAsserted(() -> {
+                    assertThat(offsetTrackListener.getWordCount("the")).isEqualTo(2);
                 });
     }
 

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.config.KafkaStreamsCustomizer;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.support.serializer.JsonSerde;
+import org.springframework.kafka.support.serializer.JacksonJsonSerde;
 
 import java.time.Duration;
 
@@ -21,8 +21,8 @@ import static org.apache.kafka.streams.kstream.Suppressed.BufferConfig.unbounded
 @EnableKafkaStreams
 @Slf4j
 public class KafkaStreamsConfig {
-    public static final String TOPIC_WORD_INPUT = "word-in";
-    public static final String TOPIC_WORD_OUTPUT = "word-out";
+    public static final String TOPIC_WORD_INPUT = "wordIn";
+    public static final String TOPIC_WORD_OUTPUT = "wordOut";
 
     @Bean
     NewTopic wordInputTopic() {
@@ -43,12 +43,12 @@ public class KafkaStreamsConfig {
                 .suppress(Suppressed.untilWindowCloses(unbounded()))
                 .toStream()
                 .map((key, value) -> {
-                    System.out.println(">>>>>>>>>>>>> windowed key: " + key.key()+", value: " + value);
+                    System.out.println(">>>>>>>>>>>>> windowed key: " + key.key() + ", value: " + value);
                     return new KeyValue<>(key.key(), value);
                 })
                 .mapValues(WordCount::new);
-        wordCountStreams               
-                .to(TOPIC_WORD_OUTPUT, Produced.with(Serdes.String(), new JsonSerde<>()));
+        wordCountStreams
+                .to(TOPIC_WORD_OUTPUT, Produced.with(Serdes.String(), new JacksonJsonSerde<>()));
         return wordCountStreams;
     }
 
