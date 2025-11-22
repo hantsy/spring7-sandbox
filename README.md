@@ -10,6 +10,7 @@ Spring 7 retains JDK 17 as a baseline but incorporates the new features from JDK
 
 ## Resources
 
+* [Spring Boot 4.0.0 available now](https://spring.io/blog/2025/11/20/spring-boot-4-0-0-available-now)
 * [Spring Framework 7.0 General Availability](https://spring.io/blog/2025/11/13/spring-framework-7-0-general-availability)
 * [Spring Data 2025.1.0-RC1 released](https://spring.io/blog/2025/10/17/spring-data-2025-1-0-RC1-released)
 * [Spring Framework 7.0.0-RC1 available now](https://spring.io/blog/2025/10/16/spring-framework-7-0-0-RC1-available-now)
