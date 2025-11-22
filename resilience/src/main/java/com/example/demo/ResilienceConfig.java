@@ -5,6 +5,6 @@ import org.springframework.resilience.annotation.EnableResilientMethods;
 
 @EnableResilientMethods
 @Configuration
-public class ResilientConfig {
+public class ResilienceConfig {
 
 }

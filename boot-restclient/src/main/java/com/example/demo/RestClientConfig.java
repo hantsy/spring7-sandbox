@@ -20,7 +20,7 @@ public class RestClientConfig {
         return builder -> builder
                 .baseUrl("http://localhost:9090")
                 .configureMessageConverters(c -> c.registerDefaults()
-                        .jsonMessageConverter(new JacksonJsonHttpMessageConverter(mapper))
+                        .withJsonConverter(new JacksonJsonHttpMessageConverter(mapper))
                 )
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
