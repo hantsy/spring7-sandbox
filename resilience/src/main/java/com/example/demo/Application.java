@@ -20,7 +20,7 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Application.class)) {
-          var retryExample =   context.getBean(RetryExample.class);
+          var retryExample =   context.getBean(RetryableExample.class);
           retryExample.test();
           log.debug("retryExample count:{}", retryExample.count());
         }

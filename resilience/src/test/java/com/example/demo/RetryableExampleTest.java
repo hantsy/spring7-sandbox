@@ -9,12 +9,11 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringJUnitConfig(classes = {RetryableExample.class, ResilientConfig.class})
+@SpringJUnitConfig(classes = {RetryableExample.class, ResilienceConfig.class})
 public class RetryableExampleTest {
 
     @Autowired
     RetryableExample retryableExample;
-    ;
 
     @Test
     public void test() {
