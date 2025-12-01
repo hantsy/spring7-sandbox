@@ -36,7 +36,8 @@
 
     <!-- Debug hibernate SQL,  see: https://thorben-janssen.com/hibernate-logging-guide/ -->
     <logger name="org.hibernate.SQL" level="DEBUG"/>
-    <logger name="org.hibernate.type.descriptor.sql" level="trace"/>
+    <logger name="org.hibernate.type.descriptor.sql" level="TRACE"/>
+    <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" />
 
     <!-- Custom debug level for the application code -->
     <logger name="com.example" level="debug" additivity="false">
