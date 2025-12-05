@@ -39,7 +39,6 @@ class DemoApplicationTests {
 
     @Test
     public void testSendMessage() throws InterruptedException {
-        producer.send(Flux.just("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"));
         Awaitility.waitAtMost(Duration.ofMillis(10_000))
                 .untilAsserted(() -> assertThat(this.listener.messages).containsExactly("THE:2"));
     }

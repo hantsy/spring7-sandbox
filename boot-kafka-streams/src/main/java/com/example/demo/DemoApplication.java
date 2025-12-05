@@ -28,7 +28,7 @@ public class DemoApplication {
     @Bean
     NewTopic wordInputTopic() {
         return TopicBuilder.name(TOPIC_WORD_INPUT)
-                .partitions(10)
+                //.partitions(10)
                 //.replicas(3)
                 .build();
     }
@@ -36,7 +36,7 @@ public class DemoApplication {
     @Bean
     NewTopic wordOutputTopic() {
         return TopicBuilder.name(TOPIC_WORD_OUTPUT)
-                .partitions(10)
+                //.partitions(10)
                 //.replicas(3)
                 .build();
     }
