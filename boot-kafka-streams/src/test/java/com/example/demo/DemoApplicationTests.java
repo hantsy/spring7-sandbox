@@ -5,6 +5,7 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.junit.jupiter.Container;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Flux;
 import java.time.Duration;
 import java.util.stream.Stream;
 
+import static com.example.demo.DemoApplication.TOPIC_WORD_INPUT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
@@ -32,13 +34,20 @@ class DemoApplicationTests {
     }
 
     @Autowired
-    private Consumer listener;
+    private WordCountListener listener;
 
     @Autowired
-    private Producer producer;
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Test
     public void testSendMessage() throws InterruptedException {
+        Stream.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
+                .forEach(word ->
+                    kafkaTemplate.send(TOPIC_WORD_INPUT, word, word)
+                            .thenAccept(w -> log.debug("sent message: " + w))
+                            .join()
+                );
+
         Awaitility.waitAtMost(Duration.ofMillis(10_000))
                 .untilAsserted(() -> assertThat(this.listener.messages).containsExactly("THE:2"));
     }
