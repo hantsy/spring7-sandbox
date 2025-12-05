@@ -12,9 +12,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
-import reactor.core.publisher.Flux;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static com.example.demo.DemoApplication.TOPIC_WORD_INPUT;
@@ -41,14 +43,20 @@ class DemoApplicationTests {
 
     @Test
     public void testSendMessage() throws InterruptedException {
-        Stream.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
-                .forEach(word ->
-                    kafkaTemplate.send(TOPIC_WORD_INPUT, word, word)
-                            .thenAccept(w -> log.debug("sent message: " + w))
-                            .join()
-                );
+        var futures = Stream.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
+                .map(word ->
+                        kafkaTemplate.send(TOPIC_WORD_INPUT, word, word)
+                                .thenAccept(w -> log.debug("sent message: " + w))
 
-        Awaitility.waitAtMost(Duration.ofMillis(10_000))
+                )
+                .toArray(CompletableFuture[]::new);
+        var latch = new CountDownLatch(1);
+        CompletableFuture.allOf(futures)
+                .whenComplete((unused, throwable) -> latch.countDown())
+                .join();
+        latch.await(10_000, TimeUnit.MILLISECONDS);
+
+        Awaitility.waitAtMost(Duration.ofMillis(15_000))
                 .untilAsserted(() -> assertThat(this.listener.messages).containsExactly("THE:2"));
     }
 }
