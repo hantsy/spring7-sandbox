@@ -1,0 +1,32 @@
+name: boot-mongo
+
+on:
+  push:
+    paths:
+      - "boot-mongo/**"
+    branches:
+      - master
+  pull_request:
+    paths:
+      - "boot-mongo/**"
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: 25
+          cache: "maven"
+
+      - name: Build with Maven
+        run: mvn -B -q clean package --file boot-mongo/pom.xml
+        
+
