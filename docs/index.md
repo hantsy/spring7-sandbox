@@ -1,4 +1,4 @@
-# Welcome to MkDocs
+# Spring 7 Cookbook
 
 For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 
