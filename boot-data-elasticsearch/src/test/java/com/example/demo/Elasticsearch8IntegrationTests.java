@@ -28,7 +28,7 @@ public class Elasticsearch8IntegrationTests {
     private final static String IMAGE_NAME = "docker.elastic.co/elasticsearch/elasticsearch:9.2.2";
 
     @Container
-    public static ElasticsearchContainer ES_CONTAINER = new ElasticsearchContainer(IMAGE_NAME);
+    static ElasticsearchContainer ES_CONTAINER = new ElasticsearchContainer(IMAGE_NAME);
 
     @DynamicPropertySource
     static void registerElasticsearchProperties(DynamicPropertyRegistry registry) {
