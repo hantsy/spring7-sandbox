@@ -57,10 +57,12 @@ public class JakartaDataPostRepositoryWithTestcontainersTest {
     public void testInsertAndQuery() {
         var data = Post.of("test1", "content1", Status.DRAFT);
         var saved = this.posts.save(data);
-        this.posts.findById(saved.getId()).ifPresent(
-                p -> assertThat(p.getStatus()).isEqualTo(Status.DRAFT)
-        );
-
+		
+        var byId = this.posts.findById(saved.getId());
+		assertThat(byId.isPresent()).isTrue();
+		
+		var p = byId.get();
+		assertThat(p.getStatus()).isEqualTo(Status.DRAFT);
     }
 
     @Configuration
