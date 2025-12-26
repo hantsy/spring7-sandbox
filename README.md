@@ -10,6 +10,8 @@ Spring 7 retains JDK 17 as a baseline but incorporates the new features from JDK
 
 ## Resources
 
+* [Next level Kotlin support in Spring Boot 4](https://spring.io/blog/2025/12/18/next-level-kotlin-support-in-spring-boot-4)
+* [Modularizing Spring Boot](https://spring.io/blog/2025/10/28/modularizing-spring-boot)
 * [Spring Boot 4.0.0 available now](https://spring.io/blog/2025/11/20/spring-boot-4-0-0-available-now)
 * [Spring Framework 7.0 General Availability](https://spring.io/blog/2025/11/13/spring-framework-7-0-general-availability)
 * [Spring Data 2025.1.0-RC1 released](https://spring.io/blog/2025/10/17/spring-data-2025-1-0-RC1-released)
