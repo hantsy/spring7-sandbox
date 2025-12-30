@@ -3,7 +3,7 @@
 Jackson is the de facto standard for JSON processing in Spring apps. With Spring 7 and Spring Boot 4, Jackson 3 is now the default — it modernizes the codebase for Java 17+ and also brings some breaking changes. Let’s walk through what changed and what you need to do when come to Spring 7 world.
 
 [!NOTE]
-> Check out the release notes and migration guide: [Jackson-Release-3.0](https://github.com/FasterXML/jackson/wiki/Jackson-Release-3.0) and the [Migration Guide](https://github.com/FasterXML/jackson/blob/main/jackson3/MIGRATING_TO_JACKSON_3.md).
+> Check out the release notes and migration guide: [Jackson-Release-3.0](https://github.com/FasterXML/jackson/wiki/Jackson-Release-3.0) and the [Jackson 3 Migration Guide](https://github.com/FasterXML/jackson/blob/main/jackson3/MIGRATING_TO_JACKSON_3.md).
 
 If you're migrating from Spring 6 to Spring 7, you'll probably need to update your Jackson configuration — here's one example of Jackson 2 configuration in Spring 6:
 
