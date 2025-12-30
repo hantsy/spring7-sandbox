@@ -22,7 +22,7 @@ class JacksonTests {
     JsonMapper jsonMapper;
 
     @Test
-    void testPersonSerialAndDeserial() throws IOException {
+    void testPersonSerializationAndDeserialization() throws IOException {
         var data = new Person(
                 "Hantsy Bai",
                 LocalDate.of(1970, 1, 1),
@@ -32,8 +32,8 @@ class JacksonTests {
         var jsonData = jsonMapper.writeValueAsString(data);
         log.debug("serialized json string: {} ", jsonData);
 
-        var testContents = tester.parse(jsonData);
-        testContents.assertThat()
+        tester.parse(jsonData)
+                .assertThat()
                 .matches(person -> person.name().equals("Hantsy Bai"));
     }
 
