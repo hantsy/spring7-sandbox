@@ -1,6 +1,6 @@
 # An Introduction to Jackson 3 in Spring 7 and Spring Boot 4
 
-Jackson is the de facto standard for JSON processing in Spring apps. With Spring 7 and Spring Boot 4, Jackson 3 is now the default — it modernizes the codebase for Java 17+ and also brings some breaking changes. Let’s walk through what changed and what you need to do when come to Spring 7 world.
+Jackson is the defacto standard for JSON processing in Spring apps. With Spring 7 and Spring Boot 4, Jackson 3 is now the default — it modernizes the codebase for Java 17+ and also brings some breaking changes. Let’s walk through what changed and what you need to do when come to Spring 7 world.
 
 [!NOTE]
 > Check out the release notes and migration guide: [Jackson-Release-3.0](https://github.com/FasterXML/jackson/wiki/Jackson-Release-3.0) and the [Jackson 3 Migration Guide](https://github.com/FasterXML/jackson/blob/main/jackson3/MIGRATING_TO_JACKSON_3.md).
@@ -58,7 +58,7 @@ A few notes on the example:
 * Dates and times are serialized as ISO‑8601 strings by default, so you don't need to turn off `WRITE_DATES_AS_TIMESTAMPS`.
 
 >[!NOTE]
-> Heads up: even though Jackson 3 uses `tools.jackson`, it still shares the [`jackson-annotations`](https://github.com/FasterXML/jackson-annotations) module with Jackson 2, which uses the legacy namespace `com.fasterxml.jackson`. It looks odd, but this is intentional for backward compatibility.
+> Although Jackson 3 uses `tools.jackson`, it still shares the [`jackson-annotations`](https://github.com/FasterXML/jackson-annotations) module with Jackson 2, which uses the legacy namespace `com.fasterxml.jackson`. It looks odd, but this is intentional for backward compatibility.
 
 Like the Jackson 2 `Jackson2ObjectMapperBuilderCustomizer` in Spring Boot 3.x, Spring Boot 4 gives you a `JsonMapperBuilderCustomizer` hook to tweak Jackson 3's configuration.
 
