@@ -109,7 +109,7 @@ spring.jackson.serialization.indent-output=true
 
 The `spring-boot-starter-jackson-test` sets up a minimal JSON test context for use with `@JsonTest`. Inject `JacksonTester` into your tests to assert JSON serialization and deserialization.
 
-Here's a simple `Person` example you can use in tests.
+Here's a simple `Person` example class will be used in our tests.
 
 ```java
 record Person(
@@ -209,6 +209,6 @@ void deserializedWithFullName() throws IOException {
 
 If you still need Jackson 2, that's fine — add the Jackson 2 modules (`jackson-module-parameter-names`, `jackson-datatype-jdk8`, `jackson-datatype-jsr310`) and set `spring.http.converters.preferred-json-mapper=jackson2` (Web MVC) or `spring.http.codecs.preferred-json-mapper=jackson2` (WebFlux) to return back to use Jackson 2 for JSON serialization and deserialization.
 
-One gotcha I hit during migration: `Locale` serialization changed. For example, `Locale.CHINA` used to serialize as `zh_CN` in Jackson 2 but is `zh-CN` in Jackson 3 — Jackson 3 now uses the `LanguageTag` format, so be aware of the difference when you parse or compare locale values.
+One issue I encountered during the migration of my projects: `Locale` serialization changed. For example, `Locale.CHINA` used to serialize as `zh_CN` in Jackson 2 but is `zh-CN` in Jackson 3 — Jackson 3 now uses the `LanguageTag` format, so be aware of the difference when you parse or compare locale values.
 
 Grab the complete example on GitHub: [spring7-sandbox/boot-jackson](https://github.com/hantsy/spring7-sandbox/tree/master/boot-jackson).
