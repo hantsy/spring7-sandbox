@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 import static com.example.demo.RabbitClientConfig.HELLO_EXCHANGE_NAME;
 import static com.example.demo.RabbitClientConfig.HELLO_ROUTING_KEY;
@@ -45,9 +46,11 @@ public class RabbitAmqpListenerContainerTest {
         rabbitAmqpTemplate.convertAndSend(HELLO_EXCHANGE_NAME, HELLO_ROUTING_KEY, new Greeting("Hello", Instant.now()))
                 .whenComplete((aBoolean, throwable) -> log.debug("Sending message is completed!!!"));
 
-        Awaitility.await().atMost(Duration.ofMillis(1_5000))
+        Awaitility.await().atMost(Duration.ofMillis(1_000))
                 .untilAsserted(() -> {
-                    assertThat(greetingListener.received.size()).isEqualTo(1);
+                    List<Greeting> received = greetingListener.received;
+                    assertThat(received.size()).isEqualTo(1);
+                    assertThat(received.getFirst().body()).isEqualTo("Hello");
                 });
 
     }

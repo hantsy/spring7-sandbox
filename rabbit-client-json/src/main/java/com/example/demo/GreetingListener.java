@@ -21,10 +21,14 @@ class GreetingListener {
 
     @RabbitListener(queues = RabbitClientConfig.HELLO_QUEUE_NAME,
             concurrency = "2",
-            id = "helloListener")
-    void handleGreeting(Message data) {
-        log.info("Received data from RabbitMQ: {}", data);
-        Greeting greeting = jsonMapper.readValue(data.body(), Greeting.class);
+            id = "helloListener",
+            // there is no global message converter property in the listener container factory
+            // see: https://github.com/spring-projects/spring-amqp/issues/3274
+            messageConverter = "jsonMessageConverter"
+    )
+    void handleGreeting(/*Message data*/ Greeting greeting) {
+//        log.info("Received data from RabbitMQ: {}", data);
+//        Greeting greeting = jsonMapper.readValue(data.body(), Greeting.class);
         log.info("Converted message payload: {}", greeting);
         received.add(greeting);
     }

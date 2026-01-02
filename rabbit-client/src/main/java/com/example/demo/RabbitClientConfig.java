@@ -10,12 +10,9 @@ import org.springframework.amqp.rabbitmq.client.RabbitAmqpAdmin;
 import org.springframework.amqp.rabbitmq.client.RabbitAmqpTemplate;
 import org.springframework.amqp.rabbitmq.client.SingleAmqpConnectionFactory;
 import org.springframework.amqp.rabbitmq.client.config.RabbitAmqpListenerContainerFactory;
-import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 @EnableRabbit
@@ -52,7 +49,7 @@ public class RabbitClientConfig {
     // The RabbitAmqpTemplate is an implementation of the AsyncAmqpTemplate
     // and performs various send/receive operations with AMQP 1.0 protocol.
     @Bean
-    RabbitAmqpTemplate rabbitAmqpTemplate(AmqpConnectionFactory connectionFactory                                          ) {
+    RabbitAmqpTemplate rabbitAmqpTemplate(AmqpConnectionFactory connectionFactory) {
         RabbitAmqpTemplate rabbitAmqpTemplate = new RabbitAmqpTemplate(connectionFactory);
         return rabbitAmqpTemplate;
     }
