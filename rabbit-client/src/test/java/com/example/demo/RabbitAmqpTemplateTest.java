@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.example.demo.RabbitClientConfig.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringJUnitConfig(classes = {
@@ -21,10 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RabbitAmqpTemplateTest {
 
     @Configuration
-    @Import({
-            JacksonJsonMapperConfig.class,
-            RabbitClientConfig.class
-    })
+    @Import({RabbitClientConfig.class})
     static class TestConfig {
     }
 
@@ -32,15 +30,11 @@ public class RabbitAmqpTemplateTest {
     RabbitAmqpTemplate rabbitAmqpTemplate;
 
     @Test
-    void defaultExchangeAndRoutingKey() {
-        this.rabbitAmqpTemplate.setExchange("e1");
-        this.rabbitAmqpTemplate.setRoutingKey("k1");
-        this.rabbitAmqpTemplate.setReceiveQueue("q1");
-
-        assertThat(this.rabbitAmqpTemplate.convertAndSend("test1"))
+    void testSendAndReceive() throws Exception {
+        assertThat(this.rabbitAmqpTemplate.convertAndSend(HELLO_EXCHANGE_NAME, HELLO_ROUTING_KEY, "test1"))
                 .succeedsWithin(Duration.ofSeconds(10));
 
-        assertThat(this.rabbitAmqpTemplate.receiveAndConvert())
+        assertThat(this.rabbitAmqpTemplate.receiveAndConvert(HELLO_QUEUE_NAME))
                 .succeedsWithin(Duration.ofSeconds(10))
                 .isEqualTo("test1");
     }

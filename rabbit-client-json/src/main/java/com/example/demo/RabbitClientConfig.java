@@ -52,9 +52,16 @@ public class RabbitClientConfig {
     // The RabbitAmqpTemplate is an implementation of the AsyncAmqpTemplate
     // and performs various send/receive operations with AMQP 1.0 protocol.
     @Bean
-    RabbitAmqpTemplate rabbitAmqpTemplate(AmqpConnectionFactory connectionFactory                                          ) {
+    RabbitAmqpTemplate rabbitAmqpTemplate(AmqpConnectionFactory connectionFactory,
+                                          MessageConverter jsonMessageConverter) {
         RabbitAmqpTemplate rabbitAmqpTemplate = new RabbitAmqpTemplate(connectionFactory);
+        rabbitAmqpTemplate.setMessageConverter(jsonMessageConverter);
         return rabbitAmqpTemplate;
+    }
+
+    @Bean
+    public MessageConverter jsonMessageConverter(JsonMapper jsonMapper) {
+        return new JacksonJsonMessageConverter(jsonMapper);
     }
 
     @Bean
