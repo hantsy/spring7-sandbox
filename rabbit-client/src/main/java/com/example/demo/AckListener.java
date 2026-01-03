@@ -27,9 +27,7 @@ class AckListener {
               ackMode = "#{T(org.springframework.amqp.core.AcknowledgeMode).MANUAL}",
             concurrency = "2",
             id = "testAmqpListener")
-    void processAckManually(Message message, AmqpAcknowledgment acknowledgment, Consumer.Context context) {
-        var data = new String(message.body());
-        System.out.println("received: " + data);
+    void processAckManually(String data, AmqpAcknowledgment acknowledgment, Consumer.Context context) {
         log.debug(":: received data: [{}]", data);
         try {
             if ("discard".equals(data)) {

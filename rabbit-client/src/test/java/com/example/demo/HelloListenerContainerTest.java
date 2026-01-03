@@ -23,16 +23,16 @@ import static com.example.demo.RabbitClientConfig.HELLO_ROUTING_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringJUnitConfig(classes = {
-        AckListenerContainerTest.TestConfig.class
+        HelloListenerContainerTest.TestConfig.class
 })
 @ContextConfiguration(initializers = {RabbitContainerInitializer.class})
-public class AckListenerContainerTest {
-    private final Logger log = LoggerFactory.getLogger(AckListenerContainerTest.class);
+public class HelloListenerContainerTest {
+    private final Logger log = LoggerFactory.getLogger(HelloListenerContainerTest.class);
 
     @Configuration
     @Import({
             RabbitClientConfig.class,
-            AckListener.class
+            HelloListener.class
     })
     static class TestConfig {
     }
@@ -41,23 +41,20 @@ public class AckListenerContainerTest {
     RabbitAmqpTemplate rabbitAmqpTemplate;
 
     @Autowired
-    AckListener ackListener;
+    HelloListener listener;
 
     @Test
-    void testAck() {
+    void testHello() {
         log.debug("Start sending message...");
         var initialFuture = CompletableFuture.completedFuture(true);
         var words = List.of(
                 "the",
-                "discard",
                 "quick",
                 "dog",
                 "jumped",
                 "over",
                 "the",
-                "requeue",
                 "lazy",
-                "discard",
                 "fox");
         for (String word : words) {
             initialFuture = initialFuture
@@ -69,15 +66,14 @@ public class AckListenerContainerTest {
 
         initialFuture.join();
 
-        Awaitility.await().atMost(Duration.ofMillis(1_5000))
+        Awaitility.await().atMost(Duration.ofMillis(1_000))
                 .untilAsserted(() -> {
-                    List<String> received = this.ackListener.received;
+                    List<String> received = this.listener.received;
                     log.debug(">>> ackListener received: {}", received);
 
                     Map<String, Long> wordCount = received.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
                     log.debug("word count: {}", wordCount);
 
-                    assertThat(wordCount.get("discard")).isEqualTo(1);
                     assertThat(wordCount.get("the")).isEqualTo(2);
                 });
 
