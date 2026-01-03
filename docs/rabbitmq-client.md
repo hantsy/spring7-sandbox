@@ -1,16 +1,16 @@
 # An Introduction to new Spring RabbitMQ Client
 
-Spring AMQP 4.0 brings a new module `spring-rabbitmq-client` which is based on the new RabbitMQ official Java client `com.rabbitmq.client:amqp-client`, which is aligned with AMQP 1.0 protocol, and is also required to upgrade to RabbitMQ 4.0 when using it.
+Spring AMQP 4.0 brings a new module `spring-rabbitmq-client` which is based on the new RabbitMQ official Java client `com.rabbitmq.client:amqp-client`, which is aligned with AMQP 1.0 protocol. When using `spring-rabbitmq-client` in your projects, it is better to upgrade to RabbitMQ 4.0 to get native AMQP 1.0 support.
 
 >[!NOTE]
-> AMQP 0.9.1 and AMQP 1.0 are two different protocols, and RabbitMQ 3.x supports both protocols, but enabling AMQP 1.0 support requires installing an extra plugin `rabbitmq_amqp1_0`, RabbitMQ 4.0 switches to use AMQP 1.0 by default. The previous Spring RabbitMQ module `spring-rabbit` is still based on AMQP 0.9.1 protocol. Spring AMQP 4.1 will introduce new generic `spring-amqp-client` to implement AMQP 1.0 protocol, see: [spring-amqp#3271](https://github.com/spring-projects/spring-amqp/issues/3271)
+> AMQP 0.9.1 and AMQP 1.0 are two different protocols, and RabbitMQ 3.x supports both protocols, but enabling AMQP 1.0 support requires installing an extra plugin `rabbitmq_amqp1_0`, RabbitMQ 4.0 switches to use AMQP 1.0 as the core protocol by default. The previous Spring RabbitMQ module `spring-rabbit` is still based on AMQP 0.9.1 protocol. Spring AMQP 4.1 will introduce new generic `spring-amqp-client` to implement AMQP 1.0 protocol, see: [spring-amqp#3271](https://github.com/spring-projects/spring-amqp/issues/3271)
 
 ## Getting Started
 
-Create a new simple Maven project with the basic `spring-core` and `spring-context` as dependencies, or generate a Spring Boot project via https://start.spring.io as the previous post.
+Create a new simple Maven project with the basic `spring-core` and `spring-context` as dependencies, or generate a simple Spring Boot project via https://start.spring.io as [the previous post](https://github.com/hantsy/spring7-sandbox/blob/master/docs/jackson.md).
 
 >[!NOTE]
-> Till now the Spring Boot 4.0 does not contain a starter for Spring RabbitMQ Client, you need to add the dependency and configuration manually.
+> Till now the Spring Boot 4.0 does not contain a starter for autoconfiguring Spring RabbitMQ Client, you need to add the dependency and configuration manually.
 
 Then add the following dependencies in your `pom.xml` file:
 
@@ -160,7 +160,8 @@ class RabbitContainerInitializer implements ApplicationContextInitializer<@NotNu
 }
 ```
 
-Make sure you are using RabittMQ 4.x image to get AMQP 1.0 protocol support by default.
+> [!NOTE]
+> Make sure you are using RabittMQ 4.x image to get AMQP 1.0 protocol support by default.
 
 Now create a test to verify sending and receiving messages:
 
@@ -217,7 +218,7 @@ void verifyRpc() {
 }
 ```
 
-We have configured the listener container bean `RabbitAmqpListenerContainerFactory` in the configuration class, now you can use `@RabbitListener` to consume messages as usual:
+We have configured a listener container bean `RabbitAmqpListenerContainerFactory` in the configuration class, now you can use `@RabbitListener` to consume messages as usual:
 
 ```java
 @Component
@@ -233,7 +234,7 @@ class HelloListener {
 }
 ```
 
-The `HelloListener` component will receive messages sent to the `HELLO_QUEUE_NAME` queue, and collected in the `received` list.
+The `HelloListener` component will receive messages sent to the `HELLO_QUEUE_NAME` queue, and save them in the `received` list.
 
 Let's write a test to verify the listener works as expected:
 
@@ -413,9 +414,11 @@ public class AckListenerContainerTest {
 
 The test similarly sends a list of words to the queue, and verifies that the `discard` message is only received once, and the second `discard` message is rejected and caused an exception.
 
-# Messaging Conversion
+## Messaging Conversion
 
-Finally, to use JSON message converter with Jackson,  add the following dependencies to your `pom.xml`:
+Finally, to use a POJO class as the message payload, you can configure a JSON message converter with Jackson to convert the message payload between JSON strings and type-safe objects.  
+
+Add the following dependencies to your `pom.xml`:
 
 ```xml
 <dependencies>
@@ -469,7 +472,7 @@ public class RabbitClientConfig {
 }
 ```    
 
-Now create a simple record class to present the message payload:
+Now create a simple `record` class to present the message payload:
 
 ```java
 public record Greeting(String body, Instant sentAt) {
@@ -528,10 +531,10 @@ class GreetingListener {
 }
 ```
 
-In the `@RabbitListener`, set the `messageConverter` attribute to refer to the `JacksonJsonMessageConverter` bean. Then the payload will be converted to a `Greeting` object and injected as method parameters automatically. Otherwise, you would have to use the generic `Message` object and extract the payload data manually.
+In the `@RabbitListener`, you have to set the `messageConverter` attribute to refer to the `JacksonJsonMessageConverter` bean. Then the payload will be converted to a `Greeting` object and available to be injected as method parameters automatically. Otherwise, you would have to use the generic `Message` object and extract the payload data manually.
 
 > [!NOTE]
-> Unlike other rabbit listener container, there is no global message converter property in the listener container factory, see: https://github.com/spring-projects/spring-amqp/issues/3274
+> Unlike other rabbit listener container, there is no `messageConverter` property in the `RabbitAmqpListenerContainerFactory` bean to apply the message conversion globally, see: https://github.com/spring-projects/spring-amqp/issues/3274
 
 Create a test to verify the JSON listener works as expected:
 
