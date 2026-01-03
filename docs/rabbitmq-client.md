@@ -297,7 +297,11 @@ public class HelloListenerContainerTest {
 }
 ```
 
-By default, the message is sent and acknowledged automatically. You can set the `@RabbitListener` attribute `ackMode` to `MANUAL`, and customize the acknowledgment mode with listener method parameters: `AmqpAcknowledgment` and `Consumer.Context`.
+By default, the message is sent and acknowledged automatically. You can add fine-grained acknowledgement control in your listener method.
+
+## Manual Acknowledgement
+
+You can set the `@RabbitListener` attribute `ackMode` to `MANUAL`, and customize the acknowledgment mode with listener method parameters: `AmqpAcknowledgment` and `Consumer.Context`.
 
 ```java
 @Component
@@ -408,6 +412,8 @@ public class AckListenerContainerTest {
 ```
 
 The test similarly sends a list of words to the queue, and verifies that the `discard` message is only received once, and the second `discard` message is rejected and caused an exception.
+
+# Messaging Conversion
 
 Finally, to use JSON message converter with Jackson,  add the following dependencies to your `pom.xml`:
 
