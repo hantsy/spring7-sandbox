@@ -58,8 +58,9 @@ nav:
   - Preface: index.md
   - Core:
     - "Programmatic Bean Registration with BeanRegistrar": bean-reg.md
-    - "Jackson 3 support": jackson.md
+    - "Jackson 3": jackson.md
     - "Kotlin Serialization": kotlinx-serialization.md
+    - "Resilience": resilience.md
   - Web: 
     - "API Versioning": api-versioning.md
   - Messaging:
