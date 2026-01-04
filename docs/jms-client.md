@@ -1,8 +1,8 @@
 # An Introduction to Spring JmsClient API
 
-In previous posts, I dicussed the new [`JdbcClient`](https://itnext.io/an-introduction-to-spring-jdbcclient-api-20e833d7b0f3) and [`RestClient`](https://medium.com/itnext/an-introduction-to-spring-restclient-api-22bfafcf9405) which used to replace the existing `JdbcTemplate` and `RestTemplate`. We are all impressed by these developer-friendly APIs. 
+In previous posts, we discussed the new [`JdbcClient`](https://itnext.io/an-introduction-to-spring-jdbcclient-api-20e833d7b0f3) and [`RestClient`](https://medium.com/itnext/an-introduction-to-spring-restclient-api-22bfafcf9405) introduced in Spring 6 which used to replace the existing `JdbcTemplate` and `RestTemplate`. We are all impressed by these developer-friendly APIs. 
  
-Spring 7 introduces [`JmsClient`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jms/core/JmsClient.html),  a more modern and fluent API to interact with JMS(Jakarta Message Service) brokers, which is intended to replace the existing [`JmsTemplate`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jms/core/JmsTemplate.html) and [`JmsMessagingTemplate`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jms/core/JmsMessagingTemplate.html).
+Spring 7 introduces [`JmsClient`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jms/core/JmsClient.html), a more modern and fluent API to interact with JMS(Jakarta Message Service) brokers, which is intended to replace the existing [`JmsTemplate`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jms/core/JmsTemplate.html) and [`JmsMessagingTemplate`](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jms/core/JmsMessagingTemplate.html).
 
 ## Getting Started
 
@@ -24,7 +24,7 @@ Add the following dependencies in your `pom.xml` file:
 </dependency>
 ```
 
-Create a configuratoin class and declare a JMS `ConnectionFactory`, `MessageConverter` and `JmsListenerContainerFactory` bean to enable JMS support:
+Create a configuration class and declare a JMS `ConnectionFactory`, `MessageConverter` and `JmsListenerContainerFactory` bean to enable JMS support:
 
 ```java
 @Configuration
@@ -73,9 +73,9 @@ public JmsTemplate jmsTemplate() {
 }
 ```
 
-With the `messageConverter` property set, you can use `jmsTemplate` to send a POJO object, as well as text message.
+With the `messageConverter` property set, you can use `jmsTemplate` to send a POJO object, as well as a text message.
 
-Spring JMS also embraces the Spring Messaging abstraction, it provides a `JmsMessagingTemplate` which is based on Spring Messaging API. 
+Spring JMS also embraces the Spring Messaging abstraction, and it provides a `JmsMessagingTemplate` which is based on Spring Messaging API. 
 
 Declare a `JmsMessagingTemplate` in the configuration class, and configure the `messageConverter` property with Spring Messaging specific `MessageConverter`.
 
@@ -107,7 +107,7 @@ public JmsClient jmsClient() {
 }
 ```
 
-Alternatively, delcare `JmsClient` with `JmsClient.Builder` to customize with a global `MessageConverter` and `MessagePostProcessor`.
+Alternatively, declare `JmsClient` with `JmsClient.Builder` to customize with a global `MessageConverter` and `MessagePostProcessor`.
 
 ```java
 public JmsClient jmsClient() {
@@ -120,7 +120,7 @@ public JmsClient jmsClient() {
 
 ## Sending and Receiving Messages
 
-To boostrap a ActiveMQ Artimes server at runtime, add the following testcontainers dependencies in your `pom.xml` file:
+To bootstrap an ActiveMQ Artimes server at runtime, add the following testcontainers dependencies in your `pom.xml` file:
 
 ```xml
 <dependency>
@@ -248,7 +248,7 @@ public void testSendAndReceive_GreetingObject() {
 }
 ```
 
-As you see, the `jmsMessagingTemplate` improves payload type resovling when receiving messages.
+As you see, the `jmsMessagingTemplate` improved payload type resolves when receiving messages.
 
 The following is the example testing code using the new `JmsClient`:
 
@@ -295,7 +295,7 @@ In the `JmsClient` example, the traditional method parameters are replaced with 
 
 With `jmsListenerContainerFactory` bean, both `JmsTemplate` and `JmsMessagingTamplate` work well with the listener methods which are annotated with `@JmsListener`. The new `JmsClient` also works seamlessly with the listener methods.
 
-For example, create a `GreetingListener` to consume mesasages with payload type `Greeting`.
+For example, create a `GreetingListener` to consume messages with a payload type `Greeting`.
 
 ```java
 @Component
@@ -312,7 +312,7 @@ public class GreetingListener {
 }
 ```
 
-Use `jmsClient` to send a `Greeting` message to the destination `greeting`, then check the recieved messages in the `GreetingListener`.
+Use `jmsClient` to send a `Greeting` message to the destination `greeting`, then check the received messages in the `GreetingListener`.
 
 ```java
 @Autowired
@@ -355,11 +355,11 @@ Generate your project skeleton from https://start.spring.io, add `Spring for Apa
 </dependencies>
 ```
 
-Additionally, it will add a testcontainers configuration for starting a Artemis server in Docker for development and test environment. In the transitive dependency tree, it includes `ativemq-artemis-client` which is responsible for connecting to the running Artemis server.
+Additionally, it will add a Testcontainers configuration to start an Artemis server in Docker for development and test environments. The transitive dependency tree includes `ativemq-artemis-client` which is responsible for connecting to the running Artemis server.
 
 Now you can inject `JmsTempalate`, `JmsMessagingTemplate` and `JmsClient` freely in your Spring components.
 
-Add a `JmsTemplate` compatiable `MessageConverter` to send and receive POJO messages. 
+Add a `JmsTemplate` compatible `MessageConverter` to send and receive POJO messages. 
 
 ```java
 // from org.springframework.jms.support.converter
@@ -373,4 +373,4 @@ JacksonJsonMessageConverter jacksonMessageConverter() {
 
 Do not forget to add `spring-boot-starter-jackson` and `spring-boot-starter-jackson-test` to the project dependencies to enable Jackson autoconfiguration.
 
-Check the example code for demontrating [JmsTemplate](https://github.com/hantsy/spring7-sandbox/tree/master/jms), [JmsMessagingTemlate](https://github.com/hantsy/spring7-sandbox/tree/master/jms-messaging),[JmsClient](https://github.com/hantsy/spring7-sandbox/tree/master/jms-client) and [all-in-one Spring Boot](https://github.com/hantsy/spring7-sandbox/tree/master/boot-jms) from my Github account.
+Check the example code for demonstrating [JmsTemplate](https://github.com/hantsy/spring7-sandbox/tree/master/jms), [JmsMessagingTemplate](https://github.com/hantsy/spring7-sandbox/tree/master/jms-messaging), [JmsClient](https://github.com/hantsy/spring7-sandbox/tree/master/jms-client) and [all-in-one Spring Boot](https://github.com/hantsy/spring7-sandbox/tree/master/boot-jms) from my GitHub account.
