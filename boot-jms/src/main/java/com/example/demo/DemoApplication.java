@@ -3,6 +3,7 @@ package com.example.demo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jms.support.converter.JacksonJsonMessageConverter;
 
 @SpringBootApplication
 public class DemoApplication {
@@ -14,16 +15,9 @@ public class DemoApplication {
     }
 
     @Bean
-    org.springframework.jms.support.converter.JacksonJsonMessageConverter jacksonMessageConverter() {
-        org.springframework.jms.support.converter.JacksonJsonMessageConverter messageConverter = new org.springframework.jms.support.converter.JacksonJsonMessageConverter();
+    JacksonJsonMessageConverter jacksonMessageConverter() {
+        JacksonJsonMessageConverter messageConverter = new JacksonJsonMessageConverter();
         messageConverter.setTypeIdPropertyName("_type");
         return messageConverter;
     }
-
-
-//    @Bean
-//    JacksonJsonMessageConverter jacksonJsonMessageConverter() {
-//        return new JacksonJsonMessageConverter();
-//    }
-
 }

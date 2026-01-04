@@ -8,6 +8,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
+import org.springframework.jms.core.JmsClient;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.JacksonJsonMessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
@@ -46,5 +47,10 @@ public class JmsConfig {
         JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory());
         jmsTemplate.setMessageConverter(messageConverter());
         return jmsTemplate;
+    }
+
+    @Bean
+    public JmsClient jmsClient() {
+        return JmsClient.create(jmsTemplate());
     }
 }

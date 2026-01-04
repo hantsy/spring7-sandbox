@@ -8,9 +8,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
+import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.support.converter.JacksonJsonMessageConverter;
-import org.springframework.jms.support.converter.MessageConverter;
+import org.springframework.messaging.converter.JacksonJsonMessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
 
 @Configuration
 @EnableJms
@@ -27,8 +28,8 @@ public class JmsConfig {
     }
 
     @Bean
-    public MessageConverter messageConverter() {
-        JacksonJsonMessageConverter messageConverter = new JacksonJsonMessageConverter();
+    public org.springframework.jms.support.converter.MessageConverter messageConverter() {
+        org.springframework.jms.support.converter.JacksonJsonMessageConverter messageConverter = new org.springframework.jms.support.converter.JacksonJsonMessageConverter();
         messageConverter.setTypeIdPropertyName("_type");
         return messageConverter;
     }
@@ -37,9 +38,13 @@ public class JmsConfig {
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory());
+        //factory.setDestinationResolver(destinationResolver());
         factory.setMessageConverter(messageConverter());
+//        factory.setSessionTransacted(true);
+//        factory.setConcurrency("5");
         return factory;
     }
+
 
     @Bean
     public JmsTemplate jmsTemplate() {
@@ -47,4 +52,17 @@ public class JmsConfig {
         jmsTemplate.setMessageConverter(messageConverter());
         return jmsTemplate;
     }
+
+    @Bean
+    public MessageConverter messagingMessageConverter() {
+        return new JacksonJsonMessageConverter();
+    }
+
+    @Bean
+    public JmsMessagingTemplate jmsMessagingTemplate() {
+        JmsMessagingTemplate jmsMessagingTemplate = new JmsMessagingTemplate(connectionFactory());
+        jmsMessagingTemplate.setMessageConverter(messagingMessageConverter());
+        return jmsMessagingTemplate;
+    }
+
 }

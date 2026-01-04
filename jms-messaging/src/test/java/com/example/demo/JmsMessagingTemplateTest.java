@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jms.core.JmsMessagingTemplate;
@@ -28,19 +27,28 @@ public class JmsMessagingTemplateTest {
     }
 
     @Autowired
-    JmsMessagingTemplate template;
+    JmsMessagingTemplate jmsMessagingTemplate;
 
     @Test
-    public void sendAndReceiveMessagesViaJmsMessagingTemplate() {
-        template.convertAndSend("test", new Greeting("Hello JmsClient!", Instant.now()));
+    public void testSendAndReceive() {
+        jmsMessagingTemplate.convertAndSend("test", "hello");
+
+        // wait to verify.
+        await().atMost(Duration.ofMillis(1_500))
+                .untilAsserted(() -> assertThat(jmsMessagingTemplate.receiveAndConvert("test", String.class)).isEqualTo("hello"));
+    }
+
+    @Test
+    public void testSendAndReceive_GreetingObject() {
+        jmsMessagingTemplate.convertAndSend("testObject", new Greeting("Hello JmsClient!", Instant.now()));
 
         // wait one second to verify.
         await().atMost(Duration.ofMillis(1_500))
                 .untilAsserted(() -> {
-                    var receivedMessage = template.receiveAndConvert("test", Greeting.class);
+                    var receivedMessage = jmsMessagingTemplate.receiveAndConvert("testObject", Greeting.class);
                     assertThat(receivedMessage).isNotNull();
                     log.info("Greeting messages received via JmsMessagingTemplate: {}", receivedMessage);
-                    assertThat(receivedMessage.message()).isEqualTo("Hello JmsClient!");
+                    assertThat(receivedMessage.body()).isEqualTo("Hello JmsClient!");
                 });
     }
 }

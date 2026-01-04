@@ -9,18 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class HelloReceiver {
-    private final Logger log = LoggerFactory.getLogger(JmsConfig.class);
+public class HelloListener {
+    private final Logger log = LoggerFactory.getLogger(HelloListener.class);
 
-    private List<String> messageList = new ArrayList<>();
+    public List<String> received = new ArrayList<>();
 
     @JmsListener(destination = "hello")
     public void onMessage(String message) {
-        log.debug("receiving message: {}", message);
-        messageList.add(message);
-    }
-
-    public List<String> getMessageList() {
-        return messageList;
+        log.debug("receiving body: {}", message);
+        received.add(message);
     }
 }

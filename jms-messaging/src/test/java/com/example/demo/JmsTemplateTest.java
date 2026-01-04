@@ -1,0 +1,56 @@
+package com.example.demo;
+
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import java.time.Duration;
+import java.time.Instant;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
+@SpringJUnitConfig(value = {JmsTemplateTest.TestConfig.class})
+@ContextConfiguration(initializers = {ArtemisContainerInitializer.class})
+public class JmsTemplateTest {
+    private final static Logger log = LoggerFactory.getLogger(JmsTemplateTest.class);
+
+    @Configuration
+    @Import(value = {JmsConfig.class})
+    static class TestConfig {
+    }
+
+    @Autowired
+    JmsTemplate jmsTemplate;
+
+    @Test
+    public void testSendAndReceive() {
+        jmsTemplate.convertAndSend("test", "hello");
+
+        // wait to verify.
+        await().atMost(Duration.ofMillis(1_500))
+                .untilAsserted(() -> assertThat(jmsTemplate.receiveAndConvert("test")).isEqualTo("hello"));
+    }
+
+    @Test
+    public void testSendAndReceive_GreetingObject() {
+        jmsTemplate.convertAndSend("testObject", new Greeting("Hello", Instant.now()));
+
+        // wait to verify.
+        await().atMost(Duration.ofMillis(1_500))
+                .untilAsserted(() -> {
+                    Object receivedObject = jmsTemplate.receiveAndConvert("testObject");
+                    log.debug("received object: {}", receivedObject);
+
+                    var greetingObject = (Greeting) receivedObject;
+                    assertThat(greetingObject.body()).isEqualTo("Hello");
+                });
+
+    }
+}

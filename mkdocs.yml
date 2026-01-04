@@ -56,4 +56,18 @@ plugins:
 
 nav:
   - Preface: index.md
+  - Core:
+    - "Programmatic Bean Registration with BeanRegistrar": bean-reg.md
+    - "Jackson 3 support": jackson.md
+    - "Kotlin Serialization": kotlinx-serialization.md
+  - Web: 
+    - "API Versioning": api-versioning.md
+  - Messaging:
+    - "Spring RabbitMQ Client": rabbitmq-client.md
+    - "JMS Client": jms-client.md
+  - Data Access:
+    - "Hibernate and Jakarta Data": jakarta-data.md
+    - "Spring Data and AOT": spring-data-aot.md
+  - Misc:
+    - "Migrating to Spring Boot 4: The Hard Way": migrating-sb4.md
 
