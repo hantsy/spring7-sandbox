@@ -28,7 +28,7 @@
         <jakartaee-api.version>11.0.0</jakartaee-api.version>
         <spring-framework.version>7.0.3</spring-framework.version>
         <reactor.version>2025.0.2</reactor.version>
-        <spring-data.version>2025.1.1</spring-data.version>
+        <spring-data.version>2025.1.2</spring-data.version>
         <spring-security.version>7.0.2</spring-security.version>
         <freemarker.version>2.3.34</freemarker.version>
         <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
