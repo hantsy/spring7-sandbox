@@ -98,7 +98,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.activemq</groupId>
+            <groupId>org.apache.artemis</groupId>
             <artifactId>artemis-jakarta-client</artifactId>
             <version>2.50.0</version>
         </dependency>
