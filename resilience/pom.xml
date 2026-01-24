@@ -28,7 +28,7 @@
 
         <junit.version>6.0.2</junit.version>
         <mockito.version>5.21.0</mockito.version>
-        <assertj-core.version>3.27.6</assertj-core.version>
+        <assertj-core.version>3.27.7</assertj-core.version>
         <json-path.version>2.9.0</json-path.version>
         <hamcrest.version>3.0</hamcrest.version>
         <awaitility.version>4.3.0</awaitility.version>
