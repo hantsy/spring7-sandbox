@@ -60,6 +60,7 @@ nav:
     - "Programmatic Bean Registration with BeanRegistrar": bean-reg.md
     - "Jackson 3": jackson.md
     - "Kotlin Serialization": kotlinx-serialization.md
+    - "Modularization": modularization.md
     - "Resilience": resilience.md
   - Web: 
     - "API Versioning": api-versioning.md
