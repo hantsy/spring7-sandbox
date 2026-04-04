@@ -496,10 +496,10 @@ public class Product {
 }
 ```
 
-> [WARNING!]
+> [!WARNING]
 > At the moment I prepared the example code, the MongoClient API did not support a record type.
 
-Create a `ProductRepository` class  to use `MongoClient` to operate the documents.
+Create a `ProductRepository` class  to use `MongoClient` to operate  the documents.
 
 ```java
 @Component
