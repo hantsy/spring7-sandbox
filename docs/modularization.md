@@ -322,7 +322,9 @@ ClientHttpRequestFactoryBuilder<?> clientHttpRequestFactoryBuilder() {
 
 #### RestTestClient
 
-In parallel with the reactive `WebTestClient`, `RestTestClient` offers analogous APIs for synchronous (blocking) scenarios. You can instantiate `RestTestClient` targeting a controller class, `RouterFunction`, `ApplicationContext`, or a remote server. The following demonstrates connecting to a remote server and verifying REST endpoints:
+`RestTestClient`, located in the `spring-test` module, adopts the `RestClient` design pattern and provides additional test-specific methods for convenient assertions and verification.
+
+In parallel with the existing reactive `WebTestClient`, `RestTestClient` offers analogous APIs for synchronous (blocking) scenarios. You can instantiate `RestTestClient` targeting a controller class, `RouterFunction`, `ApplicationContext`, or a remote server. The following demonstrates connecting to a remote server and verifying REST endpoints:
 
 ```java
 @SpringBootTest
