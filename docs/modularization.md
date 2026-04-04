@@ -90,10 +90,6 @@ Now, let's examine Spring Boot 4's enhanced `RestClient` and `WebClient` capabil
 
 ## Spring Web Client Modules
 
-We'll begin by exploring `RestClient` support in Spring Boot 4, which builds upon the `RestClient` API introduced in Spring Framework 6.0. 
-
-Create a new Spring Boot 4 project through [Spring Initializr](https://start.spring.io/) with the `Http Client` dependency, then manually include `spring-boot-starter-jackson`. The `spring-boot-starter-restclient` starter automatically configures a `RestClient.Builder`, while `spring-boot-starter-restclient-test` provides test utilities including `RestClient/RestTemplate` mocks and `MockRestServiceServer` for verification.
-
 Leverage the existing `Post` model and assume a RESTful API with the following core operations: 
 
 * `GET /posts` — retrieves all posts
@@ -101,6 +97,12 @@ Leverage the existing `Post` model and assume a RESTful API with the following c
 * `POST /posts` — accepts a `Post` entity in the request body and returns a 201 (CREATED) status with a `Location` header pointing to the newly created resource
 * `PUT /posts/{id}` — updates the specified post by ID and returns a 204 (NO CONTENT) status
 * `DELETE /posts/{id}` — removes the specified post by ID and returns a 204 (NO CONTENT) status
+
+We'll begin by exploring `RestClient` support in Spring Boot 4, which builds upon the `RestClient` API introduced in Spring Framework 6.0. 
+
+### RestClient
+
+Create a new Spring Boot 4 project through [Spring Initializr](https://start.spring.io/) with the `Http Client` dependency, then manually include `spring-boot-starter-jackson`. The `spring-boot-starter-restclient` starter automatically configures a `RestClient.Builder`, while `spring-boot-starter-restclient-test` provides test utilities including `RestClient/RestTemplate` mocks and `MockRestServiceServer` for verification.
 
 Now create a `PostClient` class that leverages `RestClient` to implement these operations:
 
@@ -318,6 +320,8 @@ ClientHttpRequestFactoryBuilder<?> clientHttpRequestFactoryBuilder() {
 }
 ```
 
+#### RestTestClient
+
 In parallel with the reactive `WebTestClient`, `RestTestClient` offers analogous APIs for synchronous (blocking) scenarios. You can instantiate `RestTestClient` targeting a controller class, `RouterFunction`, `ApplicationContext`, or a remote server. The following demonstrates connecting to a remote server and verifying REST endpoints:
 
 ```java
@@ -498,7 +502,372 @@ This example uses `WireMock` to simulate a remote server and stub REST endpoints
 
 For the complete working example, visit the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-restclient), which also includes comprehensive tests demonstrating `RestClient` validation against `WireMock`.  
 
-Previous posts have covered the reactive `WebClient` and test-focused `WebTestClient` in detail. For brevity, we'll forgo a deep dive into the new `spring-boot-starter-webclient` and `spring-boot-starter-webclient-test` modules here. For the complete working example, visit the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-webclient).
+### WebClient
+
+Previous articles have explored the reactive `WebClient` and test-focused `WebTestClient` comprehensively. Here, we'll provide a concise overview of their capabilities.
+
+Begin by creating a Spring Boot 4 project from [Spring Initializr](https://start.spring.io) with the `Reactive HTTP Client` dependency. Additionally, add `spring-boot-starter-jackson` for Jackson 3 support. The `spring-boot-starter-webclient` starter automatically configures a `WebClient.Builder`, while `spring-boot-starter-webclient-test` furnishes test-specific `WebClient.Builder` configurations.
+
+Implement a `PostClient` class that leverages `WebClient`:
+
+```java
+@Component
+public class PostClient {
+    private final WebClient client;
+
+    public PostClient(WebClient.Builder builder) {
+        this.client = builder.build();
+    }
+
+    public Flux<Post> allPosts() {
+        return client
+                .get().uri("/posts")
+                .exchangeToFlux(response -> response.bodyToFlux(Post.class));
+    }
+
+    public Mono<Post> getById(UUID id) {
+        return client.get().uri("/posts/{id}", id)
+                .retrieve()
+                .onStatus(code -> code == HttpStatus.NOT_FOUND,
+                        clientResponse -> {
+                            throw new PostNotFoundException(id);
+                        }
+                )
+                .bodyToMono(Post.class);
+    }
+
+    public Mono<URI> save(Post post) {
+        return client.post().uri("/posts")
+                .bodyValue(post)
+                .retrieve()
+                .toBodilessEntity()
+                .map(entity -> entity.getHeaders().getLocation());
+    }
+
+    public Mono<Void> update(UUID id, Post post) {
+        return client.put().uri("/posts/{id}", id)
+                .bodyValue(post)
+                .exchangeToMono(response -> response.bodyToMono(Void.class));
+    }
+
+    public Mono<Void> delete(UUID id) {
+        return client.delete().uri("/posts/{id}", id)
+                .exchangeToMono(response -> response.bodyToMono(Void.class));
+    }
+}
+```
+
+Now create a test class to validate the functionality using `WireMock` to simulate the remote server and stub REST endpoints:
+
+```java
+@SpringBootTest
+@WireMockTest(httpPort = 9090)
+public class PostClientTest {
+
+    static {
+        ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
+        wireMockObjectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS);
+        wireMockObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
+
+        JavaTimeModule module = new JavaTimeModule();
+        wireMockObjectMapper.registerModule(module);
+    }
+
+    @Autowired
+    PostClient client;
+
+    @BeforeEach
+    public void setup() {
+    }
+
+    @Test
+    public void testGetAllPosts() {
+        var data = List.of(
+                new Post(UUID.randomUUID(), "title1", "content1", Status.DRAFT, LocalDateTime.now()),
+                new Post(UUID.randomUUID(), "title2", "content2", Status.PUBLISHED, LocalDateTime.now())
+        );
+        stubFor(get("/posts")
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withResponseBody(Body.fromJsonBytes(Json.toByteArray(data)))
+                )
+        );
+
+        client.allPosts()
+                .as(StepVerifier::create)
+                .expectNextCount(2)
+                .verifyComplete();
+
+        verify(getRequestedFor(urlEqualTo("/posts"))
+                .withHeader("Accept", equalTo("application/json")));
+    }
+
+    @Test
+    public void testGetPostById() {
+        var id = UUID.randomUUID();
+        var data = new Post(id, "title1", "content1", Status.DRAFT, LocalDateTime.now());
+
+        stubFor(get("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withResponseBody(Body.fromJsonBytes(Json.toByteArray(data)))
+                )
+        );
+
+        client.getById(id)
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        post -> {
+                            assertThat(post.id()).isEqualTo(id);
+                            assertThat(post.title()).isEqualTo(data.title());
+                            assertThat(post.content()).isEqualTo(data.content());
+                            assertThat(post.status()).isEqualTo(data.status());
+                            assertThat(post.createdAt()).isEqualTo(data.createdAt());
+                        }
+                )
+                .verifyComplete();
+
+        verify(getRequestedFor(urlEqualTo("/posts/" + id))
+                .withHeader("Accept", equalTo("application/json"))
+        );
+    }
+
+    @Test
+    public void testCreatePost() {
+        var id = UUID.randomUUID();
+        var data = new Post(null, "title1", "content1", Status.DRAFT, null);
+
+        stubFor(post("/posts")
+                .willReturn(
+                        aResponse()
+                                .withHeader("Location", "/posts/" + id)
+                                .withStatus(201)
+                )
+        );
+
+        client.save(data)
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        uri -> {
+                            assertThat(uri.toString()).isEqualTo("/posts/" + id);
+                        }
+                )
+                .verifyComplete();
+
+        verify(postRequestedFor(urlEqualTo("/posts"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(equalToJson(Json.write(data)))
+        );
+    }
+
+    @Test
+    public void testUpdatePost() {
+        var id = UUID.randomUUID();
+        var data = new Post(null, "title1", "content1", Status.DRAFT, null);
+
+        stubFor(put("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withStatus(204)
+                )
+        );
+
+        client.update(id, data)
+                .as(StepVerifier::create)
+                .thenAwait()
+                .verifyComplete();
+
+        verify(putRequestedFor(urlEqualTo("/posts/" + id))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(equalToJson(Json.write(data)))
+        );
+    }
+
+    @Test
+    public void testDeletePostById() {
+        var id = UUID.randomUUID();
+        stubFor(delete("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withStatus(204)
+                )
+        );
+
+        client.delete(id)
+                .as(StepVerifier::create)
+                .thenAwait()
+                .verifyComplete();
+
+        verify(deleteRequestedFor(urlEqualTo("/posts/" + id)));
+    }
+}
+```
+
+#### WebTestClient
+
+`WebTestClient` is a test client designed to work seamlessly with controller classes, `RouterFunction`, `ApplicationContext`, or remote servers. The example below demonstrates connecting to a remote server while employing `WireMock` to stub REST endpoints. 
+
+```java
+@SpringBootTest
+@WireMockTest(httpPort = 9090)
+public class WebTestClientTest {
+
+    static {
+        ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
+        wireMockObjectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS);
+        wireMockObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
+
+        JavaTimeModule module = new JavaTimeModule();
+        wireMockObjectMapper.registerModule(module);
+    }
+
+    @TestConfiguration
+    @Import(JacksonJsonMapperConfig.class)
+    static class TestConfig {
+    }
+
+    @Autowired
+    JsonMapper jsonMapper;
+
+    WebTestClient client;
+
+    @BeforeEach
+    public void setup() {
+        client = WebTestClient.bindToServer()
+                .baseUrl("http://localhost:9090")
+                .codecs(c -> c.defaultCodecs()
+                        .jacksonJsonEncoder(new JacksonJsonEncoder(jsonMapper))
+                )
+                .build();
+    }
+
+    @Test
+    public void testGetAllPosts() {
+        var data = List.of(
+                new Post(UUID.randomUUID(), "title1", "content1", Status.DRAFT, LocalDateTime.now()),
+                new Post(UUID.randomUUID(), "title2", "content2", Status.PUBLISHED, LocalDateTime.now())
+        );
+        stubFor(get("/posts")
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withResponseBody(Body.fromJsonBytes(Json.toByteArray(data)))
+                )
+        );
+
+        client.get().uri("/posts").accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("size()").isEqualTo(2);
+
+        verify(getRequestedFor(urlEqualTo("/posts"))
+                .withHeader("Accept", equalTo("application/json")));
+    }
+
+    @Test
+    public void testGetPostById() {
+        var id = UUID.randomUUID();
+        var data = new Post(id, "title1", "content1", Status.DRAFT, LocalDateTime.now());
+
+        stubFor(get("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withResponseBody(Body.fromJsonBytes(Json.toByteArray(data)))
+                )
+        );
+
+        client.get().uri("/posts/{id}", id).accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Post.class).value(post -> {
+                            assertThat(post.id()).isEqualTo(id);
+                            assertThat(post.title()).isEqualTo(data.title());
+                            assertThat(post.content()).isEqualTo(data.content());
+                            assertThat(post.status()).isEqualTo(data.status());
+                            assertThat(post.createdAt()).isEqualTo(data.createdAt());
+                        }
+                );
+
+        verify(getRequestedFor(urlEqualTo("/posts/" + id))
+                .withHeader("Accept", equalTo("application/json"))
+        );
+    }
+
+    @Test
+    public void testCreatePost() {
+        var id = UUID.randomUUID();
+        var data = new Post(null, "title1", "content1", Status.DRAFT, null);
+
+        stubFor(post("/posts")
+                .willReturn(
+                        aResponse()
+                                .withHeader("Location", "/posts/" + id)
+                                .withStatus(201)
+                )
+        );
+
+        client.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(data)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().location("/posts/" + id);
+
+        verify(postRequestedFor(urlEqualTo("/posts"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(equalToJson(Json.write(data)))
+        );
+    }
+
+    @Test
+    public void testUpdatePost() {
+        var id = UUID.randomUUID();
+        var data = new Post(null, "title1", "content1", Status.DRAFT, null);
+
+        stubFor(put("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withStatus(204)
+                )
+        );
+
+        client.put().uri("/posts/{id}", id).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(data)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        verify(putRequestedFor(urlEqualTo("/posts/" + id))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(equalToJson(Json.write(data)))
+        );
+    }
+
+    @Test
+    public void testDeletePostById() {
+        var id = UUID.randomUUID();
+        stubFor(delete("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withStatus(204)
+                )
+        );
+
+        client.delete().uri("/posts/{id}", id)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        verify(deleteRequestedFor(urlEqualTo("/posts/" + id)));
+    }
+}
+```
+
+For the complete working example, visit the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-webclient).
 
 Spring Boot 4 also modularizes Spring Data dependencies by moving database drivers and client SDKs into dedicated modules. For example:
 
