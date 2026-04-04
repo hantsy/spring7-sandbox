@@ -6,7 +6,6 @@ import com.mongodb.client.model.Filters;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.BsonObjectId;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +16,12 @@ import java.util.Optional;
 @Slf4j
 public class ProductRepository {
 
-    private final MongoClient  mongoClient;
+    private final MongoClient mongoClient;
     private MongoCollection<Product> productsCollection;
 
     @PostConstruct
     public void init() {
-        this.productsCollection= mongoClient
+        this.productsCollection = mongoClient
                 .getDatabase("test")
                 .getCollection("products", Product.class);
     }
@@ -35,11 +34,11 @@ public class ProductRepository {
     }
 
     Optional<Product> findById(String id) {
-       var byId = this.productsCollection
-               .find(Filters.eq(new ObjectId(id)))
-               .first();
-       log.debug("find product by id: {}", byId);
-       return Optional.ofNullable(byId);
+        var byId = this.productsCollection
+                .find(Filters.eq(new ObjectId(id)))
+                .first();
+        log.debug("find product by id: {}", byId);
+        return Optional.ofNullable(byId);
     }
 
 }
