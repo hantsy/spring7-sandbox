@@ -64,7 +64,7 @@ In contrast, Spring Boot 4 demonstrates that `spring-boot-starter-web` has been 
 </dependency>
 ```
 
-Spring Boot 4 distributes autoconfiguration classes—previously consolidated in the monolithic `spring-boot-autoconfigure` module—across feature-specific modules instead. For instance, `spring-boot-starter-security-test` includes `spring-security-test` along with its corresponding autoconfiguration classes. Additionally, the package hierarchy has been reorganized around features; for example, `...autoconfigure.data.jpa` is now `...data.jpa.autoconfigure`.
+Spring Boot 4 distributes autoconfiguration classes—previously consolidated in the monolithic `spring-boot-autoconfigure` module—across feature-specific modules instead. For instance, `spring-boot-starter-security-test` includes `spring-security-test` dependency along with its corresponding autoconfiguration classes. Additionally, the package hierarchy has been reorganized around features; for example, `...autoconfigure.data.jpa` is now `...data.jpa.autoconfigure`.
 
 For a complete list of Spring Boot 4 modules, see the [Module dependencies section of the Spring Boot 4 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide#module-dependencies).
 
@@ -84,7 +84,7 @@ For applications requiring only specific lightweight features—such as Jackson,
 
 We have discussed the [new Jackson 3 support in Spring 7 and Spring Boot 4](./jackson.md).
 
-In Spring Boot 3, using `RestClient` or `WebClient` required adding `spring-boot-starter-web` or `spring-boot-starter-webflux`, which introduced a sizable collection of dependencies and autoconfiguration overhead. Spring Boot 4 streamlines this by offering the lightweight `spring-boot-starter-restclient` and `spring-boot-starter-webclient` modules, which include only the necessary client libraries and their associated configurations.
+In Spring Boot 3, using `RestClient` or `WebClient` out-of-box required adding `spring-boot-starter-web` or `spring-boot-starter-webflux`, which introduced a sizable collection of dependencies and autoconfiguration overhead. Spring Boot 4 streamlines this by offering the lightweight `spring-boot-starter-restclient` and `spring-boot-starter-webclient` modules, which include only the necessary client libraries and their associated configurations.
 
 Now, let's examine Spring Boot 4's enhanced `RestClient` and `WebClient` capabilities more thoroughly.
 
@@ -711,7 +711,7 @@ public class PostClientTest {
 
 #### WebTestClient
 
-`WebTestClient` is a test client designed to work seamlessly with controller classes, `RouterFunction`, `ApplicationContext`, or remote servers. The example below demonstrates connecting to a remote server while employing `WireMock` to stub REST endpoints. 
+`WebTestClient` is a test client designed to work seamlessly with a controller class, `RouterFunction`, `ApplicationContext`, or a remote server. The example below demonstrates connecting to a remote server while employing `WireMock` to stub REST endpoints. 
 
 ```java
 @SpringBootTest
