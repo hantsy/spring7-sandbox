@@ -1,6 +1,6 @@
-# Modularizing Spring Boot 4 Application
+#  Spring Boot 4 Modularization
 
-One breaking change in Spring Boot 4 is that the single monolithic `spring-boot-autoconfigure` module is split into smaller, fine-grained feature and library specific modules. Each feature or library now provides its own `starter` and `starter-test` modules, which allows developers to include only the autoconfiguration classes and third-party libraries their application requires.
+One breaking change in Spring Boot 4 is that the single monolithic `spring-boot-autoconfigure` module is split into smaller, fine-grained feature and library-specific modules. Each feature or library now provides its own `starter` and `starter-test` modules, which allow developers to include only the autoconfiguration classes and third-party libraries their application requires.
 
 ## Transforming to Spring Boot 4
 
@@ -84,9 +84,9 @@ For applications requiring only specific lightweight features—such as Jackson,
 
 We have discussed the [new Jackson 3 support in Spring 7 and Spring Boot 4](./jackson.md).
 
-In Spring Boot 3, using `RestClient` or `WebClient` required adding `spring-boot-starter-web` or `spring-boot-starter-webflux`, which introduced a sizable collection of dependencies and autoconfiguration overhead. Spring Boot 4 streamlines this by offering lightweight `spring-boot-starter-restclient` and `spring-boot-starter-webclient` modules that include only the necessary client libraries and their associated configurations.
+In Spring Boot 3, using `RestClient` or `WebClient` required adding `spring-boot-starter-web` or `spring-boot-starter-webflux`, which introduced a sizable collection of dependencies and autoconfiguration overhead. Spring Boot 4 streamlines this by offering the lightweight `spring-boot-starter-restclient` and `spring-boot-starter-webclient` modules, which include only the necessary client libraries and their associated configurations.
 
-Now let's examine Spring Boot 4's enhanced `RestClient` and `WebClient` capabilities more thoroughly.
+Now, let's examine Spring Boot 4's enhanced `RestClient` and `WebClient` capabilities more thoroughly.
 
 ## Spring Web Client Modules
 
@@ -165,7 +165,7 @@ public class PostClient {
 }
 ```
 
-Create a test class to verify the functionalities, and use `MockRestServiceServer` to mock the server to provide RESTful APIs.
+Create a test class to verify functionality, and use `MockRestServiceServer` to mock the server and provide RESTful APIs.
 
 ```java
 @RestClientTest
@@ -318,7 +318,7 @@ ClientHttpRequestFactoryBuilder<?> clientHttpRequestFactoryBuilder() {
 }
 ```
 
-Parallel to the reactive `WebTestClient`, `RestTestClient` offers analogous APIs for synchronous (blocking) scenarios. You can instantiate `RestTestClient` targeting a controller class, `RouterFunction`, `ApplicationContext`, or a remote server. The following demonstrates connecting to a remote server and verifying REST endpoints:
+In parallel with the reactive `WebTestClient`, `RestTestClient` offers analogous APIs for synchronous (blocking) scenarios. You can instantiate `RestTestClient` targeting a controller class, `RouterFunction`, `ApplicationContext`, or a remote server. The following demonstrates connecting to a remote server and verifying REST endpoints:
 
 ```java
 @SpringBootTest
@@ -550,7 +550,7 @@ public interface PostRepository {
     Integer update(Post post);
     Integer deleteById(UUID id);
     Integer deleteAll();
-    // other methods are ommitted for brevity
+    // other methods are omitted for brevity
 }
 ```
 
@@ -722,7 +722,7 @@ public interface PostRepository {
     Mono<Integer> update(Post post);
     Mono<Integer> deleteById(UUID id);
     Mono<Integer> deleteAll();
-    // other methods are ommitted for brevity
+    // other methods are omitted for brevity
 }
 ```
 
