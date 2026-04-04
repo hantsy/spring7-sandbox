@@ -35,7 +35,7 @@ public class ProductRepository {
         GetResponse<Product> response = this.client.get(builder -> builder.id(id).index("products"), Product.class);
 
         if (response.found()) {
-            return Optional.of(response.source());
+            return Optional.ofNullable(response.source());
         }
 
         return Optional.empty();

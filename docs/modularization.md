@@ -4,9 +4,9 @@ One breaking change in Spring Boot 4 is that the single monolithic `spring-boot-
 
 ## Transforming to Spring Boot 4
 
-Go to [Spring Initializr](https://start.spring.io/), generate one Spring Boot 3 project and one Spring Boot 4 project using the dependencies `Web`, `Data JPA`, and `Security`, and then compare the generated `pom.xml` files to see how the dependencies differ.
+Visit [Spring Initializr](https://start.spring.io/) and generate both a Spring Boot 3 and a Spring Boot 4 project using the same dependencies: `Web`, `Data JPA`, and `Security`. Then compare the generated `pom.xml` files to observe how the dependency structure differs.
 
-The Spring Boot 3 example below uses a single shared test starter:
+Spring Boot 3 employs a single unified test starter:
 
 ```xml
 <dependency>
@@ -32,7 +32,7 @@ The Spring Boot 3 example below uses a single shared test starter:
 </dependency>
 ```
 
-The Spring Boot 4 example shows that `spring-boot-starter-web` is now `spring-boot-starter-webmvc`, and each feature module now has its own test starter.
+In contrast, Spring Boot 4 demonstrates that `spring-boot-starter-web` has been renamed to `spring-boot-starter-webmvc`, and each feature module provides dedicated test starters.
 
 ```xml
 <dependency>
@@ -64,11 +64,11 @@ The Spring Boot 4 example shows that `spring-boot-starter-web` is now `spring-bo
 </dependency>
 ```
 
-In Spring Boot 4, the autoconfiguration classes that used to be bundled in the large `spring-boot-autoconfigure` module are now distributed across specific feature modules. In the example above, `spring-boot-starter-security-test` pulls in `spring-security-test` plus the matching autoconfiguration classes. The package structure has also been reorganized by feature (e.g. `...autoconfigure.data.jpa` becomes `...data.jpa.autoconfigure`).
+Spring Boot 4 distributes autoconfiguration classes—previously consolidated in the monolithic `spring-boot-autoconfigure` module—across feature-specific modules instead. For instance, `spring-boot-starter-security-test` includes `spring-security-test` along with its corresponding autoconfiguration classes. Additionally, the package hierarchy has been reorganized around features; for example, `...autoconfigure.data.jpa` is now `...data.jpa.autoconfigure`.
 
 For a complete list of Spring Boot 4 modules, see the [Module dependencies section of the Spring Boot 4 Migration Guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-4.0-Migration-Guide#module-dependencies).
 
-If you only need a few smaller features (for example, Jackson, Flyway, or Liquibase), each of them now has dedicated `starter` and `starter-test` modules. For Jackson, add:
+For applications requiring only specific lightweight features—such as Jackson, Flyway, or Liquibase—dedicated `starter` and `starter-test` modules are now available. Here's how to add Jackson:
 
 ```xml
 <dependency>
@@ -84,6 +84,422 @@ If you only need a few smaller features (for example, Jackson, Flyway, or Liquib
 
 We have discussed the [new Jackson 3 support in Spring 7 and Spring Boot 4](./jackson.md).
 
+In Spring Boot 3, using `RestClient` or `WebClient` required adding `spring-boot-starter-web` or `spring-boot-starter-webflux`, which introduced a sizable collection of dependencies and autoconfiguration overhead. Spring Boot 4 streamlines this by offering lightweight `spring-boot-starter-restclient` and `spring-boot-starter-webclient` modules that include only the necessary client libraries and their associated configurations.
+
+Now let's examine Spring Boot 4's enhanced `RestClient` and `WebClient` capabilities more thoroughly.
+
+## Spring Web Client Modules
+
+We'll begin by exploring `RestClient` support in Spring Boot 4, which builds upon the `RestClient` API introduced in Spring Framework 6.0. 
+
+Create a new Spring Boot 4 project through [Spring Initializr](https://start.spring.io/) with the `Http Client` dependency, then manually include `spring-boot-starter-jackson`. The `spring-boot-starter-restclient` starter automatically configures a `RestClient.Builder`, while `spring-boot-starter-restclient-test` provides test utilities including `RestClient/RestTemplate` mocks and `MockRestServiceServer` for verification.
+
+Leverage the existing `Post` model and assume a RESTful API with the following core operations: 
+
+* `GET /posts` — retrieves all posts
+* `GET /posts/{id}` — retrieves a post by ID; returns a 404 (NOT FOUND) status if it doesn't exist
+* `POST /posts` — accepts a `Post` entity in the request body and returns a 201 (CREATED) status with a `Location` header pointing to the newly created resource
+* `PUT /posts/{id}` — updates the specified post by ID and returns a 204 (NO CONTENT) status
+* `DELETE /posts/{id}` — removes the specified post by ID and returns a 204 (NO CONTENT) status
+
+Now create a `PostClient` class that leverages `RestClient` to implement these operations:
+
+```java
+@Component
+public class PostClient {
+    private final static Logger log = LoggerFactory.getLogger(PostClient.class);
+    private final RestClient client;
+
+    public PostClient(RestClient.Builder builder) {
+        this.client = builder.build();
+    }
+
+    List<Post> allPosts() {
+        return client.get().uri("/posts")
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+    }
+
+    Post getById(UUID id) {
+        var response = client.get().uri("/posts/{id}", id)
+                .retrieve()
+                .onStatus((HttpStatusCode s) -> s == HttpStatus.NOT_FOUND,
+                        (HttpRequest req, ClientHttpResponse res) -> {
+                            throw new PostNotFoundException(id);
+                        }
+                )
+                .toEntity(Post.class);
+        log.debug("response status code: {}", response.getStatusCode());
+        return response.getBody();
+    }
+
+    URI save(Post post) {
+        var response = client.post().uri("/posts")
+                .body(post)
+                .retrieve()
+                .toBodilessEntity();
+
+        URI location = response.getHeaders().getLocation();
+        log.debug("saved location:" + location);
+        return location;
+    }
+
+    void update(UUID id, Post post) {
+        var response = client.put().uri("/posts/{id}", id)
+                .body(post)
+                .retrieve()
+                .toBodilessEntity();
+
+        log.debug("updated post status:" + response.getStatusCode());
+    }
+
+    void delete(UUID id) {
+        var response = client.delete().uri("/posts/{id}", id)
+                .retrieve()
+                .toBodilessEntity();
+
+        log.debug("deleted post status:" + response.getStatusCode());
+    }
+
+}
+```
+
+Create a test class to verify the functionalities, and use `MockRestServiceServer` to mock the server to provide RESTful APIs.
+
+```java
+@RestClientTest
+public class PostClientWithMockRestServiceServerTest {
+    private final static Logger log = LoggerFactory.getLogger(PostClientWithMockRestServiceServerTest.class);
+
+    @TestConfiguration
+    @Import(PostClient.class)
+    static class TestConfig {
+    }
+
+    @Autowired
+    MockRestServiceServer server;
+
+    @Autowired
+    JsonMapper jsonMapper;
+
+    @Autowired
+    PostClient client;
+
+    @BeforeEach
+    public void setup() {
+        server.reset();
+    }
+
+    @Test
+    public void testGetAllPosts() {
+        var data = List.of(
+                new Post(UUID.randomUUID(), "title1", "content1", Status.DRAFT, LocalDateTime.now()),
+                new Post(UUID.randomUUID(), "title2", "content2", Status.PUBLISHED, LocalDateTime.now())
+        );
+        server.expect(ExpectedCount.once(), requestTo("/posts"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(
+                        withSuccess(jsonMapper.writeValueAsBytes(data), MediaType.APPLICATION_JSON)
+                                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                );
+
+        var posts = client.allPosts();
+        assertThat(posts.size()).isEqualTo(2);
+
+        server.verify();
+    }
+
+    @Test
+    public void testGetPostById() {
+        var id = UUID.randomUUID();
+        var data = new Post(id, "title1", "content1", Status.DRAFT, LocalDateTime.now());
+
+        server.expect(ExpectedCount.once(), requestTo("/posts/" + id))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(jsonMapper.writeValueAsBytes(data), MediaType.APPLICATION_JSON));
+
+        var post = client.getById(id);
+        assertThat(post.id()).isEqualTo(id);
+        assertThat(post.title()).isEqualTo(data.title());
+        assertThat(post.content()).isEqualTo(data.content());
+        assertThat(post.status()).isEqualTo(data.status());
+        assertThat(post.createdAt()).isEqualTo(data.createdAt());
+
+        server.verify();
+    }
+
+    @Test
+    public void testGetPostById_NotFound() {
+        var id = UUID.randomUUID();
+        server.expect(ExpectedCount.once(), requestTo("/posts/" + id))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.NOT_FOUND));
+
+        assertThatThrownBy(() -> client.getById(id)).isInstanceOf(PostNotFoundException.class);
+
+        server.verify();
+    }
+
+    @Test
+    public void testCreatePost() {
+        var id = UUID.randomUUID();
+        var data = new Post(null, "title1", "content1", Status.DRAFT, null);
+
+        server.expect(ExpectedCount.once(), requestTo("/posts"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().bytes(jsonMapper.writeValueAsBytes(data)))
+                .andRespond(withStatus(HttpStatus.CREATED).location(URI.create("/posts/" + id)));
+
+        var uri = client.save(data);
+        //assertThat(uri).isEqualTo("/posts/" + id);
+        log.debug("The location URI of the saved post:{}", uri);
+
+        server.verify();
+    }
+
+    @Test
+    public void testUpdatePost() {
+        var id = UUID.randomUUID();
+        var data = new Post(null, "title1", "content1", Status.DRAFT, null);
+
+        server.expect(ExpectedCount.once(), requestTo("/posts/" + id))
+                .andExpect(method(HttpMethod.PUT))
+                .andRespond(withStatus(HttpStatus.NO_CONTENT));
+
+        client.update(id, data);
+
+        server.verify();
+    }
+
+    @Test
+    public void testDeletePostById() {
+        var id = UUID.randomUUID();
+
+        server.expect(ExpectedCount.once(), requestTo("/posts/" + id))
+                .andExpect(method(HttpMethod.DELETE))
+                .andRespond(withStatus(HttpStatus.NO_CONTENT));
+
+
+        client.delete(id);
+
+        server.verify();
+    }
+}
+```
+
+The `@RestClientTest` annotation provides a `MockRestServiceServer` instance and configures a minimal test environment tailored for REST client verification.
+
+To customize `RestClient.Builder` behavior, implement a `RestClientCustomizer` bean: 
+
+```java
+@Bean
+RestClientCustomizer restClientCustomizer(JsonMapper mapper) {
+    return builder -> builder
+            .baseUrl("http://localhost:9090")
+            .configureMessageConverters(c -> c.registerDefaults()
+                    .withJsonConverter(new JacksonJsonHttpMessageConverter(mapper))
+            )
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+}
+```
+
+You can further customize the underlying HTTP client engine by configuring a `ClientHttpRequestFactoryBuilder` and `ClientHttpRequestFactoryBuilderCustomizer`. Here's an example using the JDK HTTP client:
+
+```java
+@Bean
+ClientHttpRequestFactoryBuilder<?> clientHttpRequestFactoryBuilder() {
+    return ClientHttpRequestFactoryBuilder.jdk();
+//                .withCustomizer()
+//                .withHttpClientCustomizer()
+//                .withExecutor()
+}
+```
+
+Parallel to the reactive `WebTestClient`, `RestTestClient` offers analogous APIs for synchronous (blocking) scenarios. You can instantiate `RestTestClient` targeting a controller class, `RouterFunction`, `ApplicationContext`, or a remote server. The following demonstrates connecting to a remote server and verifying REST endpoints:
+
+```java
+@SpringBootTest
+@WireMockTest(httpPort = 9090)
+public class RestTestClientTest {
+    private final static Logger log = LoggerFactory.getLogger(RestTestClientTest.class);
+
+    static {
+        ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
+        wireMockObjectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS);
+        wireMockObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
+
+        JavaTimeModule module = new JavaTimeModule();
+        wireMockObjectMapper.registerModule(module);
+    }
+
+    @TestConfiguration
+    @Import(JacksonJsonMapperConfig.class)
+    class TestConfig {
+    }
+
+    @Autowired
+    JsonMapper jsonMapper;
+
+    RestTestClient client;
+
+    @BeforeEach
+    public void setup() {
+        client = RestTestClient.bindToServer()
+                .configureMessageConverters(c -> c.registerDefaults()
+                        .withJsonConverter(new JacksonJsonHttpMessageConverter(jsonMapper))
+                )
+                .baseUrl("http://localhost:9090")
+                .build();
+    }
+
+    @Test
+    public void testGetAllPosts() {
+        var data = List.of(
+                new Post(UUID.randomUUID(), "title1", "content1", Status.DRAFT, LocalDateTime.now()),
+                new Post(UUID.randomUUID(), "title2", "content2", Status.PUBLISHED, LocalDateTime.now())
+        );
+        stubFor(get("/posts")
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withResponseBody(Body.fromJsonBytes(Json.toByteArray(data)))
+                )
+        );
+
+        client.get().uri("/posts").accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("size()").isEqualTo(2);
+
+        verify(getRequestedFor(urlEqualTo("/posts"))
+                .withHeader("Accept", equalTo("application/json")));
+    }
+
+    @Test
+    public void testGetPostById() {
+        var id = UUID.randomUUID();
+        var data = new Post(id, "title1", "content1", Status.DRAFT, LocalDateTime.now());
+
+        stubFor(get("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withResponseBody(Body.fromJsonBytes(Json.toByteArray(data)))
+                )
+        );
+
+        client.get().uri("/posts/{id}", id).accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Post.class)
+                .value(p -> {
+                    Assertions.assertThat(p.id()).isEqualTo(id);
+                    Assertions.assertThat(p.title()).isEqualTo(data.title());
+                    Assertions.assertThat(p.content()).isEqualTo(data.content());
+                    Assertions.assertThat(p.status()).isEqualTo(data.status());
+                    Assertions.assertThat(p.createdAt()).isEqualTo(data.createdAt());
+                });
+
+        verify(getRequestedFor(urlEqualTo("/posts/" + id))
+                .withHeader("Accept", equalTo("application/json"))
+        );
+    }
+
+    @Test
+    public void testGetPostById_NotFound() {
+        var id = UUID.randomUUID();
+
+        stubFor(get("/posts/" + id)
+                .willReturn(aResponse().withStatus(404))
+        );
+
+        client.get().uri("/posts/{id}", id).accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+
+        verify(getRequestedFor(urlEqualTo("/posts/" + id))
+                .withHeader("Accept", equalTo("application/json"))
+        );
+    }
+
+    @Test
+    public void testCreatePost() {
+        var id = UUID.randomUUID();
+        var data = new Post(null, "title1", "content1", Status.DRAFT, null);
+
+        stubFor(post("/posts")
+                .willReturn(
+                        aResponse()
+                                .withHeader("Location", "/posts/" + id)
+                                .withStatus(201)
+                                .withResponseBody(Body.none())
+                )
+        );
+
+        client
+                .post().uri("/posts").contentType(MediaType.APPLICATION_JSON).body(data)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().location("/posts/" + id);
+
+        verify(postRequestedFor(urlEqualTo("/posts"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(equalToJson(jsonMapper.writeValueAsString(data)))
+        );
+    }
+
+    @Test
+    public void testUpdatePost() {
+        var id = UUID.randomUUID();
+        var data = new Post(null, "title1", "content1", Status.DRAFT, null);
+
+        stubFor(put("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withStatus(204)
+                )
+        );
+
+        client.put().uri("/posts/{id}", id).contentType(MediaType.APPLICATION_JSON).body(data)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        verify(putRequestedFor(urlEqualTo("/posts/" + id))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(equalToJson(jsonMapper.writeValueAsString(data)))
+        );
+    }
+
+    @Test
+    public void testDeletePostById() {
+        var id = UUID.randomUUID();
+        stubFor(delete("/posts/" + id)
+                .willReturn(
+                        aResponse()
+                                .withStatus(204)
+                )
+        );
+
+        client.delete().uri("/posts/{id}", id)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        verify(deleteRequestedFor(urlEqualTo("/posts/" + id)));
+    }
+}
+```
+
+This example uses `WireMock` to simulate a remote server and stub REST endpoints.
+
+For the complete working example, visit the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-restclient), which also includes comprehensive tests demonstrating `RestClient` validation against `WireMock`.  
+
+Previous posts have covered the reactive `WebClient` and test-focused `WebTestClient` in detail. For brevity, we'll forgo a deep dive into the new `spring-boot-starter-webclient` and `spring-boot-starter-webclient-test` modules here. For the complete working example, visit the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-webclient).
+
 Spring Boot 4 also modularizes Spring Data dependencies by moving database drivers and client SDKs into dedicated modules. For example:
 
 - JDBC `JdbcClient` and R2DBC `DatabaseClient` are now exposed by `spring-boot-starter-jdbc` and `spring-boot-starter-r2dbc`.
@@ -91,15 +507,15 @@ Spring Boot 4 also modularizes Spring Data dependencies by moving database drive
 
 This makes it possible to depend on the specific client libraries you need without pulling in full Spring Data starter sets.
 
-Let's explore the Spring Data client support in Spring Boot 4 in more detail in the next section.
+Now let's examine Spring Boot 4's revamped Spring Data client support across multiple persistence layers.
 
-## Spring Data Client Support
+## Spring Data Client Modules
 
-Let's start with the simplest JDBC `JdbcClient` and R2DBC `DatabaseClient` support, although I have described them in my previous articles.
+We'll begin with JDBC `JdbcClient` and R2DBC `DatabaseClient` support, building on earlier explorations of these technologies.
 
 ### JDBC `JdbcClient`
 
-Create a new Spring Boot 4 project via [Spring Initializr](https://start.spring.io/) with dependencies `JDBC API`, `PostgreSQL`, `Lombok` and `Testcontainers`.  The `spring-boot-starter-jdbc` starter will autoconfigure a `JdbcTemplate`, `NamedParameterJdbcTemplate`, and `JdbcClient` for you.
+Begin by generating a Spring Boot 4 project from [Spring Initializr](https://start.spring.io/) with `JDBC API`, `PostgreSQL`, `Lombok`, and `Testcontainers` dependencies. The `spring-boot-starter-jdbc` starter automatically configures `JdbcTemplate`, `NamedParameterJdbcTemplate`, and `JdbcClient`.
 
 Create a simple record type `Post` to represent the row data in the database. 
 
@@ -124,9 +540,10 @@ public enum Status {
 }
 ```
 
-Declear a `PostRepository` interface to define the data access methods.
+Define a `PostRepository` interface to declare the data access methods:
 
-```javapublic interface PostRepository {
+```java
+public interface PostRepository {
     Post save(Post post);
     Post findById(UUID id);
     List<Post> findAll();
@@ -286,11 +703,11 @@ class DemoApplicationTests {
 }
 ```
 
-The full example code also include a `DataInitilizer` to add some data via observing `ApplicationReadyEvent`, check it on [GitHub](https://github.com/hantsy/spring7-sandbox/tree/master/boot-jdbc).
+The complete implementation includes a `DataInitializer` component that uses `ApplicationReadyEvent` observation to populate initial data. Review the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-jdbc) for details.
 
 ### R2DBC `DatabaseClient`
 
-Similarly create a Spring Boot 4 project with `R2DBC API`, `PostgreSQL`, `Lombok` and `Testcontainers`. The `spring-boot-starter-r2dbc` starter will autoconfigure a `DatabaseClient` for you. Spring uses Reactor to handle reactive streams, so the repository methods will return `Mono` or `Flux` instead of direct values.
+Similarly, scaffold a Spring Boot 4 project using `R2DBC API`, `PostgreSQL`, `Lombok`, and `Testcontainers` dependencies. The `spring-boot-starter-r2dbc` starter provides automatic configuration of `DatabaseClient`. Since Spring leverages Project Reactor for reactive streams, repository methods return `Mono` or `Flux` types rather than direct values.
 
 The `Post` record and `Status` enum are the same as the JDBC example above, so we can reuse them here.
 
@@ -471,13 +888,13 @@ public class R2dbcClientPostRepository implements PostRepository {
 }
 ```
 
-The test code is similar, we ignore it here for brevity, check it on [GitHub](https://github.com/hantsy/spring7-sandbox/tree/master/boot-r2dbc). One thing to note is that the Postgres testcontainer depends on Jdbc driver, so in the `pom.xml` you will see we add both Postgres R2dbc and Postgres JDBC dependencies.
+The test code parallels the JDBC example above; for brevity, we omit it here. For the full implementation, see the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-r2dbc). Note that the PostgreSQL Testcontainer requires the JDBC driver, necessitating both PostgreSQL R2DBC and JDBC dependencies in `pom.xml`.
 
 ### MongoDB `MongoClient`
 
-Create a new Spring Boot 4 project with dependencies: `MongoDB`, `Lombok` and `Testcontainers`. Open the `pom.xml` file and add `org.testcontainters:testcontainers-mongodb` dependency to use MongoDB Testcontainers. The `spring-boot-starter-mongodb` starter will autoconfigure a `MongoClient` for you.
+Generate a Spring Boot 4 project with `MongoDB`, `Lombok`, and `Testcontainers` dependencies. Manually add the `org.testcontainers:testcontainers-mongodb` dependency to `pom.xml`. The `spring-boot-starter-mongodb` starter automatically configures a `MongoClient`.
 
-Create a simple POJO class `Product` to repsent the document data in MongoDB.
+Define a simple POJO class `Product` to represent MongoDB document data:
 
 ```java
 @BsonDiscriminator("products")
@@ -497,9 +914,9 @@ public class Product {
 ```
 
 > [!WARNING]
-> At the moment I prepared the example code, the MongoClient API did not support a record type.
+> At the time of writing, the MongoClient API does not support record types.
 
-Create a `ProductRepository` class  to use `MongoClient` to operate  the documents.
+Implement a `ProductRepository` class that uses `MongoClient` to manipulate documents:
 
 ```java
 @Component
@@ -535,7 +952,7 @@ public class ProductRepository {
 }
 ```
 
-Add a test class to verify the `ProductRepository` implementation against a real MongoDB database running in Testcontainers.
+Create a test class to validate the `ProductRepository` implementation using a MongoDB instance from Testcontainers:
 
 ```java
 @Import(TestcontainersConfiguration.class)
@@ -562,20 +979,20 @@ class DemoApplicationTests {
 }
 ```
 
-Check the full example code on [GitHub](https://github.com/hantsy/spring7-sandbox/tree/master/boot-r2dbc). One thing to note is that currently Spring Initializr does not generate a `TestcontainersConfiguration` class for MongoDB when adding `MongoDB`, so you need to create it yourself, or copy it from the generated result when add `Spring Data MongoDB` dependency into projects. 
+Visit the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-mongodb) for the complete implementation. Note that Spring Initializr doesn't generate `TestcontainersConfiguration` for MongoDB automatically; you'll need to create it manually or copy from a project generated with `Spring Data MongoDB` included. 
 
 ### Neo4j `Driver`
 
-Create a new Spring Boot 4 project with dependencies: `Neo4j`, `Lombok` and `Testcontainers`. Open the `pom.xml` file and add `org.testcontainers:testcontainers-neo4j` dependency to use Neo4j Testcontainers. The `spring-boot-starter-neo4j` starter will autoconfigure a Neo4j `Driver` for you.
+Start with a Spring Boot 4 project configured with `Neo4j`, `Lombok`, and `Testcontainers` dependencies. Add `org.testcontainers:testcontainers-neo4j` to `pom.xml`. The `spring-boot-starter-neo4j` starter automatically configures a Neo4j `Driver`.
 
-Create a simple record type `Product` to represent the node data in Neo4j.
+Define a record type `Product` to represent node data in Neo4j:
 
 ```java
 public record Product(String id, String name, BigDecimal price) {
 }
 ```
 
-Create a `ProductRepository` class  to use `Driver` to operate the nodes.
+Implement a `ProductRepository` class that uses the `Driver` to interact with nodes:
 
 ```java
 @Component
@@ -642,21 +1059,265 @@ class DemoApplicationTests {
  @Autowired
  private ProductRepository productRepository;
 
- @Test
- public void testProductRepository() {
-  var product = productRepository.save(new Product(null, "test", BigDecimal.ONE));
-  assertThat(product).isNotNull();
-  assertThat(product.id()).isNotNull();
+    @Test
+    public void testProductRepository() {
+        var product = productRepository.save(new Product(null, "test", BigDecimal.ONE));
+        assertThat(product).isNotNull();
+        assertThat(product.id()).isNotNull();
 
-  Optional<Product> byId = productRepository.findById(product.id());
-  assertThat(byId).isPresent();
-  var p = byId.get();
+        Optional<Product> byId = productRepository.findById(product.id());
+        assertThat(byId).isPresent();
+        var p = byId.get();
 
-  log.debug("found product by id: {}", p);
-  assertThat(p.name()).isEqualTo("test");
- }
+        log.debug("found product by id: {}", p);
+        assertThat(p.name()).isEqualTo("test");
+    }
 }
 ```
 
-Check the full example code on [GitHub](https://github.com/hantsy/spring7-sandbox/tree/master/boot-neo4j). We faced the same situation as MongoDB, Spring Initializr does not generate a `TestcontainersConfiguration` class for Neo4j when adding `Neo4j`, so you need to create it yourself, or copy it from the generated result when add `Spring Data Neo4j` dependency into projects.
+View the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-neo4j) for the complete example. As with MongoDB, Spring Initializr doesn't auto-generate `TestcontainersConfiguration` for Neo4j, requiring manual creation or copying from a `Spring Data Neo4j` configuration.
+
+### Elasticsearch `ElasticsearchClient`
+
+Create a Spring Boot 4 project featuring `Elasticsearch`, `Lombok`, and `Testcontainers` dependencies. Add `org.testcontainers:testcontainers-elasticsearch` to `pom.xml`. The `spring-boot-starter-elasticsearch` starter automatically configures both `ElasticsearchClient` and a low-level REST client. We'll use the high-level `ElasticsearchClient` for document operations.
+
+Define a record type `Product` to represent document data in Elasticsearch:
+
+```java
+public record Product(String id, String name, BigDecimal price) {
+}
+```
+
+Implement a `ProductRepository` class that uses `ElasticsearchClient` to manage documents:
+
+```java
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class ProductRepository {
+
+    private final ElasticsearchClient client;
+
+    @SneakyThrows
+    Product save(Product product) {
+        var id = product.id() != null ? product.id() : UUID.randomUUID().toString();
+        log.debug("Saving product with id={}", id);
+        IndexResponse response = client.index(builder -> builder.id(id).index("products").document(product));
+
+        var savedID = response.id();
+        log.debug("Saved product with id={}", savedID);
+        return new Product(savedID, product.name(), product.price());
+    }
+
+    @SneakyThrows
+    Optional<Product> findById(String id) {
+        GetResponse<Product> response = this.client.get(builder -> builder.id(id).index("products"), Product.class);
+
+        if (response.found()) {
+            return Optional.ofNullable(response.source());
+        }
+
+        return Optional.empty();
+    }
+}
+```
+
+Write a test class to verify the functionality: 
+
+```java
+@Import(TestcontainersConfiguration.class)
+@SpringBootTest
+@Slf4j
+class DemoApplicationTests {
+
+	@Autowired
+	ProductRepository productRepository;
+
+	@Test
+	public void testProductRepository() {
+		var product = productRepository.save(new Product(null, "test", BigDecimal.ONE));
+		assertThat(product).isNotNull();
+		assertThat(product.id()).isNotNull();
+
+		Optional<Product> byId = productRepository.findById(product.id());
+		assertThat(byId).isPresent();
+		var p = byId.get();
+		log.debug("found product by id: {}", p);
+		assertThat(p.name()).isEqualTo("test");
+	}
+
+}
+```
+
+As before, manually create `TestcontainersConfiguration` or copy it from a project generated with `Spring Data Elasticsearch`. See the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-elasticsearch) for the complete implementation.
+
+### CouchBase `Cluster`
+
+Generate a Spring Boot 4 project from [Spring Initializr](http://start.spring.io) with `CouchBase`, `Lombok`, and `Testcontainers` dependencies. Add `org.testcontainers:testcontainers-couchbase` to `pom.xml`. The `spring-boot-starter-couchbase` starter automatically configures a Couchbase `Cluster`. 
+
+Define a record type `Product` to represent documents in a Couchbase bucket:
+
+```java
+public record Product(String id,
+                      String name,
+                      BigDecimal price) {
+}
+```
+
+Implement a `ProductRepository` to manage documents:
+
+```java
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class ProductRepository {
+    private final Cluster cluster;
+
+    private Collection productCollection;
+
+    @PostConstruct
+    public void init() {
+        this.productCollection = this.cluster
+                .bucket("demo")
+                .defaultCollection(); // or collections().createCollection() 
+    }
+
+    Product save(Product product) {
+        String id = product.id() != null ? product.id() : UUID.randomUUID().toString();
+        MutationResult result = this.productCollection.upsert(id, product);
+        log.debug("saving product result: {}", result);
+
+        return new Product(id, product.name(), product.price());
+    }
+
+    Optional<Product> findById(String id) {
+        try {
+            GetResult result = this.productCollection.get(id);
+            return Optional.of(result.contentAs(Product.class));
+        } catch (DocumentNotFoundException e) {
+            return Optional.empty();
+        }
+    }
+}
+```
+
+Write a test class to validate `ProductRepository` functionality with Couchbase Testcontainers: 
+
+```java
+@Import(TestcontainersConfiguration.class)
+@SpringBootTest
+@Slf4j
+class DemoApplicationTests {
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Test
+    public void testProductRepository() {
+        var product = productRepository.save(new Product(null, "test", BigDecimal.ONE));
+        assertThat(product).isNotNull();
+        assertThat(product.id()).isNotNull();
+
+        Optional<Product> byId = productRepository.findById(product.id());
+        assertThat(byId).isPresent();
+        var p = byId.get();
+
+        log.debug("found product by id: {}", p);
+        assertThat(p.name()).isEqualTo("test");
+    }
+}
+```
+
+View the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-couchbase) for the complete example. 
+
+### Cassandra `CqlSession`
+
+Begin with a Spring Boot 4 project from [Spring Initializr](http://start.spring.io) featuring `Cassandra`, `Lombok`, and `Testcontainers` dependencies. Add `org.testcontainers:testcontainers-cassandra` to `pom.xml`. The `spring-boot-starter-cassandra` starter automatically configures a Cassandra `CqlSession`. 
+
+Define a record type `Product` to represent Cassandra table rows:
+
+```java
+public record Product(String id, String name, BigDecimal price) {}
+```
+
+Implement a `ProductRepository` that uses `CqlSession` to interact with Cassandra table data:
+
+```java
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class ProductRepository {
+
+    private final CqlSession cqlSession;
+
+    Product save(Product product) {
+        var id = product.id() != null ? product.id() : UUID.randomUUID().toString();
+        String query = """
+                INSERT INTO products(id, name, price)
+                VALUES (:id, :name, :price)
+                """;
+        ResultSet resultSet = cqlSession.execute(query, Map.of("id", id,
+                "name", product.name(),
+                "price", product.price())
+        );
+        log.debug("saving product: {}", resultSet.wasApplied());
+
+        return new Product(id, product.name(), product.price());
+    }
+
+    Optional<Product> findById(String id) {
+        String query = """
+                SELECT * FROM products WHERE id = :id
+                """;
+        ResultSet resultSet = cqlSession.execute(query, Map.of("id", id));
+        Row one = resultSet.one();
+        if (one != null) {
+            return Optional.of(
+                    new Product(
+                            one.get("id", String.class),
+                            one.get("name", String.class),
+                            one.get("price", BigDecimal.class)
+                    )
+            );
+        }
+        return Optional.empty();
+    }
+}
+```
+
+Write a test class to validate functionality using Cassandra Testcontainers: 
+
+```java
+@Import(TestcontainersConfiguration.class)
+@SpringBootTest
+@Slf4j
+class DemoApplicationTests {
+
+    @Autowired
+    ProductRepository productRepository;
+
+    @Test
+    public void testProductRepository() {
+        var product = productRepository.save(new Product(UUID.randomUUID().toString(), "test", BigDecimal.ONE));
+        assertThat(product).isNotNull();
+        assertThat(product.id()).isNotNull();
+
+        Optional<Product> byId = productRepository.findById(product.id());
+        assertThat(byId).isPresent();
+        var p = byId.get();
+        log.debug("found product by id: {}", p);
+        assertThat(p.name()).isEqualTo("test");
+    }
+
+}
+```
+
+Explore the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-cassandra) for the complete implementation.
+
+Unfortunately, Spring Boot doesn't provide a dedicated module for Redis due to the multiple client libraries supported by Spring Data.
+
+## Summary
+
+Spring Boot 4 splits monolithic starters into fine-grained modules, allowing developers to include only what they need. Each feature provides dedicated `starter` and `starter-test` modules with better performance and reduced overhead.
 

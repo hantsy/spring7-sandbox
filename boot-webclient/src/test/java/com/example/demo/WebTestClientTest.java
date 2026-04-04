@@ -8,7 +8,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.json.JacksonJsonEncoder;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
+import tools.jackson.databind.json.JsonMapper;
 import wiremock.com.fasterxml.jackson.annotation.JsonInclude;
 import wiremock.com.fasterxml.jackson.databind.DeserializationFeature;
 import wiremock.com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,12 +25,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @WireMockTest(httpPort = 9090)
-public class PostClientTest {
+public class WebTestClientTest {
 
     static {
         ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
@@ -37,11 +56,24 @@ public class PostClientTest {
         wireMockObjectMapper.registerModule(module);
     }
 
+    @TestConfiguration
+    @Import(JacksonJsonMapperConfig.class)
+    static class TestConfig {
+    }
+
     @Autowired
-    PostClient client;
+    JsonMapper jsonMapper;
+
+    WebTestClient client;
 
     @BeforeEach
     public void setup() {
+        client = WebTestClient.bindToServer()
+                .baseUrl("http://localhost:9090")
+                .codecs(c -> c.defaultCodecs()
+                        .jacksonJsonEncoder(new JacksonJsonEncoder(jsonMapper))
+                )
+                .build();
     }
 
     @Test
@@ -58,10 +90,10 @@ public class PostClientTest {
                 )
         );
 
-        client.allPosts()
-                .as(StepVerifier::create)
-                .expectNextCount(2)
-                .verifyComplete();
+        client.get().uri("/posts").accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("size()").isEqualTo(2);
 
         verify(getRequestedFor(urlEqualTo("/posts"))
                 .withHeader("Accept", equalTo("application/json")));
@@ -80,18 +112,17 @@ public class PostClientTest {
                 )
         );
 
-        client.getById(id)
-                .as(StepVerifier::create)
-                .consumeNextWith(
-                        post -> {
+        client.get().uri("/posts/{id}", id).accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Post.class).value(post -> {
                             assertThat(post.id()).isEqualTo(id);
                             assertThat(post.title()).isEqualTo(data.title());
                             assertThat(post.content()).isEqualTo(data.content());
                             assertThat(post.status()).isEqualTo(data.status());
                             assertThat(post.createdAt()).isEqualTo(data.createdAt());
                         }
-                )
-                .verifyComplete();
+                );
 
         verify(getRequestedFor(urlEqualTo("/posts/" + id))
                 .withHeader("Accept", equalTo("application/json"))
@@ -111,14 +142,11 @@ public class PostClientTest {
                 )
         );
 
-        client.save(data)
-                .as(StepVerifier::create)
-                .consumeNextWith(
-                        uri -> {
-                            assertThat(uri.toString()).isEqualTo("/posts/" + id);
-                        }
-                )
-                .verifyComplete();
+        client.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(data)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().location("/posts/" + id);
 
         verify(postRequestedFor(urlEqualTo("/posts"))
                 .withHeader("Content-Type", equalTo("application/json"))
@@ -138,10 +166,10 @@ public class PostClientTest {
                 )
         );
 
-        client.update(id, data)
-                .as(StepVerifier::create)
-                .thenAwait()
-                .verifyComplete();
+        client.put().uri("/posts/{id}", id).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(data)
+                .exchange()
+                .expectStatus().isNoContent();
 
         verify(putRequestedFor(urlEqualTo("/posts/" + id))
                 .withHeader("Content-Type", equalTo("application/json"))
@@ -159,10 +187,9 @@ public class PostClientTest {
                 )
         );
 
-        client.delete(id)
-                .as(StepVerifier::create)
-                .thenAwait()
-                .verifyComplete();
+        client.delete().uri("/posts/{id}", id)
+                .exchange()
+                .expectStatus().isNoContent();
 
         verify(deleteRequestedFor(urlEqualTo("/posts/" + id)));
     }

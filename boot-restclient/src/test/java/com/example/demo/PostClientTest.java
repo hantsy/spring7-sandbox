@@ -31,8 +31,8 @@ public class PostClientTest {
 
     static {
         ObjectMapper wireMockObjectMapper = Json.getObjectMapper();
-        wireMockObjectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        wireMockObjectMapper.disable(wiremock.com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        wireMockObjectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        wireMockObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         wireMockObjectMapper.disable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS);
         wireMockObjectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
 
