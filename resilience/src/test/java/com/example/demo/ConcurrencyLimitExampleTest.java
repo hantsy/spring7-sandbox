@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 @SpringJUnitConfig(classes = {
         ConcurrencyLimitExampleTest.AsyncConfig.class,
         ConcurrencyLimitExample.class,
-        ResilienceConfig.class,
+        ResilienceConfig.class
 })
 public class ConcurrencyLimitExampleTest {
 
@@ -33,7 +33,7 @@ public class ConcurrencyLimitExampleTest {
         @Bean(name = "taskExecutor")
         public Executor taskExecutor() {
             ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-            executor.setCorePoolSize(10); // Number of concurrent threads
+            executor.setCorePoolSize(3); // Number of concurrent threads
             executor.setMaxPoolSize(20);
             executor.setQueueCapacity(500);
             executor.setThreadNamePrefix("MyParallelThread-");

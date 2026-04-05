@@ -20,7 +20,7 @@ public class ConcurrencyLimitExample {
             throw new RuntimeException(e);
         }
         count = i;
-        log.info("RetryableExample test:{}", count);
+        log.info("RetryableExample test:{}, thread: {}", count, Thread.currentThread().getName());
     }
 
     public int count() {
