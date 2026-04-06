@@ -24,10 +24,17 @@ class WebConfig implements WebMvcConfigurer {
     @Override
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
         configurer
-//                .usePathSegment(0)
+                // Add version in uri path: /api/v1/resource
+                // .usePathSegment(0)
+                
+                // Set in HTTP header: X-API-Version: 1
                 .useRequestHeader("X-API-Version")
-//                .useRequestParam("version")
-//                .useMediaTypeParameter(MediaType.APPLICATION_JSON, "v" )
+
+                // Add a request parameter: /api/resource?version=1
+                // .useRequestParam("version")
+                
+                // Append version parameter to `Accept` header value: application/json;version=1
+                // .useMediaTypeParameter(MediaType.APPLICATION_JSON, "version" )
 
                 .addSupportedVersions("1.0", "1.1", "2.0")
 
@@ -48,6 +55,9 @@ The `addSupportedVersions` method specifies all supported versions in the applic
 By default, Spring uses `SemanticApiVersionParser` to parse version values, which supports semantic versioning (e.g., "1", "1.1", "1.2.3", "v2.0"). You can also implement a custom `ApiVersionParser` for different versioning schemes.
 
 The `setDefaultVersion` method sets a default version when the client does not provide one. The `setVersionRequired` method enforces that clients must specify a version; however, if a `defaultVersion` is set, this is automatically disabled.
+
+>[!NOTE]
+> Unfortunately, Spring API versioning does not yet support HATEOAS-compatible content negotiation, such as `Accept: application/vnd.api.v1+json`, though you can implement this manually with Spring HATEOAS. 
 
 The following is an example of REST controller that supports multiple API versions:
 

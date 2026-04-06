@@ -43,10 +43,17 @@ class WebConfig implements WebMvcConfigurer {
     @Override
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
         configurer
-//                .usePathSegment(0)
+                // Add version in uri path: /api/v1/resource
+                // .usePathSegment(0)
+
+                // Set in HTTP header: X-API-Version: 1
                 .useRequestHeader("X-API-Version")
-//                .useRequestParam("version")
-//                .useMediaTypeParameter(MediaType.APPLICATION_JSON, "v" )
+
+                // Add a request parameter: /api/resource?version=1
+                // .useRequestParam("version")
+
+                // Append version parameter to `Accept` header value: application/json;version=1
+                // .useMediaTypeParameter(MediaType.APPLICATION_JSON, "version" )
 
                 .addSupportedVersions("1.0", "1.1", "2.0")
 
