@@ -79,7 +79,7 @@ Check the full example codes of [Spring WebMVC](https://github.com/hantsy/spring
 
 You can configure API versioning in both Spring MVC and WebFlux via application properties as well in a Spring Boot 4 project, for example:
 
- ```properties
+```properties
 spring.mvc.api-versioning.use-request-header=true
 spring.mvc.api-versioning.request-header-name=X-API-Version
 spring.mvc.api-versioning.supported-versions=1.0,1.1,2.0
