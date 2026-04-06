@@ -1,16 +1,16 @@
-# An Introduction to new Spring RabbitMQ Client
+# An Introduction to the New Spring RabbitMQ Client
 
-Spring AMQP 4.0 brings a new module `spring-rabbitmq-client` which is based on the new RabbitMQ official Java client `com.rabbitmq.client:amqp-client`, which is aligned with AMQP 1.0 protocol. When using `spring-rabbitmq-client` in your projects, it is better to upgrade to RabbitMQ 4.0 to get native AMQP 1.0 support.
+Spring AMQP 4.0 brings a new module `spring-rabbitmq-client` which is based on the new RabbitMQ official Java client `com.rabbitmq.client:amqp-client`, which is aligned with AMQP 1.0 protocol. When using `spring-rabbitmq-client` in your projects, it is recommended to upgrade to RabbitMQ 4.0 for native AMQP 1.0 support.
 
 >[!NOTE]
-> AMQP 0.9.1 and AMQP 1.0 are two different protocols, and RabbitMQ 3.x supports both protocols, but enabling AMQP 1.0 support requires installing an extra plugin `rabbitmq_amqp1_0`, RabbitMQ 4.0 switches to use AMQP 1.0 as the core protocol by default. The previous Spring RabbitMQ module `spring-rabbit` is still based on AMQP 0.9.1 protocol. Spring AMQP 4.1 will introduce new generic `spring-amqp-client` to implement AMQP 1.0 protocol, see: [spring-amqp#3271](https://github.com/spring-projects/spring-amqp/issues/3271)
+> AMQP 1.0 is not compatible with AMQP 0.91. Version 1.0 is not a simple upgrade from 0.91. The two versions can be considered as two different protocols. RabbitMQ 3.x supports both protocols, but enabling AMQP 1.0 support requires installing an extra plugin `rabbitmq_amqp1_0`. RabbitMQ 4.0 switches to AMQP 1.0 as the default core protocol. The previous Spring RabbitMQ module `spring-rabbit` is still based on the AMQP 0.9.1 protocol. Spring AMQP 4.1 will introduce a new generic `spring-amqp-client` to implement the AMQP 1.0 protocol, see: [spring-amqp#3271](https://github.com/spring-projects/spring-amqp/issues/3271)
 
 ## Getting Started
 
 Create a new simple Maven project with the basic `spring-core` and `spring-context` as dependencies, or generate a simple Spring Boot project via https://start.spring.io as [the previous post](https://github.com/hantsy/spring7-sandbox/blob/master/docs/jackson.md).
 
 >[!NOTE]
-> Till now the Spring Boot 4.0 does not contain a starter for autoconfiguring Spring RabbitMQ Client, you need to add the dependency and configuration manually.
+> Till now, Spring Boot 4.0 does not contain a starter for autoconfiguring the Spring RabbitMQ Client; you need to add the dependency and configuration manually.
 
 Then add the following dependencies in your `pom.xml` file:
 
@@ -36,7 +36,7 @@ Then add the following dependencies in your `pom.xml` file:
 </dependencies>
 ```
 
-Next let's create a simple configuration class:
+Next, let's create a simple configuration class:
 
 ```java
 @Configuration
@@ -79,7 +79,7 @@ public class RabbitClientConfig {
 }
 ```
 
-In the above configuration class, we create the enssential beans, eg. `AmqpConnectionFactory`, `RabbitAmqpAdmin`, `RabbitAmqpTemplate`, and `RabbitAmqpListenerContainerFactory` for Spring RabbitMQ client. Make sure the `Environment` and `AmqpEnvironmentBuilder` is from package `com.rabbitmq.client.amqp`.
+In the above configuration class, we create the essential beans, eg, `AmqpConnectionFactory`, `RabbitAmqpAdmin`, `RabbitAmqpTemplate`, and `RabbitAmqpListenerContainerFactory` for the Spring RabbitMQ client. Make sure the `Environment` and `AmqpEnvironmentBuilder` are from the package `com.rabbitmq.client.amqp`.
 
 With `RabbitAmqpAdmin`, you can declare exchanges, queues, and bindings as usual:
 
@@ -114,7 +114,7 @@ public class RabbitClientConfig {
 }
 ```    
 
-To boostrap a RabbitMQ server at runtime, add the following testcontainers dependencies in your `pom.xml`:
+To bootstrap a RabbitMQ server at runtime, add the following testcontainers dependencies in your `pom.xml`:
 
 ```xml
  <dependency>
@@ -161,7 +161,7 @@ class RabbitContainerInitializer implements ApplicationContextInitializer<@NotNu
 ```
 
 > [!NOTE]
-> Make sure you are using RabittMQ 4.x image to get AMQP 1.0 protocol support by default.
+> Make sure you are using RabbitMQ 4.x image to get AMQP 1.0 protocol support by default.
 
 Now create a test to verify sending and receiving messages:
 
@@ -192,9 +192,9 @@ public class RabbitAmqpTemplateTest {
 }
 ```
 
-The `RabbitAmqpTemplate` imeplemnets `AsyncAmqpTemplate`, so all send and receive operations are asynchronous and return `CompletableFuture`.
+The `RabbitAmqpTemplate` implements `AsyncAmqpTemplate`, so all send and receive operations are asynchronous and return `CompletableFuture`.
 
-The `RabbitAmqpTempalte` also supports RPC-style messaging via `convertSendAndReceive` method:
+The `RabbitAmqpTemplate` also supports RPC-style messaging via the `convertSendAndReceive` method:
 
 ```java
 @Test
@@ -218,7 +218,7 @@ void verifyRpc() {
 }
 ```
 
-We have configured a listener container bean `RabbitAmqpListenerContainerFactory` in the configuration class, now you can use `@RabbitListener` to consume messages as usual:
+We have configured a listener container bean `RabbitAmqpListenerContainerFactory` in the configuration class. Now you can use `@RabbitListener` to consume messages as usual:
 
 ```java
 @Component
@@ -430,7 +430,7 @@ Add the following dependencies to your `pom.xml`:
 </dependencies>
 ```
 
-Then delcare a `JsonMapper` bean in your configuration class:
+Then declare a `JsonMapper` bean in your configuration class:
 
 ```java
 @Configuration(proxyBeanMethods = false)
