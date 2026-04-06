@@ -29,16 +29,6 @@ public class GreetingControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-//    private RestTestClient testClient;
-//
-//    @BeforeEach
-//    public void setup() {
-//        this.testClient = RestTestClient.bindTo(mockMvc)
-//                .defaultApiVersion("1.0")
-//                .apiVersionInserter(ApiVersionInserter.useHeader("X-API-Version"))
-//                .build();
-//    }
-
     @Test
     void testHello() throws Exception {
         this.mockMvc.perform(get("/hello")/*.apiVersion("1.0")*/)
