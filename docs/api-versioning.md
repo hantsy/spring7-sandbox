@@ -9,7 +9,7 @@ There are several common strategies for API versioning, including:
 * Header versioning (e.g., using a custom header like `X-API-Version: 1`) keeps URLs clean but can be less discoverable.
 * Content negotiation (e.g., using the `Accept` header to specify the version) is elegant but can be complex to implement.
 
-Before Spring 7, developers had to implement API versioning manually, which could result in boilerplate code and maintenance challenges. Spring 7 provides built-in features that enable API versioning on both the server side and client side. 
+Before Spring 7, developers had to implement API versioning manually, which could result in boilerplate code and maintenance challenges. Spring 7 provides built-in features that enable API versioning on both the server side and client side.
 
 ## Server-Side API Versioning
 
@@ -43,7 +43,7 @@ class WebConfig implements WebMvcConfigurer {
 
 In the example above, API versioning is configured to use a custom header `X-API-Version` to specify the API version. You can also use other strategies such as path segments (`usePathSegment`), request headers (`useRequestHeader`), or media type parameters (`useMediaTypeParameter`), or combine them.
 
-The `addSupportedVersions` method specifies all supported versions in the application. Requests using an unsupported version will raise an exception. 
+The `addSupportedVersions` method specifies all supported versions in the application. Requests using an unsupported version will raise an exception.
 
 By default, Spring uses `SemanticApiVersionParser` to parse version values, which supports semantic versioning (e.g., "1", "1.1", "1.2.3", "v2.0"). You can also implement a custom `ApiVersionParser` for different versioning schemes.
 
@@ -84,11 +84,11 @@ spring.mvc.api-versioning.use-request-header=true
 spring.mvc.api-versioning.request-header-name=X-API-Version
 spring.mvc.api-versioning.supported-versions=1.0,1.1,2.0
 spring.mvc.api-versioning.default-version=1.0
-``` 
+```
 
 ## Client-Side API Versioning
 
-Spring 7 also adds API versioning support to Spring's HTTP clients, including `RestClient`, the reactive `WebClient`, and test-focused tools like `MockMvc/RestTestClient` and `WebTestClient`. 
+Spring 7 also adds API versioning support to Spring's HTTP clients, including `RestClient`, the reactive `WebClient`, and test-focused tools like `MockMvc/RestTestClient` and `WebTestClient`.
 
 The following is a test class using `RestClient` to verify the REST endpoints shown above.
 
@@ -199,7 +199,7 @@ public class GreetingControllerTest {
 }
 ```
 
-Through the `MockMvcBuilderCustomizer`, we can configure the `MockMvc` instance to use a custom `ApiVersionInserter` to insert the API version into the request header. 
+Through the `MockMvcBuilderCustomizer`, we can configure the `MockMvc` instance to use a custom `ApiVersionInserter` to insert the API version into the request header.
 
 The following is an example of using `RestTestClient` to test the API versioning in Spring MVC:
 
