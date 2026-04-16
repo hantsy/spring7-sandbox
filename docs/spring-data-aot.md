@@ -97,7 +97,8 @@ public class Product {
 
 In this example, `Customer` uses an embedded key `CustomerId`, and `Order` contains a collection of `OrderItem` records. The `OrderStatus` enum is stored as an integer using `@EnumeratedValue`.
 
-> Note: The record type embeddable classes like `CustomerId` and `OrderItem`, as well as the `@EnumeratedValue` support are [new features introduced in Jakarta Persistence 3.2](https://hantsy.github.io/jakartaee11-sandbox/jpa/).
+> [!Note]
+> The record type embeddable classes like `CustomerId` and `OrderItem`, as well as the `@EnumeratedValue` support are [new features introduced in Jakarta Persistence 3.2](https://hantsy.github.io/jakartaee11-sandbox/jpa/).
 
 Create the Spring Data repositories as usual.
 
