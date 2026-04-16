@@ -1,10 +1,10 @@
 # AOT Build Improvements in Spring Data
 
-In previous Spring 5 and Spring 6, it allows you to use GraalVM build tools to build applications to native executables, or native image and run in Docker container. There is no doubt that the native application startup times are impressive, but the build process can be slow and fragile for applications that use reflection, dynamic proxies, and runtime class loading.
+In Spring 5 and Spring 6, it allowed you to use GraalVM build tools to compile applications into native executables (native images) and run them in a Docker container. There is no doubt that the native application startup times are impressive, but the build process can be slow and fragile for applications that use reflection, dynamic proxies, and runtime class loading.
 
 With Spring 7, Spring Data modules such as JDBC, JPA, and MongoDB now generate AOT metadata during compilation. That means the framework moves much of its runtime reflection work into build time, so the same application can target both JVM and native images without significant code changes.
 
-For develpers, you can continue writing Spring Data repositories and entities, and Spring will generate the metadata classes needed for both native images and JVM execution.
+For developers, you can continue writing Spring Data repositories and entities, and Spring will generate the metadata classes needed for both native images and JVM execution.
 
 Let’s build a small example around a typical e-commerce model: `Customer`, `Order`, and `Product`.
 
@@ -174,13 +174,13 @@ mvn compile -Paot
 
 After the build completes, you’ll find generated AOT metadata classes under `target/classes`.
 
-For example, for `CustomerRepository` interface, the compile task ( with the bound `process-aot` goal) may generate the following files, including:
+For example, for the `CustomerRepository` interface, the compile task ( with the bound `process-aot` goal) may generate the following files, including:
 
 - `CustomerRepository.json` — metadata describing repository methods
 - `CustomerRepositoryImpl__AotRepository` — repository implementation using `EntityManager`/`CriteriaBuilder`
 - `CustomerRepository__BeanDefinition` — bean definition for repository registration
 
-You can run the following command to generate AOT medadata classes and package them in the final application `jar` file, then run the jar as reguarly on the JVM:
+You can run the following command to generate AOT metadata classes and package them in the final application `jar` file, then run the jar as regularly on the JVM:
 
 ```bash
 mvn clean package -Paot
