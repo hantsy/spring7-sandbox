@@ -1,6 +1,19 @@
 package com.example.demo;
 
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumeratedValue;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +43,13 @@ public class Order {
 
     @CreatedDate
     Instant createdAt;
+
+    public static Order of(CustomerId customerId, List<OrderItem> items) {
+        var order = new Order();
+        order.setCustomerId(customerId);
+        order.setItems(items);
+        return order;
+    }
 }
 
 enum OrderStatus {
@@ -39,10 +59,10 @@ enum OrderStatus {
     CANCELED(-1);
 
     @EnumeratedValue
-    final int intValue;
+    final int code;
 
-    OrderStatus(int intValue) {
-        this.intValue = intValue;
+    OrderStatus(int code) {
+        this.code = code;
     }
 }
 

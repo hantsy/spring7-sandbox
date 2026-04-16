@@ -4,7 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -14,10 +15,14 @@ import org.springframework.data.support.WindowIterator;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Import(TestcontainersConfiguration.class)
-@SpringBootTest
+@DataJpaTest
 @Slf4j
 class DemoApplicationTests {
+
+    @TestConfiguration
+    @Import({TestcontainersConfiguration.class, DataJpaConfig.class})
+    static class TestConfig {
+    }
 
     @Autowired
     private ProductRepository productRepository;
@@ -39,18 +44,16 @@ class DemoApplicationTests {
     public void testCreateOrder() {
         var customerId = new CustomerId();
         var customer = customerRepository.save(Customer.of(customerId, "Foo", "bar", "foobar@example.com"));
+        log.debug("saved customer: {}", customer);
         var apple = productRepository.save(Product.of(null, "Apple", BigDecimal.ONE));
         var orange = productRepository.save(Product.of(null, "Orange", BigDecimal.TEN));
 
         var order = orderRepository.save(
-                Order.of(null,
+                Order.of(customerId,
                         List.of(
                                 new OrderItem(apple.name, 10, apple),
                                 new OrderItem(orange.name, 5, orange)
-                        ),
-                        OrderStatus.PENDING,
-                        customerId,
-                        null
+                        )
                 )
         );
 

@@ -57,7 +57,7 @@ By default, Spring uses `SemanticApiVersionParser` to parse version values, whic
 The `setDefaultVersion` method sets a default version when the client does not provide one. The `setVersionRequired` method enforces that clients must specify a version; however, if a `defaultVersion` is set, this is automatically disabled.
 
 >[!NOTE]
-> Unfortunately, Spring API versioning does not yet support HATEOAS-compatible content negotiation, such as `Accept: application/vnd.api.v1+json`, though you can implement this manually with Spring HATEOAS. 
+> Unfortunately, Spring API versioning does not yet support HATEOAS-compatible content negotiation, such as `Accept: application/vnd.api.v1+json`, though you can implement this manually with Spring HATEOAS.
 
 The following is an example of REST controller that supports multiple API versions:
 
