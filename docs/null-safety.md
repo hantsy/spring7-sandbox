@@ -1,4 +1,4 @@
-# Build a Null-safety Spring Boot Application
+# Building Null-Safety Spring Boot Applications
 
 Kotlin’s built-in null safety is a standout feature, helping developers avoid the dreaded `NullPointerException` by enforcing strict rules on variable assignments. While Java has historically lacked this level of native protection, progress is being made. A promising future lies ahead with the [JEP draft: Null-Restricted and Nullable Types (Preview)](https://openjdk.org/jeps/8303099), which aims to bring similar capabilities to the language.
 
