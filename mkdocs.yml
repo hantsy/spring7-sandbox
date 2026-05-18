@@ -71,5 +71,6 @@ nav:
     - "Hibernate and Jakarta Data": jakarta-data.md
     - "Spring Data and AOT": spring-data-aot.md
   - Misc:
+    - "Building Null Safety Spring Boot Applications": null-safety.md
     - "Migrating to Spring Boot 4: The Hard Way": migrating-sb4.md
 
