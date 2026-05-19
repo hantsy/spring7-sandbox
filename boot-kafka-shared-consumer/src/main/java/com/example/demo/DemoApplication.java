@@ -10,7 +10,7 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
     }
 
-    public final static String SHARED_TOPIC_NAME = "my-topic";
-    public static final String SHARED_GROUP_NAME = "my-share-group";
+    public final static String DEMO_TOPIC_NAME = "demo-topic";
+    public static final String DEMO_GROUP_NAME = "demo-group";
 }
 
