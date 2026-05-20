@@ -12,10 +12,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ShareKafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultShareConsumerFactory;
 import org.springframework.kafka.core.ShareConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.ShareKafkaMessageListenerContainer;
 
 import java.util.Map;
 
 import static com.example.demo.DemoApplication.DEMO_GROUP_NAME;
+import static com.example.demo.DemoApplication.DEMO_TOPIC_ANNOTATION_NAME;
+import static com.example.demo.DemoApplication.DEMO_TOPIC_EXPLICIT_NAME;
 import static com.example.demo.DemoApplication.DEMO_TOPIC_NAME;
 
 @Configuration
@@ -26,8 +30,18 @@ class ShareConsumerConfig {
     String bootstrapServers;
 
     @Bean
-    NewTopic myTopic() {
+    NewTopic demoTopic() {
         return new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1);
+    }
+
+    @Bean
+    NewTopic demoAnnotationTopic() {
+        return new NewTopic(DEMO_TOPIC_ANNOTATION_NAME, 1, (short) 1);
+    }
+
+    @Bean
+    NewTopic demoExplicitTopic() {
+        return new NewTopic(DEMO_TOPIC_EXPLICIT_NAME, 1, (short) 1);
     }
 
     @Bean
@@ -35,10 +49,9 @@ class ShareConsumerConfig {
         log.debug("Get bootstrap servers from properties:{}", bootstrapServers);
         Map<String, Object> props = Map.of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
-                ConsumerConfig.GROUP_ID_CONFIG, DEMO_GROUP_NAME,
+                // ConsumerConfig.GROUP_ID_CONFIG, DEMO_GROUP_NAME, // set in the consumer side
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class
-                //ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG, "explicit"
         );
         DefaultShareConsumerFactory<String, String> factory = new DefaultShareConsumerFactory<>(props);
         factory.addListener(new ShareConsumerFactory.Listener<>() {
@@ -56,8 +69,47 @@ class ShareConsumerConfig {
     }
 
     @Bean
+    public ShareKafkaMessageListenerContainer<String, String> shareKafkaMessageListenerContainer(
+            ShareConsumerFactory<String, String> shareConsumerFactory) {
+
+        ContainerProperties containerProps = new ContainerProperties(DEMO_TOPIC_NAME);
+        containerProps.setGroupId(DEMO_GROUP_NAME);
+
+        ShareKafkaMessageListenerContainer<String, String> container =
+                new ShareKafkaMessageListenerContainer<>(shareConsumerFactory, containerProps);
+
+        container.setupMessageListener(new GreetingListener());
+
+       // container.setConcurrency(10);
+        return container;
+    }
+
+    @Bean
     public ShareKafkaListenerContainerFactory<String, String> shareKafkaListenerContainerFactory(
             ShareConsumerFactory<String, String> shareConsumerFactory) {
-        return new ShareKafkaListenerContainerFactory<>(shareConsumerFactory);
+        var factory = new ShareKafkaListenerContainerFactory<>(shareConsumerFactory);
+       //  factory.setConcurrency(10);
+        return factory;
     }
+
+    /////////////////////// explicit acknowledge ///////////////////////////
+    @Bean
+    public ShareConsumerFactory<String, String> explicitShareConsumerFactory() {
+        Map<String, Object> props = Map.of(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG,"explicit"
+        );
+        return new DefaultShareConsumerFactory<>(props);
+    }
+
+    @Bean
+    public ShareKafkaListenerContainerFactory<String, String> explicitShareKafkaListenerContainerFactory(
+            ShareConsumerFactory<String, String> explicitShareConsumerFactory) {
+        var factory = new ShareKafkaListenerContainerFactory<>(explicitShareConsumerFactory);
+        //  factory.setConcurrency(10);
+        return factory;
+    }
+
 }
