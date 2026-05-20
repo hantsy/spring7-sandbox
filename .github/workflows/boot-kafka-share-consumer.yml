@@ -1,14 +1,14 @@
-name: boot-kafka-shared-consumer
+name: boot-kafka-share-consumer
 
 on:
   push:
     paths:
-      - "boot-kafka-shared-consumer/**"
+      - "boot-kafka-share-consumer/**"
     branches:
       - master
   pull_request:
     paths:
-      - "boot-kafka-shared-consumer/**"
+      - "boot-kafka-share-consumer/**"
     types:
       - opened
       - synchronize
@@ -27,6 +27,6 @@ jobs:
           cache: "maven"
 
       - name: Build with Maven
-        run: mvn -B -q clean package --file boot-kafka-shared-consumer/pom.xml
+        run: mvn -B -q clean package --file boot-kafka-share-consumer/pom.xml
         
 
