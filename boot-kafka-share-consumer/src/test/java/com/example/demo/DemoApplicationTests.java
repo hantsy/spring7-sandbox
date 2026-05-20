@@ -36,6 +36,9 @@ class DemoApplicationTests {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    @Autowired
+    private GreetingListener listener;
+
     @Test
     public void testSendMessage() {
         List.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
@@ -43,7 +46,7 @@ class DemoApplicationTests {
                         .thenAccept(s -> log.debug("sent message: {}", s)));
 
         Awaitility.waitAtMost(Duration.ofMillis(30_000))
-                .untilAsserted(() -> assertThat(GreetingListener.counter.get("the")).isEqualTo(2));
+                .untilAsserted(() -> assertThat(this.listener.getWordCount("the")).isEqualTo(2));
     }
 
 }

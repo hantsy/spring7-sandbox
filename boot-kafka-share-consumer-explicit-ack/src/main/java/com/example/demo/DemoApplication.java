@@ -10,7 +10,7 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
     }
 
-    public final static String DEMO_TOPIC_NAME = "demo-topic";
-    public static final String DEMO_GROUP_NAME = "demo-group";
+    public final static String DEMO_TOPIC_NAME = "demo-topic-explicit";
+    public static final String DEMO_GROUP_NAME = "demo-group-explicit";
 }
 

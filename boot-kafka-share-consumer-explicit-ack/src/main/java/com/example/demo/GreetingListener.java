@@ -10,27 +10,27 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.example.demo.DemoApplication.DEMO_GROUP_EXPLICIT_NAME;
-import static com.example.demo.DemoApplication.DEMO_TOPIC_EXPLICIT_NAME;
+import static com.example.demo.DemoApplication.DEMO_GROUP_NAME;
+import static com.example.demo.DemoApplication.DEMO_TOPIC_NAME;
 
 @Component
 @Slf4j
-public class ExplicitGreetingListener {
+public class GreetingListener {
     public Map<String, Long> counter = new ConcurrentHashMap<>();
 
     @KafkaListener(
-            topics = DEMO_TOPIC_EXPLICIT_NAME,
+            topics = DEMO_TOPIC_NAME,
             containerFactory = "explicitShareKafkaListenerContainerFactory",
-            groupId = DEMO_GROUP_EXPLICIT_NAME
+            groupId = DEMO_GROUP_NAME
     )
-    public void onMessage(ConsumerRecord<String, String> record, ShareAcknowledgment acknowledgment) {
+    public void onMessage(ConsumerRecord<String, String> record, ShareAcknowledgment ack) {
         log.debug("received record: {} at {}", record, LocalDateTime.now());
         counter.compute(record.value(), (s, v) -> {
                     if (v == null) {
-                        acknowledgment.acknowledge();
+                        ack.acknowledge();
                         return 1L;
                     } else {
-                        acknowledgment.reject(); // reject when the word is tapped.
+                        ack.reject(); // reject when the word is already tapped.
                         return v;
                     }
                 }

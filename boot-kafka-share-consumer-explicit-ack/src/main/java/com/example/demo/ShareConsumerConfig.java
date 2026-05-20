@@ -25,41 +25,28 @@ class ShareConsumerConfig {
     String bootstrapServers;
 
     @Bean
-    NewTopic demoTopic() {
+    NewTopic demoExplicitTopic() {
         return new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1);
     }
 
+    /// //////////////////// explicit acknowledge ///////////////////////////
     @Bean
-    public ShareConsumerFactory<String, String> shareConsumerFactory() {
-        log.debug("Get bootstrap servers from properties:{}", bootstrapServers);
+    public ShareConsumerFactory<String, String> explicitShareConsumerFactory() {
         Map<String, Object> props = Map.of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
-                // ConsumerConfig.GROUP_ID_CONFIG, DEMO_GROUP_NAME, // set in the consumer side
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG, "explicit"
         );
-        DefaultShareConsumerFactory<String, String> factory = new DefaultShareConsumerFactory<>(props);
-        factory.addListener(new ShareConsumerFactory.Listener<>() {
-            @Override
-            public void consumerAdded(String id, ShareConsumer<String, String> consumer) {
-                log.debug("consumer added id:{}", id);
-            }
-
-            @Override
-            public void consumerRemoved(@Nullable String id, ShareConsumer<String, String> consumer) {
-                log.debug("consumer removed id:{}", id);
-            }
-        });
-        return factory;
+        return new DefaultShareConsumerFactory<>(props);
     }
 
     @Bean
-    public ShareKafkaListenerContainerFactory<String, String> shareKafkaListenerContainerFactory(
-            ShareConsumerFactory<String, String> shareConsumerFactory) {
-        var factory = new ShareKafkaListenerContainerFactory<>(shareConsumerFactory);
+    public ShareKafkaListenerContainerFactory<String, String> explicitShareKafkaListenerContainerFactory(
+            ShareConsumerFactory<String, String> explicitShareConsumerFactory) {
+        var factory = new ShareKafkaListenerContainerFactory<>(explicitShareConsumerFactory);
         //  factory.setConcurrency(10);
         return factory;
     }
-
 
 }

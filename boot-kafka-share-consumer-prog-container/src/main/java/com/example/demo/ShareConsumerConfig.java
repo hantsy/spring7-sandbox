@@ -9,12 +9,14 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.config.ShareKafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultShareConsumerFactory;
 import org.springframework.kafka.core.ShareConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.ShareKafkaMessageListenerContainer;
 
 import java.util.Map;
 
+import static com.example.demo.DemoApplication.DEMO_GROUP_NAME;
 import static com.example.demo.DemoApplication.DEMO_TOPIC_NAME;
 
 @Configuration
@@ -54,12 +56,19 @@ class ShareConsumerConfig {
     }
 
     @Bean
-    public ShareKafkaListenerContainerFactory<String, String> shareKafkaListenerContainerFactory(
+    public ShareKafkaMessageListenerContainer<String, String> shareKafkaMessageListenerContainer(
             ShareConsumerFactory<String, String> shareConsumerFactory) {
-        var factory = new ShareKafkaListenerContainerFactory<>(shareConsumerFactory);
-        //  factory.setConcurrency(10);
-        return factory;
-    }
 
+        ContainerProperties containerProps = new ContainerProperties(DEMO_TOPIC_NAME);
+        containerProps.setGroupId(DEMO_GROUP_NAME);
+
+        ShareKafkaMessageListenerContainer<String, String> container =
+                new ShareKafkaMessageListenerContainer<>(shareConsumerFactory, containerProps);
+
+        container.setupMessageListener(new GreetingListener());
+
+        // container.setConcurrency(10);
+        return container;
+    }
 
 }

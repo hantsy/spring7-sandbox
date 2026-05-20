@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 @SpringBootTest
 @Slf4j
-class ExplicitDemoApplicationTests {
+class DemoApplicationTests {
 
     // Kafka 4.2 enabled share consumer by default
     @Container
@@ -37,12 +37,12 @@ class ExplicitDemoApplicationTests {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
-    private ExplicitGreetingListener listener;
+    private GreetingListener listener;
 
     @Test
     public void testSendMessage() {
         List.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
-                .forEach(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_EXPLICIT_NAME, word)
+                .forEach(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_NAME, word)
                         .thenAccept(s -> log.debug("sent message: {}", s)));
 
         Awaitility.waitAtMost(Duration.ofMillis(30_000))
