@@ -26,10 +26,10 @@ class ShareConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     String bootstrapServers;
 
-    @Bean
-    NewTopic demoTopic() {
-        return new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1);
-    }
+//    @Bean
+//    NewTopic demoTopic() {
+//        return new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1);
+//    }
 
     @Bean
     public ShareConsumerFactory<String, String> shareConsumerFactory() {

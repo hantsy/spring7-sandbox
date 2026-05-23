@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +28,8 @@ class DemoApplicationTests {
 
     // Kafka 4.2 enabled share consumer by default
     @Container
-    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:latest"));
+    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:latest"))
+            .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1");
 
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
@@ -39,13 +42,15 @@ class DemoApplicationTests {
     @Autowired
     private GreetingListener listener;
 
+    @SneakyThrows
     @Test
     public void testSendMessage() {
+        Thread.sleep(Duration.ofSeconds(5));
         List.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
-                .forEach(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_NAME, word)
+                .forEach(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_NAME, UUID.randomUUID().toString(), word)
                         .thenAccept(s -> log.debug("sent message: {}", s)));
 
-        Awaitility.waitAtMost(Duration.ofMillis(30_000))
+        Awaitility.waitAtMost(Duration.ofMillis(500))
                 .untilAsserted(() -> assertThat(this.listener.getWordCount("the")).isEqualTo(1));
     }
 
