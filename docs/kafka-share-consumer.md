@@ -137,7 +137,7 @@ class DemoApplicationTests {
 
 >[!NOTE] I encountered some issues when running the test, so I added the `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR` environment variable and a delay before sending messages to ensure the share consumer is fully initialized and ready to consume. Check the original discussion on StackOverflow for more details: [Kafka Share Consumer issue](https://stackoverflow.com/questions/79943319/kafka-share-consumer-issue).
 
-Grab a copy of the example from [GitHub](https://github.com/hantsy/spring7-sandbox/tree/main/boot-kafka-share-consumer) and run the test to see the share consumer in action. You should see messages consumed and the word count updated accordingly.
+Grab the example code from [GitHub](https://github.com/hantsy/spring7-sandbox/tree/main/boot-kafka-share-consumer), then run the test to verify the share consumer is working and the word count updates correctly.
 
 ## Programmatic Listeners
 
@@ -194,7 +194,7 @@ class ShareConsumerConfig {
 }
 ```
 
-Check [the example project](https://github.com/hantsy/spring7-sandbox/blob/master/boot-kafka-share-consumer-prog-container) on Github and explore the test and `GreetingListener` class to see how the programmatic listener works. Run the test to verify that the share consumer is consuming messages as expected.
+See [the example project](https://github.com/hantsy/spring7-sandbox/blob/master/boot-kafka-share-consumer-prog-container) on GitHub for the full implementation, then inspect the test and `GreetingListener` class to confirm the programmatic listener behavior.
 
 ## Explicit Acknowledgement
 
