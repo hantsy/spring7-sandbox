@@ -1,8 +1,8 @@
 # Kafka Share Consumer
 
-Apache Kafka has long been the gold standard for high-throughput, low-latency data streaming. Historically, Kafka consumption relied on a "per-partition" model, where each partition in a topic was assigned to exactly one consumer within a group. 
+Apache Kafka has long been the gold standard for high-throughput, low-latency data streaming. Historically, Kafka consumption used a `per-partition` model, where each topic partition was assigned to exactly one consumer in a group.
 
-Starting with Kafka 4.0 (via KIP-932), a new paradigm was introduced: **Share Consumer(Queues)**. This feature brings "per-message" semantics to the Kafka ecosystem. It is similar to traditional message queues, and allows multiple consumers in a "share group" to pull messages from the same topic simultaneously regardless of which partition it came from. While Kafka 4.0 introduced this as an experimental feature, it reached General Availability in Kafka 4.2.
+With Kafka 4.0 and KIP-932, Kafka introduced **Share Consumer(Queues)**. This new paradigm brings `per-message` semantics to Kafka and behaves more like a traditional message queue. A share group allows multiple consumers to pull messages from the same topic concurrently, regardless of the originating partition. The feature was experimental in Kafka 4.0 and reached General Availability in Kafka 4.2.
 
 Understanding the architectural shift is crucial for choosing the right tool for your use case:
 
@@ -15,9 +15,11 @@ Understanding the architectural shift is crucial for choosing the right tool for
 | **Scalability** | To scale, you must add more partitions | You can add consumers without modifying the topic |
 | **Use Case** | Event sourcing, stream processing, ordered logs | Work queues, competing consumers, slow task processing |
 
-A Share Consumer group is ideal when you have a high volume of independent messages where the processing time might vary, or when you want to avoid "head-of-line blocking" where one slow message stalls an entire partition.
+A Share Consumer group is a good fit when you have a high volume of independent messages, variable processing time, or want to avoid head-of-line blocking where one slow message stalls an entire partition.
 
-[Spring for Kafka 4.0 has added first-class Share Consumer support](https://spring.io/blog/2025/10/14/introducing-spring-kafka-share-consumer), providing the familiar `@KafkaListener` programming model for these new share groups.
+[Spring for Kafka 4.0 has added first-class Share Consumer support](https://spring.io/blog/2025/10/14/introducing-spring-kafka-share-consumer), providing the familiar `@KafkaListener` programming model for these share groups.
+
+## Annotation-Driven Listeners
 
 Generate a Spring Boot 4 project via [Spring Initializr](https://start.spring.io/) with these dependencies:
 
@@ -34,11 +36,6 @@ class ShareConsumerConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     String bootstrapServers;
-
-    @Bean
-    NewTopic myTopic() {
-        return new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1);
-    }
 
     @Bean
     public ShareConsumerFactory<String, String> shareConsumerFactory() {
@@ -73,9 +70,9 @@ class ShareConsumerConfig {
 }
 ```
  
-The configuration above defines a specialized `ShareConsumerFactory` along with a `ShareKafkaListenerContainerFactory` that utilizes it. We have also registered a lifecycle listener with the factory to monitor and log when consumers are dynamically added to or removed from the share group.
+This configuration defines a specialized `ShareConsumerFactory` and a `ShareKafkaListenerContainerFactory` that uses it. It also registers a lifecycle listener to log when consumers join or leave the share group.
 
-With the infrastructure in place, you can now define a `@KafkaListener` that leverages this container factory to participate in the share group:
+With the infrastructure in place, define a `@KafkaListener` that uses this container factory to participate in the share group:
 
 ```java
 @Component
@@ -99,7 +96,7 @@ public class GreetingListener {
 }
 ```
 
-Create a test to verify the functionality of the Share consumer against a running Kafka instance in testcontainers:
+Create a test to verify the share consumer behavior against a running Kafka instance in Testcontainers:
 
 ```java
 @Testcontainers
@@ -109,7 +106,8 @@ class DemoApplicationTests {
 
     // Kafka 4.2 enabled share consumer by default
     @Container
-    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:latest"));
+    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:latest"))
+        .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1");
 
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
@@ -122,8 +120,10 @@ class DemoApplicationTests {
     @Autowired
     private GreetingListener listener;
 
+    @SneakyThrows
     @Test
     public void testSendMessage() {
+         Thread.sleep(Duration.ofSeconds(5));
         List.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
                 .forEach(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_NAME, word)
                         .thenAccept(s -> log.debug("sent message: {}", s)));
@@ -135,4 +135,119 @@ class DemoApplicationTests {
 }
 ```
 
-Grab a copy of the example from [GitHub](https://github.com/hantsy/spring7-sandbox/tree/main/boot-kafka-share-consumer) and run the test to see the Share consumer in action. You should see the messages being consumed by the Share consumer and the word count being updated accordingly.
+>[!NOTE] I encountered some issues when running the test, so I added the `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR` environment variable and a delay before sending messages to ensure the share consumer is fully initialized and ready to consume. Check the original discussion on StackOverflow for more details: [Kafka Share Consumer issue](https://stackoverflow.com/questions/79943319/kafka-share-consumer-issue).
+
+Grab a copy of the example from [GitHub](https://github.com/hantsy/spring7-sandbox/tree/main/boot-kafka-share-consumer) and run the test to see the share consumer in action. You should see messages consumed and the word count updated accordingly.
+
+## Programmatic Listeners
+
+Like the traditional consumer model, you can create programmatic listeners with `ShareKafkaMessageListenerContainer`. This gives finer control over consumer lifecycle and message processing.
+
+```java
+@Configuration
+@Slf4j
+class ShareConsumerConfig {
+
+    @Value("${spring.kafka.bootstrap-servers}")
+    String bootstrapServers;
+
+    @Bean
+    public ShareConsumerFactory<String, String> shareConsumerFactory() {
+        log.debug("Get bootstrap servers from properties:{}", bootstrapServers);
+        Map<String, Object> props = Map.of(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                // ConsumerConfig.GROUP_ID_CONFIG, DEMO_GROUP_NAME, // set in the consumer side
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class
+        );
+        DefaultShareConsumerFactory<String, String> factory = new DefaultShareConsumerFactory<>(props);
+        factory.addListener(new ShareConsumerFactory.Listener<>() {
+            @Override
+            public void consumerAdded(String id, ShareConsumer<String, String> consumer) {
+                log.debug("consumer added id:{}", id);
+            }
+
+            @Override
+            public void consumerRemoved(@Nullable String id, ShareConsumer<String, String> consumer) {
+                log.debug("consumer removed id:{}", id);
+            }
+        });
+        return factory;
+    }
+
+    @Bean
+    public ShareKafkaMessageListenerContainer<String, String> shareKafkaMessageListenerContainer(
+            ShareConsumerFactory<String, String> shareConsumerFactory) {
+
+        ContainerProperties containerProps = new ContainerProperties(DEMO_TOPIC_NAME);
+        containerProps.setGroupId(DEMO_GROUP_NAME);
+
+        ShareKafkaMessageListenerContainer<String, String> container =
+                new ShareKafkaMessageListenerContainer<>(shareConsumerFactory, containerProps);
+
+        container.setupMessageListener(new GreetingListener());
+
+        // container.setConcurrency(10);
+        return container;
+    }
+
+}
+```
+
+Check [the example project](https://github.com/hantsy/spring7-sandbox/blob/master/boot-kafka-share-consumer-prog-container) on Github and explore the test and `GreetingListener` class to see how the programmatic listener works. Run the test to verify that the share consumer is consuming messages as expected.
+
+## Explicit Acknowledgement
+
+By default, a Share consumer uses implicit acknowledgement: messages are considered acknowledged as soon as they are delivered. To control acknowledgement timing, enable explicit acknowledgement mode.
+
+To enable explicit acknowledgement, set the `ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG` property to `explicit` in the consumer configuration:
+
+```java
+@Configuration
+@Slf4j
+class ShareConsumerConfig {
+
+    @Value("${spring.kafka.bootstrap-servers}")
+    String bootstrapServers;
+
+    @Bean
+    public ShareConsumerFactory<String, String> explicitShareConsumerFactory() {
+        Map<String, Object> props = Map.of(
+                ...
+                ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG, "explicit"
+        );
+        return new DefaultShareConsumerFactory<>(props);
+    }
+    ...
+
+}
+```
+
+On the consumer side, you can then use the `ShareAcknowledgment` object to acknowledge messages explicitly:
+
+```java
+@KafkaListener(
+        topics = DEMO_TOPIC_NAME,
+        containerFactory = "explicitShareKafkaListenerContainerFactory",
+        groupId = DEMO_GROUP_NAME
+)
+public void onMessage(ConsumerRecord<String, String> record, ShareAcknowledgment ack) {
+    log.debug("received record: {} at {}", record, LocalDateTime.now());
+    counter.compute(record.value(), (s, v) -> {
+                if (v == null) {
+                    ack.acknowledge();
+                    return 1L;
+                } else {
+                    ack.reject(); // reject when the word is already tapped.
+                    return v;
+                }
+            }
+    );
+}
+```
+
+In this example, the consumer acknowledges a message only on first occurrence. If the word has already been processed, the listener rejects it and the broker will not retry it.
+
+This explicit acknowledgement mode allows you to implement more complex processing logic and error handling strategies, giving you greater control over the message processing lifecycle in a Share consumer group.
+
+Check the example project from [GitHub](https://github.com/hantsy/spring7-sandbox/blob/master/boot-kafka-share-consumer-explicit-ack) and explore the test code. You can run the test to see how `explicit` acknowledgement works in the Share consumer model.
