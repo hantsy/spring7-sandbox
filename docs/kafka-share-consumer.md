@@ -135,7 +135,8 @@ class DemoApplicationTests {
 }
 ```
 
->[!NOTE] I encountered some issues when running the test, so I added the `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR` environment variable and a delay before sending messages to ensure the share consumer is fully initialized and ready to consume. Check the original discussion on StackOverflow for more details: [Kafka Share Consumer issue](https://stackoverflow.com/questions/79943319/kafka-share-consumer-issue).
+>[!NOTE]
+>I encountered some issues when running the test, so I added the `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR` environment variable and a delay before sending messages to ensure the share consumer is fully initialized and ready to consume. Check the original discussion on StackOverflow for more details: [Kafka Share Consumer issue](https://stackoverflow.com/questions/79943319/kafka-share-consumer-issue).
 
 Grab the example code from [GitHub](https://github.com/hantsy/spring7-sandbox/tree/main/boot-kafka-share-consumer), then run the test to verify the share consumer is working and the word count updates correctly.
 
