@@ -57,7 +57,7 @@ By default, Spring uses `SemanticApiVersionParser` to parse version values, whic
 The `setDefaultVersion` method sets a default version when the client does not provide one. The `setVersionRequired` method enforces that clients must specify a version; however, if a `defaultVersion` is set, this is automatically disabled.
 
 >[!NOTE]
-> Unfortunately, Spring API versioning does not yet support HATEOAS-compatible content negotiation, such as `Accept: application/vnd.api.v1+json`, though you can implement this manually with Spring HATEOAS.
+> Unfortunately, Spring API versioning does not yet support HATEOAS-compatible content negotiation, such as `Accept: application/vnd.api.v1+json`, though you can implement this manually with [Spring HATEOAS](https://spring.io/projects/spring-hateoas).
 
 The following is an example of REST controller that supports multiple API versions:
 
@@ -258,4 +258,4 @@ public class GreetingControllerWithRestTestClientTest {
 
 In this example, the `RestTestClient` is bound to the `MockMvc` instance and configured with a default version and a custom `ApiVersionInserter`.
 
-Explore the full example codes using reative [WebClient](https://github.com/hantsy/spring7-sandbox/blob/master/boot-api-versioning-webflux/src/test/java/com/example/demo/DemoApplicationTests.java) and [WebTestClient](https://github.com/hantsy/spring7-sandbox/blob/master/boot-api-versioning-webflux/src/test/java/com/example/demo/GreetingControllerTest.java) in the GitHub repository.
+Explore the full example codes using reactive [WebClient](https://github.com/hantsy/spring7-sandbox/blob/master/boot-api-versioning-webflux/src/test/java/com/example/demo/DemoApplicationTests.java) and [WebTestClient](https://github.com/hantsy/spring7-sandbox/blob/master/boot-api-versioning-webflux/src/test/java/com/example/demo/GreetingControllerTest.java) in the GitHub repository.
