@@ -1686,7 +1686,10 @@ class DemoApplicationTests {
 
 Explore the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/master/boot-cassandra) for the complete implementation.
 
-Unfortunately, Spring Boot doesn't provide a dedicated module for Redis due to the multiple client libraries supported by Spring Data.
+Unfortunately, Spring Boot doesn't provide a dedicated Redis module because it supports multiple client libraries through Spring Data.
+
+>[!NOTE]
+> I also added the reactive variants of the above examples in the Github reporitoty: https://github.com/hantsy/spring-reactive-sample/tree/master
 
 ## Summary
 
