@@ -1,10 +1,10 @@
 # Resilience Support in Spring 7
 
-Spring 7 integrates the proven resilience patterns from the `spring-retry` project directly into the core framework, offering robust capabilities for managing transient failures and controlling concurrent executions. The resilience framework provides both declarative approaches using `@Retryable` and `@ConcurrencyLimit` annotations, as well as programmatic control through the flexible `RetryTemplate` API.
+Spring 7 integrates proven resilience patterns by directly incorporating the `spring-retry` project into the core framework, offering robust capabilities for managing transient failures and controlling concurrent executions. The resilience feature provides both declarative approaches using `@Retryable` and `@ConcurrencyLimit` annotations, as well as programmatic control through the flexible `RetryTemplate` API.
 
 ## Declarative Resilience Support
 
-To enable Spring 7's declarative resilience features, start by annotating your configuration class with `@EnableResilientMethods`. This enables the framework to process and apply resilience annotations throughout your application:
+To experience Spring 7's declarative resilience features, start by annotating your configuration class with `@EnableResilientMethods`. This enables the Spring framework to process and apply resilience annotations throughout your application:
 
 ```java
 @EnableResilientMethods
@@ -65,7 +65,7 @@ public class RetryableExampleTest {
 }
 ```
 
-The test invokes the `test()` method and verifies that it eventually throws `ExampleException`. We use Awaitility to asynchronously wait until the retry count reaches 6 (the final invocation does not trigger retry attempt), ensuring the framework behaves as expected even in asynchronous scenarios.
+The test invokes the `test()` method and verifies that it eventually throws `ExampleException`. We use Awaitility to asynchronously wait until the retry count reaches 6 (the final invocation does not trigger a retry attempt), ensuring the framework behaves as expected even in asynchronous scenarios.
 
 Beyond retry logic, Spring 7 also provides the `@ConcurrencyLimit` annotation for controlling resource utilization. This annotation restricts the number of concurrent invocations of a method, acting as a built-in semaphore. Here's a practical example:
 
@@ -154,7 +154,7 @@ For the complete working example, visit the [GitHub repository](https://github.c
 
 ## Programmatic Resilience with RetryTemplate
 
-While declarative annotations provide a clean, convention-based approach, the `RetryTemplate` class offers fine-grained, programmatic control over retry behavior. This flexible API allows you to configure every aspect of the retry strategy: maximum attempts, delays, jitter, exception matching, and listener callbacks for monitoring. This is particularly useful for complex scenarios requiring dynamic configuration or custom retry logic. Here's a comprehensive example:
+While declarative annotations provide a clean, convention-based approach, the `RetryTemplate` class offers fine-grained programmatic control over retry behavior. This flexible API allows you to configure every aspect of the retry strategy: maximum attempts, delays, jitter, exception matching, and listener callbacks for monitoring. This is particularly useful for complex scenarios requiring dynamic configuration or custom retry logic. Here's a comprehensive example:
 
 ```java
 @Configuration
