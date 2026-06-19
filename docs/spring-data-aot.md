@@ -1,8 +1,8 @@
 # AOT Build Improvements in Spring Data
 
-In Spring 5 and Spring 6, it allowed you to use GraalVM build tools to compile applications into native executables (native images) and run them in a Docker container. There is no doubt that the native application startup times are impressive, but the build process can be slow and fragile for applications that use reflection, dynamic proxies, and runtime class loading.
+In Spring 5 and Spring 6, you could use GraalVM build tools to compile applications into native executables and run them directly on your operating system or in a Docker container. There is no doubt that the native application startup times are impressive, but the build process can be slow and fragile for applications that use reflection, dynamic proxies, and runtime class loading.
 
-With Spring 7, Spring Data modules such as JDBC, JPA, and MongoDB now generate AOT metadata during compilation. That means the framework moves much of its runtime reflection work into build time, so the same application can target both JVM and native images without significant code changes.
+With Spring 7 and Spring Boot v4, Spring Data modules such as JDBC, JPA, and MongoDB, etc. can now generate AOT metadata during compilation. That means the framework moves much of its runtime reflection work into build time, so the same application can target both JVM and native images without significant code changes.
 
 For developers, you can continue writing Spring Data repositories and entities, and Spring will generate the metadata classes needed for both native images and JVM execution.
 
@@ -98,7 +98,7 @@ public class Product {
 In this example, `Customer` uses an embedded key `CustomerId`, and `Order` contains a collection of `OrderItem` records. The `OrderStatus` enum is stored as an integer using `@EnumeratedValue`.
 
 > [!Note]
-> The record type embeddable classes like `CustomerId` and `OrderItem`, as well as the `@EnumeratedValue` support are [new features introduced in Jakarta Persistence 3.2](https://hantsy.github.io/jakartaee11-sandbox/jpa/).
+> The record type embeddable classes like `CustomerId` and `OrderItem`, as well as the `@EnumeratedValue` support are [new features introduced in Jakarta Persistence 3.2](https://medium.com/itnext/an-introduction-to-jakarta-persistence-3-2-by-examples-69b34adc9c0b).
 
 Create the Spring Data repositories as usual.
 
@@ -179,16 +179,16 @@ For example, for the `CustomerRepository` interface, the compile task ( with the
 
 - `CustomerRepository.json` — metadata describing repository methods
 - `CustomerRepositoryImpl__AotRepository` — repository implementation using `EntityManager`/`CriteriaBuilder`
-- `CustomerRepository__BeanDefinition` — bean definition for repository registration
+- `CustomerRepository__BeanDefinition` — programatic bean definition for repository registration
 
-You can run the following command to generate AOT metadata classes and package them in the final application `jar` file, then run the jar as regularly on the JVM:
+You can run the following command to generate AOT metadata files and package them in the final application `jar` file, then run the jar as regularly on the JVM:
 
 ```bash
 mvn clean package -Paot
 java -jar target/demo-0.0.1-SNAPSHOT.jar
 ```
 
-Or run with Spring Boot plugin during development:
+Or run with the Spring Boot plugin during development:
 
 ```bash
 mvn spring-boot:run -Paot
@@ -196,4 +196,4 @@ mvn spring-boot:run -Paot
 
 If you want more details on the Spring Boot Maven plugin AOT support, check the official docs: [Ahead-of-Time Processing](https://docs.spring.io/spring-boot/maven-plugin/aot.html)
 
-Check the example project on [Github](https://github.com/hantsy/spring7-sandbox/tree/master/boot-data-jpa).
+Check the example project on [GitHub](https://github.com/hantsy/spring7-sandbox/tree/master/boot-data-jpa).
