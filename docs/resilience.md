@@ -259,4 +259,4 @@ public class RetryExampleTest {
 }
 ```
 
-Explore the complete implementation in the [GitHub repository](https://github.com/hantsylabs/spring7-sandbox/tree/main/retry).
+Explore the complete example in the [GitHub repository](https://github.com/hantsylabs/spring7-sandbox/tree/main/retry).
