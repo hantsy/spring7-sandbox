@@ -10,9 +10,9 @@ In the meantime, the Java ecosystem has developed several robust workarounds to 
 * [Jakarta Annotations](https://jakarta.ee/specifications/annotations/): The standard set of annotations provided by the Jakarta EE ecosystem.
 * [JSpecify](https://jspecify.dev/): A modern collaborative effort to standardize null-safety annotations across the Java world, gaining significant traction in major frameworks.
 
-Starting with version 7, the Spring ecosystem has fully embraced JSpecify, annotating its entire API surface for better null safety. When using an IDE like IntelliJ IDEA, this integration allows you to catch potential errors before they ever reach production. Furthermore, Kotlin developers benefit immensely, as these JSpecify annotations translate directly into Kotlin's native null-safety types.
+Starting with version 7, the Spring ecosystem has fully embraced JSpecify, annotating its entire API surface for better null safety. When using an IDE like IntelliJ IDEA, this integration lets you catch potential errors before they reach production. Furthermore, Kotlin developers benefit immensely, as these JSpecify annotations translate directly into Kotlin's native null-safety types in IDEA.
 
-To manage nullability in your own classes, you can use the `@Nullable`, `@NonNull`, and `@NullnessUnspecified` annotations from package `org.jspecify.annotations`:
+To manage nullability in your own classes, you can use the `@Nullable`, `@NonNull`, and `@NullnessUnspecified` annotations from the package `org.jspecify.annotations`:
 
 ```java
 import org.jspecify.annotations.Nullable;
@@ -29,7 +29,7 @@ public class Customer {
     @NullnessUnspecified
     private String phoneNumber;
 
-    // method parameter and return type annoations
+    // method parameter and return type annotations
     @NonNull
     public String getName() {
         return name;
@@ -41,7 +41,7 @@ public class Customer {
 }
 ```
 
-To reduce boilerplate, you can apply the `@NullMarked` annotation at the class or package level. This sets the default behavior for all members to non-null, meaning you only need to explicitly mark nullable fields:
+To reduce boilerplate, you can apply the `@NullMarked` annotation at the class or package level. This sets the default behavior for all members to non-null, meaning you only need to mark nullable fields explicitly:
 
 ```java
 // ignore the imports
@@ -79,7 +79,7 @@ public class Customer {
     @NonNull
     private String phoneNumber;
 
-    // method parameter and return type annoations
+    // method parameter and return type annotations
     public String getName() {
         return name;
     }
@@ -90,9 +90,9 @@ public class Customer {
 }
 ```
 
-IntelliJ IDEA highlights potential null-safety violations directly in the editor. For enforcing these rules during the build process, Gradle users can combine JSpecify with NullAway. For more details, see the official Spring blog post:  [Null Safety in Spring applications with JSpecify and NullAway](https://spring.io/blog/2025/03/10/null-safety-in-spring-apps-with-jspecify-and-null-away).
+IntelliJ IDEA highlights potential null-safety violations directly in the editor. To enforce these rules during the build process, Gradle users can combine JSpecify with NullAway. For more details, see the official Spring blog post:  [Null Safety in Spring applications with JSpecify and NullAway](https://spring.io/blog/2025/03/10/null-safety-in-spring-apps-with-jspecify-and-null-away).
 
-Maven users can simplify this integration by using the Nullability Maven Plugin, which streamlines the configuration for JSpecify and NullAway.
+Maven users can simplify this integration with the Nullability Maven Plugin, which streamlines configuration for JSpecify and NullAway.
 
 Add the following plugin configuration to your `pom.xml`:
 
@@ -121,6 +121,6 @@ Add the following plugin configuration to your `pom.xml`:
 ```
 
 >[!NOTE]
->More details about nullability maven plugin, check [Making JSpecify/NullAway Easier for Maven Users with the Nullability Maven Plugin](https://ik.am/entries/900/en)
+> For more details about the nullability Maven plugin, check [Making JSpecify/NullAway Easier for Maven Users with the Nullability Maven Plugin](https://ik.am/entries/900/en)
 
 By adopting JSpecify annotations, you gain more predictable Java code and take advantage of advanced tooling in both your IDE and build pipeline. With Spring 7 leading the way, building reliable, null-safe applications is easier than ever, regardless of whether you choose Java or Kotlin.
