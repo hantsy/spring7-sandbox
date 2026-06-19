@@ -1,6 +1,6 @@
 # Resilience Support in Spring 7
 
-Spring 7 integrates proven resilience patterns by directly incorporating the `spring-retry` project into the core framework, offering robust capabilities for managing transient failures and controlling concurrent executions. The resilience feature provides both declarative approaches using `@Retryable` and `@ConcurrencyLimit` annotations, as well as programmatic control through the flexible `RetryTemplate` API.
+Spring 7 integrates proven resilience patterns by directly incorporating the `spring-retry` project's effort into the core framework, offering robust capabilities for managing transient failures and controlling concurrent executions. The resilience feature provides both declarative approaches using `@Retryable` and `@ConcurrencyLimit` annotations, as well as programmatic control through the flexible `RetryTemplate` API.
 
 ## Declarative Resilience Support
 
