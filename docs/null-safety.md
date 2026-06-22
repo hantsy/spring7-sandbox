@@ -12,12 +12,11 @@ In the meantime, the Java ecosystem has developed several robust workarounds to 
 
 Starting with version 7, the Spring ecosystem has fully embraced JSpecify, annotating its entire API surface for better null safety. When using an IDE like IntelliJ IDEA, this integration lets you catch potential errors before they reach production. Furthermore, Kotlin developers benefit immensely, as these JSpecify annotations translate directly into Kotlin's native null-safety types in IDEA.
 
-To manage nullability in your own classes, you can use the `@Nullable`, `@NonNull`, and `@NullnessUnspecified` annotations from the package `org.jspecify.annotations`:
+To manage nullability in your own classes, you can use the `@Nullable`  and `@NonNull` annotations from the package `org.jspecify.annotations`:
 
 ```java
 import org.jspecify.annotations.Nullable;
 import org.jspecify.annotations.NonNull;    
-import org.jspecify.annotations.NullnessUnspecified;
 
 public class Customer {
     @NonNull
@@ -26,7 +25,7 @@ public class Customer {
     @Nullable
     private String email;
 
-    @NullnessUnspecified
+    @NonNull
     private String phoneNumber;
 
     // method parameter and return type annotations
