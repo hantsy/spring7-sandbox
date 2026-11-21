@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-elasticsearch/**"
+      - ".github/workflows/boot-elasticsearch.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-elasticsearch/**"
+      - ".github/workflows/boot-elasticsearch.yml"
     types:
       - opened
       - synchronize

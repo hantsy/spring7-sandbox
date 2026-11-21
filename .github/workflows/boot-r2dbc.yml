@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-r2dbc/**"
+      - ".github/workflows/boot-r2dbc.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-r2dbc/**"
+      - ".github/workflows/boot-r2dbc.yml"
     types:
       - opened
       - synchronize

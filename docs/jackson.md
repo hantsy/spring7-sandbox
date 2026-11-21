@@ -68,7 +68,7 @@ Start a new project at [Spring Initializr](https://start.spring.io/) with these 
 
 * Project: Maven
 * Language: Java
-* Spring Boot: 4.0.0
+* Spring Boot: 4.2.0
 * Project Metadata/Java: 25
 * Leave the other fields as-is.
 

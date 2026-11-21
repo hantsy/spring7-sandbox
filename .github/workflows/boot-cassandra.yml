@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-cassandra/**"
+      - ".github/workflows/boot-cassandra.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-cassandra/**"
+      - ".github/workflows/boot-cassandra.yml"
     types:
       - opened
       - synchronize

@@ -38,11 +38,16 @@ class ShareConsumerConfig {
     String bootstrapServers;
 
     @Bean
+    NewTopic demoTopic() {
+        return new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1);
+    }
+
+    @Bean
     public ShareConsumerFactory<String, String> shareConsumerFactory() {
         log.debug("Get bootstrap servers from properties:{}", bootstrapServers);
         Map<String, Object> props = Map.of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
-                ConsumerConfig.GROUP_ID_CONFIG, DEMO_GROUP_NAME,
+                // ConsumerConfig.GROUP_ID_CONFIG, DEMO_GROUP_NAME, // set in the consumer side
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class
                 //ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG, "explicit"
@@ -70,7 +75,7 @@ class ShareConsumerConfig {
 }
 ```
  
-This configuration defines a specialized `ShareConsumerFactory` and a `ShareKafkaListenerContainerFactory` that uses it. It also registers a lifecycle listener to log when consumers join or leave the share group.
+This configuration defines a specialized `ShareConsumerFactory` and a `ShareKafkaListenerContainerFactory` that uses it. It also registers a lifecycle listener to log when consumers join or leave the share group. The `NewTopic` bean lets `KafkaAdmin` create the demo topic on startup when you run the application outside the test.
 
 With the infrastructure in place, define a `@KafkaListener` that uses this container factory to participate in the share group:
 
@@ -98,6 +103,9 @@ public class GreetingListener {
 
 Create a test to verify the share consumer behavior against a running Kafka instance in Testcontainers:
 
+> [!NOTE]
+> The broker image is pinned to `apache/kafka:4.4.0`, the very Kafka release that Spring Boot manages for the client side (the `kafka.version` property). Keep the broker and the client on the same Kafka release, otherwise the Share Consumer protocol may fail to be negotiated. The `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_*` settings adapt the internal `__share_group_state` topic to a single broker, the default of Kafka is 3 replicas and a minimum ISR of 2. The topic is created before the application starts, so that the share group is formed with a non empty assignment.
+
 ```java
 @Testcontainers
 @SpringBootTest
@@ -106,8 +114,27 @@ class DemoApplicationTests {
 
     // Kafka 4.2 enabled share consumer by default
     @Container
-    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:latest"))
-        .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1");
+    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:4.4.0"))
+        .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1")
+        .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_MIN_ISR", "1");
+
+    @BeforeAll
+    static void createTopic() throws Exception {
+        // The share group has to know the topic before it is formed, otherwise its first
+        // assignment is empty and the records produced in the meantime are skipped.
+        try (var admin = AdminClient.create(Map.of(
+                AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers()))) {
+            try {
+                admin.createTopics(List.of(new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1)))
+                        .all().get(30, TimeUnit.SECONDS);
+            }
+            catch (ExecutionException ex) {
+                if (!(ex.getCause() instanceof TopicExistsException)) {
+                    throw ex;
+                }
+            }
+        }
+    }
 
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
@@ -120,15 +147,50 @@ class DemoApplicationTests {
     @Autowired
     private GreetingListener listener;
 
-    @SneakyThrows
+    private static void awaitShareGroupAssignment() {
+        try (var admin = AdminClient.create(Map.of(
+                AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers()))) {
+            Awaitility.waitAtMost(Duration.ofSeconds(30))
+                    .pollInterval(Duration.ofSeconds(1))
+                    .untilAsserted(() -> {
+                        Map<String, ShareGroupDescription> groups;
+                        try {
+                            groups = admin.describeShareGroups(List.of(DEMO_GROUP_NAME))
+                                    .all().get(10, TimeUnit.SECONDS);
+                        }
+                        catch (ExecutionException ex) {
+                            // The group does not exist until the first consumer joins; keep polling.
+                            if (ex.getCause() instanceof GroupIdNotFoundException) {
+                                throw new AssertionError("The share group is not available yet", ex);
+                            }
+                            throw new IllegalStateException("Failed to describe the share group", ex);
+                        }
+                        catch (TimeoutException ex) {
+                            throw new AssertionError("Timed out describing the share group", ex);
+                        }
+                        catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                            throw new IllegalStateException("Interrupted while describing the share group", ex);
+                        }
+                        var group = groups.get(DEMO_GROUP_NAME);
+                        assertThat(group).isNotNull();
+                        assertThat(group.members())
+                                .anyMatch(member -> member.assignment().topicPartitions().stream()
+                                        .anyMatch(tp -> tp.topic().equals(DEMO_TOPIC_NAME)));
+                    });
+        }
+    }
+
     @Test
     public void testSendMessage() {
-         Thread.sleep(Duration.ofSeconds(5));
-        List.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
-                .forEach(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_NAME, word)
-                        .thenAccept(s -> log.debug("sent message: {}", s)));
+        awaitShareGroupAssignment();
+        var sends = List.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog").stream()
+                .map(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_NAME, UUID.randomUUID().toString(), word)
+                        .thenAccept(s -> log.debug("sent message: {}", s)))
+                .toList();
+        CompletableFuture.allOf(sends.toArray(new CompletableFuture<?>[0])).join();
 
-        Awaitility.waitAtMost(Duration.ofMillis(30_000))
+        Awaitility.waitAtMost(Duration.ofSeconds(10))
                 .untilAsserted(() -> assertThat(this.listener.getWordCount("the")).isEqualTo(2));
     }
 
@@ -136,7 +198,7 @@ class DemoApplicationTests {
 ```
 
 >[!NOTE]
->I encountered some issues when running the test, so I added the `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR` environment variable and a delay before sending messages to ensure the share consumer is fully initialized and ready to consume. Check the original discussion on StackOverflow for more details: [Kafka Share Consumer issue](https://stackoverflow.com/questions/79943319/kafka-share-consumer-issue).
+>I encountered some issues when running the test, so I added the `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR` environment variable, created the topic before the application starts, and waited for the share group to receive a non-empty assignment before producing records. Check the original discussion on StackOverflow for more details: [Kafka Share Consumer issue](https://stackoverflow.com/questions/79943319/kafka-share-consumer-issue).
 
 Grab the example code from [GitHub](https://github.com/hantsy/spring7-sandbox/tree/main/boot-kafka-share-consumer), then run the test to verify the share consumer is working and the word count updates correctly.
 
@@ -178,7 +240,7 @@ class ShareConsumerConfig {
 
     @Bean
     public ShareKafkaMessageListenerContainer<String, String> shareKafkaMessageListenerContainer(
-            ShareConsumerFactory<String, String> shareConsumerFactory) {
+            ShareConsumerFactory<String, String> shareConsumerFactory, GreetingListener greetingListener) {
 
         ContainerProperties containerProps = new ContainerProperties(DEMO_TOPIC_NAME);
         containerProps.setGroupId(DEMO_GROUP_NAME);
@@ -186,7 +248,7 @@ class ShareConsumerConfig {
         ShareKafkaMessageListenerContainer<String, String> container =
                 new ShareKafkaMessageListenerContainer<>(shareConsumerFactory, containerProps);
 
-        container.setupMessageListener(new GreetingListener());
+        container.setupMessageListener(greetingListener);
 
         // container.setConcurrency(10);
         return container;
@@ -201,7 +263,7 @@ See [the example project](https://github.com/hantsy/spring7-sandbox/blob/master/
 
 By default, a Share consumer uses implicit acknowledgement: messages are considered acknowledged as soon as they are delivered. To control acknowledgement timing, enable explicit acknowledgement mode.
 
-To enable explicit acknowledgement, set the `ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG` property to `explicit` in the consumer configuration:
+To enable explicit acknowledgement, set the `ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG` property to `explicit` in the consumer configuration, and switch the container to `ShareAckMode.MANUAL` so it delegates acknowledgement to the listener instead of acknowledging on delivery:
 
 ```java
 @Configuration
@@ -219,6 +281,15 @@ class ShareConsumerConfig {
         );
         return new DefaultShareConsumerFactory<>(props);
     }
+
+    @Bean
+    public ShareKafkaListenerContainerFactory<String, String> explicitShareKafkaListenerContainerFactory(
+            ShareConsumerFactory<String, String> explicitShareConsumerFactory) {
+        var factory = new ShareKafkaListenerContainerFactory<>(explicitShareConsumerFactory);
+        // The listener acknowledges the records itself, so the container must run in MANUAL ack mode.
+        factory.getContainerProperties().setShareAckMode(ContainerProperties.ShareAckMode.MANUAL);
+        return factory;
+    }
     ...
 
 }
@@ -234,16 +305,12 @@ On the consumer side, you can then use the `ShareAcknowledgment` object to ackno
 )
 public void onMessage(ConsumerRecord<String, String> record, ShareAcknowledgment ack) {
     log.debug("received record: {} at {}", record, LocalDateTime.now());
-    counter.compute(record.value(), (s, v) -> {
-                if (v == null) {
-                    ack.acknowledge();
-                    return 1L;
-                } else {
-                    ack.reject(); // reject when the word is already tapped.
-                    return v;
-                }
-            }
-    );
+    // Acknowledge outside the map update: ack/reject performs network I/O.
+    if (counter.putIfAbsent(record.value(), 1L) == null) {
+        ack.acknowledge();
+    } else {
+        ack.reject(); // reject when the word is already tapped.
+    }
 }
 ```
 

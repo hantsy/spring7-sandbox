@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-api-versioning-webflux/**"
+      - ".github/workflows/boot-api-versioning-webflux.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-api-versioning-webflux/**"
+      - ".github/workflows/boot-api-versioning-webflux.yml"
     types:
       - opened
       - synchronize

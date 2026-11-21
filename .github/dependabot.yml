@@ -1,0 +1,168 @@
+# Dependabot covers every example project in this repository plus the shared
+# GitHub Actions workflows.
+#
+# Each project is a standalone Maven build (there is no aggregator POM), so all
+# of them are listed in the "directories" list of the Maven update entry.
+#
+# The projects without the "boot-" prefix are plain Spring examples: they use
+# spring-boot-starter-parent as their parent POM for dependency management
+# only - no Spring Boot starters are on their classpath - so Dependabot sees
+# the same kind of dependency declarations as in the Spring Boot projects.
+#
+# The file has two update entries:
+#   1. Maven - all Java/Kotlin example projects, updates grouped by ecosystem:
+#      spring, kotlin, testing, database, jackson, logging, jakarta,
+#      apache-commons, apache-maven, maven-plugins, wiremock, templates.
+#   2. GitHub Actions - the shared workflows in .github/workflows.
+#
+# The Maven plugins are grouped by their groupId, not one group per plugin:
+# every plugin declared in the projects falls into "maven-plugins", so a plugin
+# bump lands as one grouped pull request instead of one per module. The
+# kotlin-maven-plugin and the spring-boot-maven-plugin are not listed there:
+# they inherit their version from the parent POM, so Dependabot never proposes
+# updates for them, and their groupIds are already covered by the "kotlin" and
+# "spring" groups.
+#
+# The RabbitMQ examples use the AMQP 0.9 support that Spring Boot 4.2 renamed to
+# spring-boot-starter-rabbitmq, and the Pulsar example uses Apache Pulsar support
+# for Spring (org.apache.pulsar:pulsar-spring-*), since the Spring Boot Pulsar
+# support has been deprecated.
+#
+# Note: Dependabot does not propose snapshot or pre-release versions for Maven
+# dependencies, which keeps the intent of the former Renovate rule
+# "allowedVersions: !/SNAPSHOT$/" for the maven datasource.
+version: 2
+updates:
+  # Java / Kotlin Maven projects
+  - package-ecosystem: "maven"
+    directories:
+      - "/api-versioning-webflux"
+      - "/bean-registrar"
+      - "/bean-registrar-kotlin-dsl"
+      - "/boot-api-versioning-webflux"
+      - "/boot-api-versioning-webmvc"
+      - "/boot-cassandra"
+      - "/boot-couchbase"
+      - "/boot-data-cassandra"
+      - "/boot-data-couchbase"
+      - "/boot-data-elasticsearch"
+      - "/boot-data-jpa"
+      - "/boot-data-mongo"
+      - "/boot-data-neo4j"
+      - "/boot-data-redis"
+      - "/boot-elasticsearch"
+      - "/boot-http-service-client-restclient"
+      - "/boot-http-service-client-webclient"
+      - "/boot-jackson"
+      - "/boot-jdbc"
+      - "/boot-jms"
+      - "/boot-kafka"
+      - "/boot-kafka-share-consumer"
+      - "/boot-kafka-share-consumer-explicit-ack"
+      - "/boot-kafka-share-consumer-prog-container"
+      - "/boot-kafka-streams"
+      - "/boot-kotlinx-serialization-json"
+      - "/boot-mongo"
+      - "/boot-neo4j"
+      - "/boot-pulsar"
+      - "/boot-r2dbc"
+      - "/boot-rabbit"
+      - "/boot-rabbit-streams"
+      - "/boot-redis-streams"
+      - "/boot-restclient"
+      - "/boot-webclient"
+      - "/hibernate"
+      - "/hibernate-jakarta-data"
+      - "/jms"
+      - "/jms-client"
+      - "/jms-messaging"
+      - "/mvc-freemarker"
+      - "/rabbit-client"
+      - "/rabbit-client-json"
+      - "/resilience"
+      - "/retry"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    reviewers:
+      - "hantsy"
+    assignees:
+      - "hantsy"
+    labels:
+      - "dependencies"
+    groups:
+      spring:
+        patterns:
+          - "org.springframework*:*"
+          - "io.micrometer:*"
+          - "io.projectreactor*:*"
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin*:*"
+      testing:
+        patterns:
+          - "org.junit*:*"
+          - "org.mockito:*"
+          - "org.assertj:*"
+          - "org.hamcrest:*"
+          - "org.testcontainers:*"
+          - "com.jayway.jsonpath:*"
+          - "org.awaitility:*"
+          - "io.kotest*:*"
+          - "io.mockk:*"
+      database:
+        patterns:
+          - "org.postgresql:*"
+          - "com.h2database:*"
+          - "io.r2dbc:*"
+          - "org.hibernate*:*"
+          - "org.apache.kafka:*"
+          - "org.apache.artemis:*"
+          - "org.apache.pulsar:*"
+          - "com.redis:*"
+      jackson:
+        patterns:
+          - "tools.jackson*:*"
+      logging:
+        patterns:
+          - "ch.qos.logback:*"
+          - "org.slf4j:*"
+      jakarta:
+        patterns:
+          - "jakarta.*:*"
+          - "org.glassfish.expressly:*"
+      apache-commons:
+        patterns:
+          - "org.apache.commons:*"
+      apache-maven:
+        patterns:
+          - "org.apache.maven:*"
+      maven-plugins:
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "org.codehaus.mojo:*"
+          - "org.codehaus.cargo:*"
+          - "org.wildfly.plugins:*"
+      wiremock:
+        patterns:
+          - "org.wiremock:*"
+      templates:
+        patterns:
+          - "org.freemarker:*"
+
+  # GitHub Actions workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    reviewers:
+      - "hantsy"
+    assignees:
+      - "hantsy"
+    labels:
+      - "dependencies"
+    groups:
+      actions:
+        patterns:
+          - "*"

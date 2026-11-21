@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-kafka-share-consumer-explicit-ack/**"
+      - ".github/workflows/boot-kafka-share-consumer-explicit-ack.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-kafka-share-consumer-explicit-ack/**"
+      - ".github/workflows/boot-kafka-share-consumer-explicit-ack.yml"
     types:
       - opened
       - synchronize

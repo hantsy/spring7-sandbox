@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "hibernate-jakarta-data/**"
+      - ".github/workflows/hibernate-jakarta-data.yml"
     branches:
       - master
   pull_request:
     paths:
       - "hibernate-jakarta-data/**"
+      - ".github/workflows/hibernate-jakarta-data.yml"
     types:
       - opened
       - synchronize

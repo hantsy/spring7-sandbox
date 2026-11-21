@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "rabbit-client/**"
+      - ".github/workflows/rabbit-client.yml"
     branches:
       - master
   pull_request:
     paths:
       - "rabbit-client/**"
+      - ".github/workflows/rabbit-client.yml"
     types:
       - opened
       - synchronize

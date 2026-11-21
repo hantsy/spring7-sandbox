@@ -6,7 +6,7 @@ Spring 7 introduces [`JmsClient`](https://docs.spring.io/spring-framework/docs/c
 
 ## Getting Started
 
-Start by creating a Maven project and including the `spring-core`, `spring-context`, `spring-context-support` dependencies to provide the basic Spring container support. 
+Start by creating a Maven project and including the `spring-core`, `spring-context`, `spring-context-support` dependencies to provide the basic Spring container support. The examples in this repository use `spring-boot-starter-parent` as the parent POM, so the versions of all these dependencies are managed by Spring Boot.
 
 Add the following dependencies in your `pom.xml` file:
 
@@ -20,7 +20,6 @@ Add the following dependencies in your `pom.xml` file:
 <dependency>
     <groupId>org.apache.activemq</groupId>
     <artifactId>artemis-jakarta-client</artifactId>
-    <version>2.44.0</version>
 </dependency>
 ```
 
@@ -126,14 +125,12 @@ To bootstrap an ActiveMQ Artimes server at runtime, add the following testcontai
 <dependency>
     <groupId>org.testcontainers</groupId>
     <artifactId>testcontainers-junit-jupiter</artifactId>
-    <version>${testcontainers.version}</version>
     <scope>test</scope>
 </dependency>
 
 <dependency>
     <groupId>org.testcontainers</groupId>
     <artifactId>testcontainers-activemq</artifactId>
-    <version>${testcontainers.version}</version>
     <scope>test</scope>
 </dependency>
 ```

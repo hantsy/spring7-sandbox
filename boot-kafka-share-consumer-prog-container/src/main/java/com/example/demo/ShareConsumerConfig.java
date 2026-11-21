@@ -26,10 +26,10 @@ class ShareConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     String bootstrapServers;
 
-//    @Bean
-//    NewTopic demoTopic() {
-//        return new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1);
-//    }
+    @Bean
+    NewTopic demoTopic() {
+        return new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1);
+    }
 
     @Bean
     public ShareConsumerFactory<String, String> shareConsumerFactory() {
@@ -57,7 +57,7 @@ class ShareConsumerConfig {
 
     @Bean
     public ShareKafkaMessageListenerContainer<String, String> shareKafkaMessageListenerContainer(
-            ShareConsumerFactory<String, String> shareConsumerFactory) {
+            ShareConsumerFactory<String, String> shareConsumerFactory, GreetingListener greetingListener) {
 
         ContainerProperties containerProps = new ContainerProperties(DEMO_TOPIC_NAME);
         containerProps.setGroupId(DEMO_GROUP_NAME);
@@ -65,7 +65,7 @@ class ShareConsumerConfig {
         ShareKafkaMessageListenerContainer<String, String> container =
                 new ShareKafkaMessageListenerContainer<>(shareConsumerFactory, containerProps);
 
-        container.setupMessageListener(new GreetingListener());
+        container.setupMessageListener(greetingListener);
 
         // container.setConcurrency(10);
         return container;

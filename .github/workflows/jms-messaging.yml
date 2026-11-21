@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "jms-messaging/**"
+      - ".github/workflows/jms-messaging.yml"
     branches:
       - master
   pull_request:
     paths:
       - "jms-messaging/**"
+      - ".github/workflows/jms-messaging.yml"
     types:
       - opened
       - synchronize

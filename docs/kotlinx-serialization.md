@@ -9,7 +9,7 @@ Let's create a simple Spring Boot 4 Kotlin project to demonstrate Kotlinx Serial
 Create a Spring Boot project via https://start.spring.io/ with the following options:
 
 * Language: Kotlin
-* Spring Boot: 4.0.1
+* Spring Boot: 4.2.0
 * Project type: Maven
 * Project metadata:
   * Java version: 25
@@ -39,7 +39,6 @@ In your `pom.xml`, find the `kotlin-maven-plugin` and add the `kotlinx-serializa
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
     <artifactId>kotlin-maven-plugin</artifactId>
-    <version>${kotlin.version}</version>
     <configuration>
         <compilerPlugins>
             ...

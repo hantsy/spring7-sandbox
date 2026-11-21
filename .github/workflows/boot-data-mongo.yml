@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-data-mongo/**"
+      - ".github/workflows/boot-data-mongo.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-data-mongo/**"
+      - ".github/workflows/boot-data-mongo.yml"
     types:
       - opened
       - synchronize

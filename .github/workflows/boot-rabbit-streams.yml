@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-rabbit-streams/**"
+      - ".github/workflows/boot-rabbit-streams.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-rabbit-streams/**"
+      - ".github/workflows/boot-rabbit-streams.yml"
     types:
       - opened
       - synchronize
