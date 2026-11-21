@@ -7,6 +7,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.ShareGroupDescription;
 import org.apache.kafka.common.errors.TopicExistsException;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
@@ -70,10 +71,33 @@ class DemoApplicationTests {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    private static void awaitShareGroupAssignment() {
+        try (var admin = AdminClient.create(Map.of(
+                AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers()))) {
+            Awaitility.waitAtMost(Duration.ofSeconds(30))
+                    .pollInterval(Duration.ofSeconds(1))
+                    .untilAsserted(() -> {
+                        Map<String, ShareGroupDescription> groups;
+                        try {
+                            groups = admin.describeShareGroups(List.of(DemoApplication.DEMO_GROUP_NAME))
+                                    .all().get(10, TimeUnit.SECONDS);
+                        }
+                        catch (Exception ex) {
+                            throw new AssertionError("The share group is not available yet", ex);
+                        }
+                        var group = groups.get(DemoApplication.DEMO_GROUP_NAME);
+                        assertThat(group).isNotNull();
+                        assertThat(group.members()).isNotEmpty();
+                        assertThat(group.members().iterator().next().assignment().topicPartitions())
+                                .isNotEmpty();
+                    });
+        }
+    }
+
     @SneakyThrows
     @Test
     public void testSendMessage() {
-        Thread.sleep(Duration.ofSeconds(5));
+        awaitShareGroupAssignment();
         List.of("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
                 .forEach(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_NAME, UUID.randomUUID().toString(), word)
                         .thenAccept(s -> log.debug("sent message: {}", s)));
