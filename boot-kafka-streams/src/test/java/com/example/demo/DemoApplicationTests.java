@@ -33,6 +33,10 @@ class DemoApplicationTests {
     @DynamicPropertySource
     static void kafkaStreamsProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
+        // The windowed count results are buffered in the Streams record cache and only
+        // flushed to word-out on commit; the default commit.interval.ms (30s) outlasts
+        // the 15s awaitility timeout below, so commit frequently to emit results in time.
+        registry.add("spring.kafka.streams.properties.commit.interval.ms", () -> "100");
     }
 
     @Autowired
@@ -57,6 +61,7 @@ class DemoApplicationTests {
         latch.await(10_000, TimeUnit.MILLISECONDS);
 
         Awaitility.waitAtMost(Duration.ofMillis(15_000))
-                .untilAsserted(() -> assertThat(this.listener.messages).containsExactly("THE:2"));
+                .untilAsserted(() -> assertThat(this.listener.messages)
+                        .contains("THE:2", "QUICK:1", "BROWN:1", "FOX:1", "JUMPS:1", "OVER:1", "LAZY:1", "DOG:1"));
     }
 }
