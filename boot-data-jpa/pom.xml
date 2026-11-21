@@ -28,8 +28,6 @@
     </scm>
     <properties>
         <java.version>25</java.version>
-        <lombok.version>1.18.42</lombok.version>
-        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -87,7 +85,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>
@@ -161,7 +158,4 @@
     </pluginRepositories>
 
 </project>
-
-
-
 

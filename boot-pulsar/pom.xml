@@ -27,12 +27,29 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>25</java.version>
-	</properties>
+        <java.version>25</java.version>
+        <!-- The Pulsar 5.0 client, required by Apache Pulsar support for Spring 3.x.
+             Spring Boot manages an older Pulsar version, so it is set explicitly. -->
+        <pulsar.version>5.0.1</pulsar.version>
+    </properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Apache Pulsar support for Spring, formerly Spring for Apache Pulsar.
+			     Spring Boot does not manage these artifacts. -->
+			<dependency>
+				<groupId>org.apache.pulsar</groupId>
+				<artifactId>pulsar-spring-bom</artifactId>
+				<version>3.0.0-M1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-pulsar</artifactId>
+			<groupId>org.apache.pulsar</groupId>
+			<artifactId>pulsar-spring-boot-starter</artifactId>
 		</dependency>
 
 		<dependency>
@@ -47,8 +64,8 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-pulsar-test</artifactId>
+			<groupId>org.apache.pulsar</groupId>
+			<artifactId>pulsar-spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -98,7 +115,4 @@
 	</build>
 
 </project>
-
-
-
 

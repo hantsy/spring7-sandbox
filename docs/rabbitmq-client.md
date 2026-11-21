@@ -3,16 +3,28 @@
 Spring AMQP 4.0 brings a new module `spring-rabbitmq-client` which is based on the new RabbitMQ official Java client `com.rabbitmq.client:amqp-client`, which is aligned with AMQP 1.0 protocol. When using `spring-rabbitmq-client` in your projects, it is recommended to upgrade to RabbitMQ 4.0 for native AMQP 1.0 support.
 
 >[!NOTE]
-> AMQP 1.0 is not compatible with AMQP 0.91. Version 1.0 is not a simple upgrade from 0.91. The two versions can be considered as two different protocols. RabbitMQ 3.x supports both protocols, but enabling AMQP 1.0 support requires installing an extra plugin `rabbitmq_amqp1_0`. RabbitMQ 4.0 switches to AMQP 1.0 as the default core protocol. The previous Spring RabbitMQ module `spring-rabbit` is still based on the AMQP 0.9.1 protocol. Spring AMQP 4.1 will introduce a new generic `spring-amqp-client` to implement the AMQP 1.0 protocol, see: [spring-amqp#3271](https://github.com/spring-projects/spring-amqp/issues/3271)
+> AMQP 1.0 is not compatible with AMQP 0.91. Version 1.0 is not a simple upgrade from 0.91. The two versions can be considered as two different protocols. RabbitMQ 3.x supports both protocols, but enabling AMQP 1.0 support requires installing an extra plugin `rabbitmq_amqp1_0`. RabbitMQ 4.0 switches to AMQP 1.0 as the default core protocol. The previous Spring RabbitMQ module `spring-rabbit` is still based on the AMQP 0.9.1 protocol, and Spring Boot 4.2 renamed its RabbitMQ (AMQP 0.9) support to `spring-boot-rabbitmq`. The generic `spring-amqp-client` implementing the AMQP 1.0 protocol is on its way, see: [spring-amqp#3271](https://github.com/spring-projects/spring-amqp/issues/3271)
 
 ## Getting Started
 
 Create a new simple Maven project with the basic `spring-core` and `spring-context` as dependencies, or generate a simple Spring Boot project via https://start.spring.io as [the previous post](https://github.com/hantsy/spring7-sandbox/blob/master/docs/jackson.md).
 
 >[!NOTE]
-> Till now, Spring Boot 4.0 does not contain a starter for autoconfiguring the Spring RabbitMQ Client; you need to add the dependency and configuration manually.
+> Spring Boot 4.2 ships starters for the AMQP 1.0 support: `spring-boot-starter-amqp` provides generic AMQP 1.0 support, and `spring-boot-starter-amqp-rabbitmq` provides the AMQP 1.0 support tailored for RabbitMQ. A plain Spring project like this one still has to declare the dependency and the configuration manually.
 
-Then add the following dependencies in your `pom.xml` file:
+Then add the following dependency in your `pom.xml` file:
+
+```xml
+<dependencies>
+    ...
+    <dependency>
+        <groupId>org.springframework.amqp</groupId>
+        <artifactId>spring-rabbitmq-client</artifactId>
+    </dependency>
+</dependencies>
+```
+
+This project uses `spring-boot-starter-parent` as its parent POM for dependency management only, so the version of `spring-rabbitmq-client` is managed by Spring Boot. A plain Spring project without that parent has to import the Spring AMQP BOM instead:
 
 ```xml
 <dependencyManagement>
@@ -27,13 +39,6 @@ Then add the following dependencies in your `pom.xml` file:
         </dependency>
     </dependencies>
 </dependencyManagement>
-<dependencies>
-    ...
-    <dependency>
-        <groupId>org.springframework.amqp</groupId>
-        <artifactId>spring-rabbitmq-client</artifactId>
-    </dependency>
-</dependencies>
 ```
 
 Next, let's create a simple configuration class:

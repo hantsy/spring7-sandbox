@@ -1,11 +1,11 @@
 package com.example.demo;
 
+import org.apache.pulsar.spring.core.PulsarTemplate;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.pulsar.core.PulsarTemplate;
 
 import java.time.Duration;
 

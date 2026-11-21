@@ -1,7 +1,7 @@
 package com.example.demo;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.pulsar.annotation.PulsarListener;
+import org.apache.pulsar.spring.annotation.PulsarListener;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

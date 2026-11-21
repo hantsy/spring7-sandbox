@@ -27,9 +27,9 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>25</java.version>
-		<wiremock-standalone.version>3.13.2</wiremock-standalone.version>
-	</properties>
+        <java.version>25</java.version>
+        <wiremock-standalone.version>3.13.2</wiremock-standalone.version>
+    </properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -63,7 +63,4 @@
 	</build>
 
 </project>
-
-
-
 
