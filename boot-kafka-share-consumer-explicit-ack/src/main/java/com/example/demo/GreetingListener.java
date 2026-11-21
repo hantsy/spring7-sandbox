@@ -25,16 +25,12 @@ public class GreetingListener {
     )
     public void onMessage(ConsumerRecord<String, String> record, ShareAcknowledgment ack) {
         log.debug("received record: {} at {}", record, LocalDateTime.now());
-        counter.compute(record.value(), (s, v) -> {
-                    if (v == null) {
-                        ack.acknowledge();
-                        return 1L;
-                    } else {
-                        ack.reject(); // reject when the word is already tapped.
-                        return v;
-                    }
-                }
-        );
+        // Acknowledge outside the map update: ack/reject performs network I/O.
+        if (counter.putIfAbsent(record.value(), 1L) == null) {
+            ack.acknowledge();
+        } else {
+            ack.reject(); // reject when the word is already tapped.
+        }
     }
 
     public Long getWordCount(String word) {
