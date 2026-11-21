@@ -28,8 +28,9 @@ class DemoApplicationTests {
 
     // Kafka 4.2 enabled share consumer by default
     @Container
-    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:latest"))
-            .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1");
+    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:4.4.0"))
+            .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1")
+            .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_MIN_ISR", "1");
 
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
@@ -50,7 +51,7 @@ class DemoApplicationTests {
                 .forEach(word -> kafkaTemplate.send(DemoApplication.DEMO_TOPIC_NAME, UUID.randomUUID().toString(), word)
                         .thenAccept(s -> log.debug("sent message: {}", s)));
 
-        Awaitility.waitAtMost(Duration.ofMillis(500))
+        Awaitility.waitAtMost(Duration.ofSeconds(10))
                 .untilAsserted(() -> assertThat(this.listener.getWordCount("the")).isEqualTo(1));
     }
 

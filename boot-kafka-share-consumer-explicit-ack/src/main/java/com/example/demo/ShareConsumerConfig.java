@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ShareKafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultShareConsumerFactory;
 import org.springframework.kafka.core.ShareConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties.ShareAckMode;
 
 import java.util.Map;
 
@@ -46,6 +47,8 @@ class ShareConsumerConfig {
             ShareConsumerFactory<String, String> explicitShareConsumerFactory) {
         var factory = new ShareKafkaListenerContainerFactory<>(explicitShareConsumerFactory);
         //  factory.setConcurrency(10);
+        // The listener acknowledges the records itself, so the container must run in MANUAL ack mode.
+        factory.getContainerProperties().setShareAckMode(ShareAckMode.MANUAL);
         return factory;
     }
 

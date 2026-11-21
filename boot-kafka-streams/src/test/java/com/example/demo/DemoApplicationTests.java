@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DemoApplicationTests {
 
     @Container
-    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:4.1.1"));
+    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:4.4.0"));
 
     @DynamicPropertySource
     static void kafkaStreamsProperties(DynamicPropertyRegistry registry) {

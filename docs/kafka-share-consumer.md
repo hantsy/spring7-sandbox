@@ -98,6 +98,9 @@ public class GreetingListener {
 
 Create a test to verify the share consumer behavior against a running Kafka instance in Testcontainers:
 
+> [!NOTE]
+> The broker image is pinned to `apache/kafka:4.4.0`, the very Kafka release that Spring Boot manages for the client side (the `kafka.version` property). Keep the broker and the client on the same Kafka release, otherwise the Share Consumer protocol may fail to be negotiated. The `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_*` settings adapt the internal `__share_group_state` topic to a single broker, the default of Kafka is 3 replicas and a minimum ISR of 2.
+
 ```java
 @Testcontainers
 @SpringBootTest
@@ -106,8 +109,9 @@ class DemoApplicationTests {
 
     // Kafka 4.2 enabled share consumer by default
     @Container
-    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:latest"))
-        .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1");
+    static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:4.4.0"))
+        .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1")
+        .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_MIN_ISR", "1");
 
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
