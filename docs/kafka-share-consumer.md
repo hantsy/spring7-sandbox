@@ -99,7 +99,7 @@ public class GreetingListener {
 Create a test to verify the share consumer behavior against a running Kafka instance in Testcontainers:
 
 > [!NOTE]
-> The broker image is pinned to `apache/kafka:4.4.0`, the very Kafka release that Spring Boot manages for the client side (the `kafka.version` property). Keep the broker and the client on the same Kafka release, otherwise the Share Consumer protocol may fail to be negotiated. The `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_*` settings adapt the internal `__share_group_state` topic to a single broker, the default of Kafka is 3 replicas and a minimum ISR of 2.
+> The broker image is pinned to `apache/kafka:4.4.0`, the very Kafka release that Spring Boot manages for the client side (the `kafka.version` property). Keep the broker and the client on the same Kafka release, otherwise the Share Consumer protocol may fail to be negotiated. The `KAFKA_SHARE_COORDINATOR_STATE_TOPIC_*` settings adapt the internal `__share_group_state` topic to a single broker, the default of Kafka is 3 replicas and a minimum ISR of 2. The topic is created before the application starts, so that the share group is formed with a non empty assignment.
 
 ```java
 @Testcontainers
@@ -112,6 +112,24 @@ class DemoApplicationTests {
     static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("apache/kafka:4.4.0"))
         .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR", "1")
         .withEnv("KAFKA_SHARE_COORDINATOR_STATE_TOPIC_MIN_ISR", "1");
+
+    @BeforeAll
+    static void createTopic() throws Exception {
+        // The share group has to know the topic before it is formed, otherwise its first
+        // assignment is empty and the records produced in the meantime are skipped.
+        try (var admin = AdminClient.create(Map.of(
+                AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers()))) {
+            try {
+                admin.createTopics(List.of(new NewTopic(DEMO_TOPIC_NAME, 1, (short) 1)))
+                        .all().get(30, TimeUnit.SECONDS);
+            }
+            catch (ExecutionException ex) {
+                if (!(ex.getCause() instanceof TopicExistsException)) {
+                    throw ex;
+                }
+            }
+        }
+    }
 
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
