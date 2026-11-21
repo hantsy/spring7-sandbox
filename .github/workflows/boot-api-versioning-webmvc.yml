@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-api-versioning-webmvc/**"
+      - ".github/workflows/boot-api-versioning-webmvc.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-api-versioning-webmvc/**"
+      - ".github/workflows/boot-api-versioning-webmvc.yml"
     types:
       - opened
       - synchronize

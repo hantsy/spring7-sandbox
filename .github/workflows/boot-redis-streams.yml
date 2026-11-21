@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-redis-streams/**"
+      - ".github/workflows/boot-redis-streams.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-redis-streams/**"
+      - ".github/workflows/boot-redis-streams.yml"
     types:
       - opened
       - synchronize

@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "retry/**"
+      - ".github/workflows/retry.yml"
     branches:
       - master
   pull_request:
     paths:
       - "retry/**"
+      - ".github/workflows/retry.yml"
     types:
       - opened
       - synchronize

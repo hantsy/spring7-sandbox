@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "bean-registrar/**"
+      - ".github/workflows/bean-registrar.yml"
     branches:
       - master
   pull_request:
     paths:
       - "bean-registrar/**"
+      - ".github/workflows/bean-registrar.yml"
     types:
       - opened
       - synchronize

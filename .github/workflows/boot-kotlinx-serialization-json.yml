@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-kotlinx-serialization-json/**"
+      - ".github/workflows/boot-kotlinx-serialization-json.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-kotlinx-serialization-json/**"
+      - ".github/workflows/boot-kotlinx-serialization-json.yml"
     types:
       - opened
       - synchronize

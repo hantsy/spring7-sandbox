@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "docs/**"
+      - ".github/workflows/gh-pages.yml"
     branches:
       - master 
       - main

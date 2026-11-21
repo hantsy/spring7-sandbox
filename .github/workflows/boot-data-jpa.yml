@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-data-jpa/**"
+      - ".github/workflows/boot-data-jpa.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-data-jpa/**"
+      - ".github/workflows/boot-data-jpa.yml"
     types:
       - opened
       - synchronize

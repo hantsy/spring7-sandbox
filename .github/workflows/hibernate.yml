@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "hibernate/**"
+      - ".github/workflows/hibernate.yml"
     branches:
       - master
   pull_request:
     paths:
       - "hibernate/**"
+      - ".github/workflows/hibernate.yml"
     types:
       - opened
       - synchronize

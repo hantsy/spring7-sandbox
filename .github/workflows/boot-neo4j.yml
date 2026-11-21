@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-neo4j/**"
+      - ".github/workflows/boot-neo4j.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-neo4j/**"
+      - ".github/workflows/boot-neo4j.yml"
     types:
       - opened
       - synchronize

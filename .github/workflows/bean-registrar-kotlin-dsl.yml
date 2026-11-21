@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "bean-registrar-kotlin-dsl/**"
+      - ".github/workflows/bean-registrar-kotlin-dsl.yml"
     branches:
       - master
   pull_request:
     paths:
       - "bean-registrar-kotlin-dsl/**"
+      - ".github/workflows/bean-registrar-kotlin-dsl.yml"
     types:
       - opened
       - synchronize

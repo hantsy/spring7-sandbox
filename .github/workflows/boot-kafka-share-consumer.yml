@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-kafka-share-consumer/**"
+      - ".github/workflows/boot-kafka-share-consumer.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-kafka-share-consumer/**"
+      - ".github/workflows/boot-kafka-share-consumer.yml"
     types:
       - opened
       - synchronize

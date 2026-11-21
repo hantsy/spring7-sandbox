@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-couchbase/**"
+      - ".github/workflows/boot-couchbase.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-couchbase/**"
+      - ".github/workflows/boot-couchbase.yml"
     types:
       - opened
       - synchronize

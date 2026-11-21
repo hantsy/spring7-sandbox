@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "mvc-freemarker/**"
+      - ".github/workflows/mvc-freemarker.yml"
     branches:
       - master
   pull_request:
     paths:
       - "mvc-freemarker/**"
+      - ".github/workflows/mvc-freemarker.yml"
     types:
       - opened
       - synchronize

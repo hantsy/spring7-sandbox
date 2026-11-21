@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-webclient/**"
+      - ".github/workflows/boot-webclient.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-webclient/**"
+      - ".github/workflows/boot-webclient.yml"
     types:
       - opened
       - synchronize

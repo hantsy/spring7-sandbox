@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-kafka-streams/**"
+      - ".github/workflows/boot-kafka-streams.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-kafka-streams/**"
+      - ".github/workflows/boot-kafka-streams.yml"
     types:
       - opened
       - synchronize

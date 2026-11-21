@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-pulsar/**"
+      - ".github/workflows/boot-pulsar.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-pulsar/**"
+      - ".github/workflows/boot-pulsar.yml"
     types:
       - opened
       - synchronize

@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "boot-data-redis/**"
+      - ".github/workflows/boot-data-redis.yml"
     branches:
       - master
   pull_request:
     paths:
       - "boot-data-redis/**"
+      - ".github/workflows/boot-data-redis.yml"
     types:
       - opened
       - synchronize
