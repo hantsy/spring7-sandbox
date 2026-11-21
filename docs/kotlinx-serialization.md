@@ -39,7 +39,6 @@ In your `pom.xml`, find the `kotlin-maven-plugin` and add the `kotlinx-serializa
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
     <artifactId>kotlin-maven-plugin</artifactId>
-    <version>${kotlin.version}</version>
     <configuration>
         <compilerPlugins>
             ...

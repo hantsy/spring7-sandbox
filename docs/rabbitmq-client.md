@@ -24,22 +24,7 @@ Then add the following dependency in your `pom.xml` file:
 </dependencies>
 ```
 
-This project uses `spring-boot-starter-parent` as its parent POM for dependency management only, so the version of `spring-rabbitmq-client` is managed by Spring Boot. A plain Spring project without that parent has to import the Spring AMQP BOM instead:
-
-```xml
-<dependencyManagement>
-    <dependencies>
-        ...
-        <dependency>
-            <groupId>org.springframework.amqp</groupId>
-            <artifactId>spring-amqp-bom</artifactId>
-            <version>${spring-amqp.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
-```
+This project uses `spring-boot-starter-parent` as its parent POM for dependency management only, so the version of `spring-rabbitmq-client` is managed by Spring Boot.
 
 Next, let's create a simple configuration class:
 
@@ -125,13 +110,11 @@ To bootstrap a RabbitMQ server at runtime, add the following testcontainers depe
  <dependency>
     <groupId>org.testcontainers</groupId>
     <artifactId>testcontainers-junit-jupiter</artifactId>
-    <version>${testcontainers.version}</version>
     <scope>test</scope>
 </dependency>
 <dependency>
     <groupId>org.testcontainers</groupId>
     <artifactId>testcontainers-rabbitmq</artifactId>
-    <version>${testcontainers.version}</version>
     <scope>test</scope>
 </dependency> 
 ```   

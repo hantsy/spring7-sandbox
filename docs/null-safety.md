@@ -100,7 +100,6 @@ Add the following plugin configuration to your `pom.xml`:
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.15.0</version>
     </plugin>
     <plugin>
         <groupId>am.ik.maven</groupId>

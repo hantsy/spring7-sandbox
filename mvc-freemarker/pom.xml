@@ -17,10 +17,14 @@
     <name>spring6-sample-mvc-freemarker</name>
     <description>Spring 7 WebMvc/Freemarker Example(without Spring Boot)</description>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>25</java.version>
+        <!-- Explicit release target: these are not Spring Boot applications,
+             they are built with the plain Maven lifecycle. -->
+        <maven.compiler.release>25</maven.compiler.release>
 
         <!-- API and frameworks -->
-        <jakartaee-api.version>11.0.0</jakartaee-api.version>
 
         <!-- WildFly for Jakarta EE 10 -->
         <wildfly.artifactId>wildfly-dist</wildfly.artifactId>
@@ -29,19 +33,6 @@
         <skip.unit.tests>true</skip.unit.tests>
         <skip.integration.tests>true</skip.integration.tests>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Jakarta EE 11 platform BOM: supplies the jakarta.* APIs that Spring Boot does not manage -->
-            <dependency>
-                <groupId>jakarta.platform</groupId>
-                <artifactId>jakarta.jakartaee-bom</artifactId>
-                <version>${jakartaee-api.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <!-- Spring core dependencies-->

@@ -17,16 +17,21 @@
     <name>spring7-sandbox-hibernate-jakarta-data-example</name>
     <description>Spring 7 Hibernate/Jakarta Data Example(without Spring Boot)</description>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>25</java.version>
+        <!-- Jakarta EE 11 platform BOM: supplies the jakarta.* APIs that Spring Boot does not manage -->
+        <jakartaee-api.version>11.0.0</jakartaee-api.version>
+        <!-- Explicit release target: these are not Spring Boot applications,
+             they are built with the plain Maven lifecycle. -->
+        <maven.compiler.release>25</maven.compiler.release>
 
         <!-- runtime deps -->
-        <jakartaee-api.version>11.0.0</jakartaee-api.version>
         <expressly.version>6.0.0</expressly.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Jakarta EE 11 platform BOM: supplies the jakarta.* APIs that Spring Boot does not manage -->
             <dependency>
                 <groupId>jakarta.platform</groupId>
                 <artifactId>jakarta.jakartaee-bom</artifactId>
