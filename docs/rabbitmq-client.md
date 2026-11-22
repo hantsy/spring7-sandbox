@@ -570,9 +570,10 @@ Grab the example code from the [spring7-sandbox/rabbit-client](https://github.co
 
 ## Spring Boot Integration
 
-In the previous sections, you declared the client beans manually. Spring Boot 4.2 auto-configures them through two starters:
+In the previous sections, you declared the client beans manually. Spring Boot 4.2 refelects the changes and reorganizes the autoconfigurations and starters:
 
-* `spring-boot-starter-amqp` builds on `spring-amqp-client`, the generic AMQP 1.0 client that works with any AMQP 1.0-compliant broker, for example ActiveMQ Artemis.
+* `spring-boot-starter-rabbitmq` keeps AMQP 0.9 support for RabbitMQ 3.x, and is renamed from the previous `spring-boot-starter-amqp`.
+* `spring-boot-starter-amqp` is refreshed for generic AMQP 1.0 support that works with any AMQP 1.0-compliant broker, for example ActiveMQ Artemis.
 * `spring-boot-starter-amqp-rabbitmq` builds on `spring-rabbitmq-client`, the RabbitMQ-tailored client used in the previous sections.
 
 ### Generic AMQP 1.0 with ActiveMQ Artemis
@@ -584,15 +585,20 @@ ActiveMQ Artemis supports AMQP 1.0 natively, so it works with the generic client
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-amqp</artifactId>
 </dependency>
+```
+
+The auto-configuration exposes an `AmqpClient` bean which a fluent API for sending messages and receiving messages, and the autoconfigured listener container can process `@AmqpListener` annotations for consuming messages.
+
+To exchange JSON messages with a type-safe payload, add the following dependencies to your `pom.xml`:
+
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jackson</artifactId>
 </dependency>
 ```
 
-No Artemis-specific starter is required: `spring-boot-starter-artemis` provides JMS support, while the AMQP 1.0 client talks to the broker over the AMQP protocol directly.
-
-The auto-configuration exposes an `AmqpClient` bean for sending messages and processes `@AmqpListener` annotations for consuming. To exchange JSON payloads, declare a `JacksonJsonMessageConverter` bean:
+Then declare a `JacksonJsonMessageConverter` bean. The auto-configured `AmqpClient` and listener containers will use the converter automatically.
 
 ```java
 @Bean
@@ -601,7 +607,7 @@ MessageConverter messageConverter() {
 }
 ```
 
-The message payload is a simple record:
+Now we can use a simple POJO for the message payload instead of using `Message` objects. For example, create a `Greeting` record class:
 
 ```java
 public record Greeting(String message, Instant sentAt) {
@@ -788,10 +794,9 @@ class TestcontainersConfiguration {
 }
 ```
 
-!!! note
-    The `rabbitmq:latest` image is RabbitMQ 4.x, which supports AMQP 1.0 by default. The test dependencies are `spring-boot-starter-amqp-rabbitmq-test`, `spring-boot-testcontainers`, `testcontainers-junit-jupiter`, and `testcontainers-rabbitmq`.
+Similarly add the test dependencies: `spring-boot-starter-amqp-rabbitmq-test`, `spring-boot-testcontainers`, `testcontainers-junit-jupiter`, and `testcontainers-rabbitmq` to your `pom.xml` to run tests on a running RabbitMQ instance.
 
-Then send a JSON message through the auto-configured `RabbitAmqpTemplate` and verify the listener receives it:
+Create a test as follows, use the auto-configured `RabbitAmqpTemplate` to send a JSON message, and verify the received message via the previous listener:
 
 ```java
 @Import(TestcontainersConfiguration.class)
@@ -819,3 +824,6 @@ class DemoApplicationTests {
 ```
 
 Grab the example code from the [spring7-sandbox/boot-amqp-artemis](https://github.com/hantsy/spring7-sandbox/tree/master/boot-amqp-artemis) and [spring7-sandbox/boot-amqp-rabbit](https://github.com/hantsy/spring7-sandbox/tree/master/boot-amqp-rabbit) projects on GitHub.
+
+!!! note
+    The [spring7-sandbox/boot-rabbit](https://github.com/hantsy/spring7-sandbox/tree/master/boot-rabbit) still demonstrate the old `RabbitTemplate` designed for AMQP 0.9. Explore the source code yourself.
