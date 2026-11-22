@@ -570,14 +570,14 @@ Grab the example code from the [spring7-sandbox/rabbit-client](https://github.co
 
 ## Spring Boot Integration
 
-The examples above declare the client beans manually. Spring Boot 4.2 auto-configures them through two starters:
+In the previous sections, you declared the client beans manually. Spring Boot 4.2 auto-configures them through two starters:
 
 * `spring-boot-starter-amqp` builds on `spring-amqp-client`, the generic AMQP 1.0 client that works with any AMQP 1.0-compliant broker, for example ActiveMQ Artemis.
 * `spring-boot-starter-amqp-rabbitmq` builds on `spring-rabbitmq-client`, the RabbitMQ-tailored client used in the previous sections.
 
 ### Generic AMQP 1.0 with ActiveMQ Artemis
 
-The `boot-amqp-artemis` example sends and receives messages through an ActiveMQ Artemis broker. Add the following dependencies to your `pom.xml`:
+ActiveMQ Artemis supports AMQP 1.0 natively, so it works with the generic client out of the box. To send and receive messages through an Artemis broker, add the following dependencies to your `pom.xml`:
 
 ```xml
 <dependency>
@@ -708,7 +708,7 @@ The fluent `to(address).body(payload).send()` API targets an explicit address an
 
 ### RabbitMQ-tailored AMQP 1.0
 
-The `boot-amqp-rabbit` example replaces the manual configuration from [Getting Started](#getting-started) with `spring-boot-starter-amqp-rabbitmq`:
+If you are using RabbitMQ, the tailored starter wires the client beans for you, replacing the manual setup from [Getting Started](#getting-started). Add the following dependencies:
 
 ```xml
 <dependency>
@@ -757,7 +757,7 @@ public class DemoApplication {
 }
 ```
 
-The message payload is the same `Greeting` record as in the Artemis example. The `JacksonJsonMessageConverter` bean is applied automatically: the listener method accepts the `Greeting` record directly, without setting the `messageConverter` attribute on `@RabbitListener`.
+The message payload is the same `Greeting` record as in [Generic AMQP 1.0 with ActiveMQ Artemis](#generic-amqp-10-with-activemq-artemis). The `JacksonJsonMessageConverter` bean is applied automatically: the listener method accepts the `Greeting` record directly, without setting the `messageConverter` attribute on `@RabbitListener`.
 
 ```java
 @Component
