@@ -586,13 +586,11 @@ The `boot-amqp-artemis` example sends and receives messages through an ActiveMQ 
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-artemis</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jackson</artifactId>
 </dependency>
 ```
+
+No Artemis-specific starter is required: `spring-boot-starter-artemis` provides JMS support, while the AMQP 1.0 client talks to the broker over the AMQP protocol directly.
 
 The auto-configuration exposes an `AmqpClient` bean for sending messages and processes `@AmqpListener` annotations for consuming. To exchange JSON payloads, declare a `JacksonJsonMessageConverter` bean:
 
@@ -647,11 +645,6 @@ To run against a real broker in tests, add the test dependencies:
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-amqp-test</artifactId>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-artemis-test</artifactId>
     <scope>test</scope>
 </dependency>
 <dependency>
