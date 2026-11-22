@@ -58,8 +58,8 @@ In your `pom.xml`, find the `kotlin-maven-plugin` and add the `kotlinx-serializa
 
 With this plugin, the Kotlin compiler processes `@Serializable` annotations at compile time.
 
-> [!NOTE]
-> For Gradle users, refer to the [Kotlinx Serialization documentation](https://github.com/Kotlin/kotlinx.serialization?tab=readme-ov-file#gradle) to configure the corresponding Gradle plugin.
+!!! note
+    For Gradle users, refer to the [Kotlinx Serialization documentation](https://github.com/Kotlin/kotlinx.serialization?tab=readme-ov-file#gradle) to configure the corresponding Gradle plugin.
 
 Now, let's create a simple data class annotated with `@Serializable`:
 
@@ -164,8 +164,8 @@ spring.kotlinx.serialization.json.encode-defaults=true
 spring.kotlinx.serialization.json.ignore-unknown-keys=false
 ```
 
-> [!NOTE]
-> All available configuration properties can be found in the [`KotlinxSerializationJsonProperties`](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/kotlinx/serialization/json/autoconfigure/KotlinxSerializationJsonProperties.html) class.
+!!! note
+    All available configuration properties can be found in the [`KotlinxSerializationJsonProperties`](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/kotlinx/serialization/json/autoconfigure/KotlinxSerializationJsonProperties.html) class.
 
 Let's have a look at another example. 
 
@@ -203,8 +203,8 @@ class LocalDateSerializer : KSerializer<LocalDate> {
 
 In this example we define a `Person` data class, the `birthDate` type is `LocalDate`, which is from the Java Date and Time API and not supported by Kotlinx Serialization. Here we create a custom `LocalDateSerializer` to overcome this issue. While `@SerialName` renames a property in the JSON output, `@JsonNames("full_name")` specifies alternative field names to accept during deserialization.
 
-> [!NOTE]
-> Kotlinx Serialization is designed for Kotlin multiplatform, it has built-in support for [Kotlin/kotlinx-datetime](https://github.com/Kotlin/kotlinx-datetime).
+!!! note
+    Kotlinx Serialization is designed for Kotlin multiplatform, it has built-in support for [Kotlin/kotlinx-datetime](https://github.com/Kotlin/kotlinx-datetime).
 
 Create a test to verify `Person` serialization and deserialization:
 

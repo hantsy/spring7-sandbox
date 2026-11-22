@@ -2,8 +2,8 @@
 
 Jackson is the defacto standard for JSON processing in Spring applications. With Spring 7 and Spring Boot 4, Jackson 3 is now the default — it modernizes the codebase for Java 17+ and also brings some breaking changes. Let’s walk through what changed and what you need to do when come to Spring 7 and Spring Boot 4.
 
->[!NOTE]
-> More details about the changes in Jackson 3, refer to the official Jackson 3 [Release Notes](https://github.com/FasterXML/jackson/wiki/Jackson-Release-3.0) and the [Migration Guide](https://github.com/FasterXML/jackson/blob/main/jackson3/MIGRATING_TO_JACKSON_3.md).
+!!! note
+    More details about the changes in Jackson 3, refer to the official Jackson 3 [Release Notes](https://github.com/FasterXML/jackson/wiki/Jackson-Release-3.0) and the [Migration Guide](https://github.com/FasterXML/jackson/blob/main/jackson3/MIGRATING_TO_JACKSON_3.md).
 
 If you're migrating from Spring 6 to Spring 7, you'll probably need to update your Jackson configuration — here's one example of Jackson 2 configuration in Spring 6:
 
@@ -57,8 +57,8 @@ A few notes on the example:
 * Jackson 3 reworks `ObjectMapper` and introduces `JsonMapper` for JSON work. There are also specialized mappers like `YamlMapper` and `XmlMapper` for other formats.
 * Dates and times are serialized as ISO‑8601 strings by default, so you don't need to turn off `WRITE_DATES_AS_TIMESTAMPS`.
 
->[!NOTE]
-> Although Jackson 3 uses `tools.jackson`, it still shares the [`jackson-annotations`](https://github.com/FasterXML/jackson-annotations) module with Jackson 2, which uses the legacy namespace `com.fasterxml.jackson`. It looks odd, but this is intentional for backward compatibility.
+!!! note
+    Although Jackson 3 uses `tools.jackson`, it still shares the [`jackson-annotations`](https://github.com/FasterXML/jackson-annotations) module with Jackson 2, which uses the legacy namespace `com.fasterxml.jackson`. It looks odd, but this is intentional for backward compatibility.
 
 Like the Jackson 2 `Jackson2ObjectMapperBuilderCustomizer` in Spring Boot 3.x, Spring Boot 4 gives you a `JsonMapperBuilderCustomizer` hook to tweak Jackson 3's configuration.
 

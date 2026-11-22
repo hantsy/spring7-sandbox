@@ -118,7 +118,7 @@ Add the following plugin configuration to your `pom.xml`:
 </plugins>
 ```
 
->[!NOTE]
-> For more details about the nullability Maven plugin, check [Making JSpecify/NullAway Easier for Maven Users with the Nullability Maven Plugin](https://ik.am/entries/900/en)
+!!! note
+    For more details about the nullability Maven plugin, check [Making JSpecify/NullAway Easier for Maven Users with the Nullability Maven Plugin](https://ik.am/entries/900/en)
 
 By adopting JSpecify annotations, you gain more predictable Java code and take advantage of advanced tooling in both your IDE and build pipeline. With Spring 7 leading the way, building reliable, null-safe applications is easier than ever, regardless of whether you choose Java or Kotlin.

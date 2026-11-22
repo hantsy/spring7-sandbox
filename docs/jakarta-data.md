@@ -86,8 +86,8 @@ public interface JakartaDataPostRepository {
 
 We add Jakarta Data's `@Repository` to mark the interface as a repository and use Spring's `@Transactional` to enable transaction management. We do not extend any Jakarta Data base interface; instead we use Jakarta Data's lifecycle-aware annotations on the methods.
 
-> [!NOTE]
-> Adding `@Transactional` at the repository interface level binds an active session to the current transaction. Alternatively, in a web application you can enable "Open Session In View" globally to keep the session open for the duration of the request.
+!!! note
+    Adding `@Transactional` at the repository interface level binds an active session to the current transaction. Alternatively, in a web application you can enable "Open Session In View" globally to keep the session open for the duration of the request.
 
 When the interface is compiled, the generated implementation looks like this:
 
@@ -132,8 +132,8 @@ public class JakartaDataPostRepository_ implements JakartaDataPostRepository {
 
 The generated implementation `JakartaDataPostRepository_` is annotated with Spring's `@Component`, so it will be discovered and registered as a bean. The `StatelessSession` is injected via Spring's `ObjectProvider`, which supplies the current active session.
 
-> [!NOTE]
-> Don't forget to add `hibernate-processor` to the compiler's annotation-processor path to enable code generation.
+!!! note
+    Don't forget to add `hibernate-processor` to the compiler's annotation-processor path to enable code generation.
 
 The following test uses Spring Test and Testcontainers to verify the integration:
 

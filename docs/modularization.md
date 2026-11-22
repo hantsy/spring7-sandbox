@@ -1284,8 +1284,8 @@ public class Product {
 }
 ```
 
-> [!WARNING]
-> At the time of writing, the MongoClient API does not support record types.
+!!! warning
+    At the time of writing, the MongoClient API does not support record types.
 
 Implement a `ProductRepository` class that uses `MongoClient` to manipulate documents:
 
@@ -1688,8 +1688,8 @@ Explore the [GitHub repository](https://github.com/hantsy/spring7-sandbox/tree/m
 
 Unfortunately, Spring Boot doesn't provide a dedicated Redis module because it supports multiple client libraries through Spring Data.
 
->[!NOTE]
-> I also added the reactive variants of the above examples in the Github reporitoty: https://github.com/hantsy/spring-reactive-sample/tree/master
+!!! note
+    I also added the reactive variants of the above examples in the Github reporitoty: https://github.com/hantsy/spring-reactive-sample/tree/master
 
 ## Summary
 
