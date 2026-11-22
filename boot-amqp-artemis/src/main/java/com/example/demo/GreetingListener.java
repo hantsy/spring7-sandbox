@@ -16,8 +16,8 @@ public class GreetingListener {
     public List<String> messages = new ArrayList<>();
 
     @AmqpListener(addresses = "/queues/hello")
-    public void onGreeting(String greeting) {
+    public void onGreeting(Greeting greeting) {
         log.debug("received greeting: {} at {}", greeting, LocalDateTime.now());
-        messages.add(greeting);
+        messages.add(greeting.message());
     }
 }

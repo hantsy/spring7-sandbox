@@ -3,14 +3,14 @@
 Spring AMQP 4.0 brings a new module `spring-rabbitmq-client` which is based on the new RabbitMQ official Java client `com.rabbitmq.client:amqp-client`, which is aligned with AMQP 1.0 protocol. When using `spring-rabbitmq-client` in your projects, it is recommended to upgrade to RabbitMQ 4.0 for native AMQP 1.0 support.
 
 >[!NOTE]
-> AMQP 1.0 is not compatible with AMQP 0.91. Version 1.0 is not a simple upgrade from 0.91. The two versions can be considered as two different protocols. RabbitMQ 3.x supports both protocols, but enabling AMQP 1.0 support requires installing an extra plugin `rabbitmq_amqp1_0`. RabbitMQ 4.0 switches to AMQP 1.0 as the default core protocol. The previous Spring RabbitMQ module `spring-rabbit` is still based on the AMQP 0.9.1 protocol, and Spring Boot 4.2 renamed its RabbitMQ (AMQP 0.9) support to `spring-boot-rabbitmq`. The generic `spring-amqp-client` implementing the AMQP 1.0 protocol is on its way, see: [spring-amqp#3271](https://github.com/spring-projects/spring-amqp/issues/3271)
+> AMQP 1.0 is not compatible with AMQP 0.91. Version 1.0 is not a simple upgrade from 0.91. The two versions can be considered as two different protocols. RabbitMQ 3.x supports both protocols, but enabling AMQP 1.0 support requires installing an extra plugin `rabbitmq_amqp1_0`. RabbitMQ 4.0 switches to AMQP 1.0 as the default core protocol. The previous Spring RabbitMQ module `spring-rabbit` is still based on the AMQP 0.9.1 protocol, and Spring Boot 4.2 renamed its RabbitMQ (AMQP 0.9) support to `spring-boot-rabbitmq`. The generic `spring-amqp-client` module implements the AMQP 1.0 protocol for any compliant broker, see: [spring-amqp#3271](https://github.com/spring-projects/spring-amqp/issues/3271)
 
 ## Getting Started
 
 Create a new simple Maven project with the basic `spring-core` and `spring-context` as dependencies, or generate a simple Spring Boot project via https://start.spring.io as [the previous post](https://github.com/hantsy/spring7-sandbox/blob/master/docs/jackson.md).
 
 >[!NOTE]
-> Spring Boot 4.2 ships starters for the AMQP 1.0 support: `spring-boot-starter-amqp` provides generic AMQP 1.0 support, and `spring-boot-starter-amqp-rabbitmq` provides the AMQP 1.0 support tailored for RabbitMQ. A plain Spring project like this one still has to declare the dependency and the configuration manually.
+> Spring Boot 4.2 ships starters for the AMQP 1.0 support: `spring-boot-starter-amqp` provides generic AMQP 1.0 support, and `spring-boot-starter-amqp-rabbitmq` provides the AMQP 1.0 support tailored for RabbitMQ. A plain Spring project like this one still has to declare the dependency and the configuration manually; see [Spring Boot Integration](#spring-boot-integration) for the auto-configured setup.
 
 Then add the following dependency in your `pom.xml` file:
 
@@ -567,3 +567,262 @@ public class RabbitAmqpListenerContainerTest {
 ```
 
 Grab the example code from the [spring7-sandbox/rabbit-client](https://github.com/hantsy/spring7-sandbox/tree/master/rabbit-client) and [spring7-sandbox/rabbit-client-json](https://github.com/hantsy/spring7-sandbox/tree/master/rabbit-client-json) projects on GitHub.
+
+## Spring Boot Integration
+
+The examples above declare the client beans manually. Spring Boot 4.2 auto-configures them through two starters:
+
+* `spring-boot-starter-amqp` builds on `spring-amqp-client`, the generic AMQP 1.0 client that works with any AMQP 1.0-compliant broker, for example ActiveMQ Artemis.
+* `spring-boot-starter-amqp-rabbitmq` builds on `spring-rabbitmq-client`, the RabbitMQ-tailored client used in the previous sections.
+
+### Generic AMQP 1.0 with ActiveMQ Artemis
+
+The `boot-amqp-artemis` example sends and receives messages through an ActiveMQ Artemis broker. Add the following dependencies to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-artemis</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jackson</artifactId>
+</dependency>
+```
+
+The auto-configuration exposes an `AmqpClient` bean for sending messages and processes `@AmqpListener` annotations for consuming. To exchange JSON payloads, declare a `JacksonJsonMessageConverter` bean:
+
+```java
+@Bean
+MessageConverter messageConverter() {
+    return new JacksonJsonMessageConverter();
+}
+```
+
+The message payload is a simple record:
+
+```java
+public record Greeting(String message, Instant sentAt) {
+    public static Greeting of(String message) {
+        return new Greeting(message, Instant.now());
+    }
+}
+```
+
+Declare a listener as follows:
+
+```java
+@Component
+public class GreetingListener {
+    private final static Logger log = LoggerFactory.getLogger(GreetingListener.class.getName());
+
+    public List<String> messages = new ArrayList<>();
+
+    @AmqpListener(addresses = "/queues/hello")
+    public void onGreeting(Greeting greeting) {
+        log.debug("received greeting: {} at {}", greeting, LocalDateTime.now());
+        messages.add(greeting.message());
+    }
+}
+```
+
+The `@AmqpListener` annotation is from the package `org.springframework.amqp.client.annotation`. The `addresses` attribute uses the Artemis AMQP 1.0 address format `/queues/QUEUE_NAME`.
+
+Configure the client in `application.properties`:
+
+```properties
+spring.amqp.client.default-to-address=/queues/hello
+spring.amqp.client.completion-timeout=500ms
+```
+
+The `spring.amqp.client.default-to-address` property sets the destination used by `AmqpClient.sendToDefault`, and `spring.amqp.client.completion-timeout` bounds the asynchronous send operations. The connection itself is configured through `spring.amqp.host`, `spring.amqp.port`, `spring.amqp.username`, and `spring.amqp.password`.
+
+To run against a real broker in tests, add the test dependencies:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp-test</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-artemis-test</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-testcontainers</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>testcontainers-junit-jupiter</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>testcontainers-activemq</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+The `spring-boot-amqp` module provides `@ServiceConnection` support for `ArtemisContainer`, so the container's host and port flow into the auto-configured client:
+
+```java
+@TestConfiguration(proxyBeanMethods = false)
+class TestcontainersConfiguration {
+
+    @Bean
+    @ServiceConnection
+    ArtemisContainer artemisContainer() {
+        return new ArtemisContainer("apache/activemq-artemis:2.30.0-alpine");
+    }
+}
+```
+
+Now create a test to verify sending and receiving messages:
+
+```java
+@Import(TestcontainersConfiguration.class)
+@SpringBootTest
+class DemoApplicationTests {
+
+    @Autowired
+    private AmqpClient amqpClient;
+
+    @Autowired
+    private GreetingListener listener;
+
+    @Test
+    public void testSendMessage() {
+        amqpClient.to("/queues/hello")
+                .body(Greeting.of("Hello AMQP"))
+                .send()
+                .join();
+
+        waitAtMost(Duration.ofMillis(5_000))
+                .untilAsserted(() -> assertThat(this.listener.messages).containsExactly("Hello AMQP"));
+    }
+}
+```
+
+The fluent `to(address).body(payload).send()` API targets an explicit address and converts the payload with the configured `MessageConverter`. The `send` method returns a `CompletableFuture`, so you can `join()` it to wait for the broker acknowledgement. To send to the configured default address instead, use `amqpClient.sendToDefault(message)`.
+
+### RabbitMQ-tailored AMQP 1.0
+
+The `boot-amqp-rabbit` example replaces the manual configuration from [Getting Started](#getting-started) with `spring-boot-starter-amqp-rabbitmq`:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp-rabbitmq</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jackson</artifactId>
+</dependency>
+```
+
+The starter auto-configures the `AmqpConnectionFactory`, `RabbitAmqpAdmin`, `RabbitAmqpTemplate`, and the listener container factory — the same beans declared manually in the plain Spring setup. You still declare the topology and the message converter as beans:
+
+```java
+@SpringBootApplication
+public class DemoApplication {
+
+    public final static String QUEUE_HELLO = "q.hello";
+    public final static String EXCHANGE_HELLO = "x.hello";
+    public final static String ROUTING_HELLO = "r.hello";
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+
+    @Bean
+    Queue helloQueue() {
+        return new Queue(QUEUE_HELLO, true);
+    }
+
+    @Bean
+    DirectExchange helloExchange() {
+        return new DirectExchange(EXCHANGE_HELLO);
+    }
+
+    @Bean
+    Binding helloBinding() {
+        return BindingBuilder.bind(helloQueue()).to(helloExchange()).with(ROUTING_HELLO);
+    }
+
+    @Bean
+    MessageConverter messageConverter() {
+        return new JacksonJsonMessageConverter();
+    }
+}
+```
+
+The message payload is the same `Greeting` record as in the Artemis example. The `JacksonJsonMessageConverter` bean is applied automatically: the listener method accepts the `Greeting` record directly, without setting the `messageConverter` attribute on `@RabbitListener`.
+
+```java
+@Component
+@Slf4j
+public class GreetingListener {
+
+    public List<String> messages = new ArrayList<>();
+
+    @RabbitListener(queues = {DemoApplication.QUEUE_HELLO})
+    public void onGreeting(Greeting greeting) {
+        log.debug("received greeting: {} at {}", greeting, LocalDateTime.now());
+        messages.add(greeting.message());
+    }
+}
+```
+
+For the test, start a RabbitMQ container through `@ServiceConnection`:
+
+```java
+@TestConfiguration(proxyBeanMethods = false)
+class TestcontainersConfiguration {
+
+    @Bean
+    @ServiceConnection
+    RabbitMQContainer rabbitContainer() {
+        return new RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"));
+    }
+}
+```
+
+> [!NOTE]
+> The `rabbitmq:latest` image is RabbitMQ 4.x, which supports AMQP 1.0 by default. The test dependencies are `spring-boot-starter-amqp-rabbitmq-test`, `spring-boot-testcontainers`, `testcontainers-junit-jupiter`, and `testcontainers-rabbitmq`.
+
+Then send a JSON message through the auto-configured `RabbitAmqpTemplate` and verify the listener receives it:
+
+```java
+@Import(TestcontainersConfiguration.class)
+@SpringBootTest
+class DemoApplicationTests {
+
+    @Autowired
+    private RabbitAmqpTemplate amqpTemplate;
+
+    @Autowired
+    private GreetingListener listener;
+
+    @Test
+    public void testSendMessage() {
+        amqpTemplate.convertAndSend(
+                DemoApplication.EXCHANGE_HELLO,
+                DemoApplication.ROUTING_HELLO,
+                Greeting.of("Hello Rabbit")
+        );
+
+        waitAtMost(Duration.ofMillis(5_000))
+                .untilAsserted(() -> assertThat(this.listener.messages).containsExactly("Hello Rabbit"));
+    }
+}
+```
+
+Grab the example code from the [spring7-sandbox/boot-amqp-artemis](https://github.com/hantsy/spring7-sandbox/tree/master/boot-amqp-artemis) and [spring7-sandbox/boot-amqp-rabbit](https://github.com/hantsy/spring7-sandbox/tree/master/boot-amqp-rabbit) projects on GitHub.

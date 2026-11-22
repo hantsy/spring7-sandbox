@@ -24,7 +24,10 @@ class DemoApplicationTests {
 
     @Test
     public void testSendMessage() {
-        amqpClient.sendToDefault(new Message("Hello AMQP".getBytes())).join();
+        amqpClient.to("/queues/hello")
+                .body(Greeting.of("Hello AMQP"))
+                .send()
+                .join();
 
         waitAtMost(Duration.ofMillis(5_000))
                 .untilAsserted(() -> assertThat(this.listener.messages).containsExactly("Hello AMQP"));
